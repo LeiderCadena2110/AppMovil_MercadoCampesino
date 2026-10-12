@@ -7,7 +7,7 @@ const config: CapacitorConfig = {
   server: {
     // Permite llamar a la API por http mientras desarrollas.
     // Quitar cuando la API esté publicada con https.
-    androidScheme: 'https',
+    androidScheme: 'http',
     cleartext: true,
   },
 };
