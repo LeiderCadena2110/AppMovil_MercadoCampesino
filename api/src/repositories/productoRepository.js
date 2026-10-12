@@ -1,0 +1,71 @@
+import { and, eq, gt, ilike, desc, sql } from 'drizzle-orm';
+import { db } from '../db/index.js';
+import { productos, productores, municipios, categorias } from '../db/schema.js';
+
+export const TAMANO_PAGINA = 20;
+
+// Columnas mínimas para la lista: menos datos por la red (RNF-02)
+const columnasLista = {
+  id: productos.id,
+  nombre: productos.nombre,
+  precio: productos.precio,
+  unidad: productos.unidad,
+  stock: productos.stock,
+  fotoUrl: productos.fotoUrl,
+  productorId: productos.productorId,
+  finca: productores.nombreFinca,
+  municipio: municipios.nombre,
+  categoria: categorias.nombre,
+};
+
+export const productoRepository = {
+  async catalogo({ categoria, municipio, q, pagina }) {
+    const filtros = [eq(productos.activo, true), eq(productos.oculto, false), gt(productos.stock, 0)];
+    if (categoria) filtros.push(eq(productos.categoriaId, categoria));
+    if (municipio) filtros.push(eq(productores.municipioId, municipio));
+    if (q) filtros.push(ilike(productos.nombre, `%${q}%`));
+    const donde = and(...filtros);
+
+    const base = db.select(columnasLista).from(productos)
+      .innerJoin(productores, eq(productos.productorId, productores.id))
+      .innerJoin(municipios, eq(productores.municipioId, municipios.id))
+      .innerJoin(categorias, eq(productos.categoriaId, categorias.id))
+      .where(donde);
+
+    const [items, [{ total }]] = await Promise.all([
+      base.orderBy(desc(productos.creadoEn)).limit(TAMANO_PAGINA).offset((pagina - 1) * TAMANO_PAGINA),
+      db.select({ total: sql`count(*)::int` }).from(productos)
+        .innerJoin(productores, eq(productos.productorId, productores.id)).where(donde),
+    ]);
+    return { items, total, pagina, paginas: Math.ceil(total / TAMANO_PAGINA) };
+  },
+
+  detalle: (id) => db.query.productos.findFirst({
+    where: and(eq(productos.id, id), eq(productos.oculto, false)),
+    with: {
+      categoria: true,
+      productor: { with: { municipio: true, usuario: { columns: { nombre: true, telefono: true } } } },
+    },
+  }),
+
+  porId: (id, tx = db) => tx.query.productos.findFirst({ where: eq(productos.id, id) }),
+
+  delProductor: (productorId) => db.query.productos.findMany({
+    where: eq(productos.productorId, productorId),
+    orderBy: desc(productos.creadoEn),
+    with: { categoria: true },
+  }),
+
+  crear: (datos) => db.insert(productos).values(datos).returning().then((r) => r[0]),
+  actualizar: (id, datos, tx = db) => tx.update(productos).set(datos).where(eq(productos.id, id)).returning().then((r) => r[0]),
+  eliminar: (id) => db.delete(productos).where(eq(productos.id, id)),
+
+  // Descuenta stock solo si alcanza (evita vender más de lo que hay)
+  descontarStock: (id, cantidad, tx) => tx.update(productos)
+    .set({ stock: sql`${productos.stock} - ${cantidad}` })
+    .where(and(eq(productos.id, id), sql`${productos.stock} >= ${cantidad}`))
+    .returning({ id: productos.id }),
+
+  devolverStock: (id, cantidad, tx) => tx.update(productos)
+    .set({ stock: sql`${productos.stock} + ${cantidad}` }).where(eq(productos.id, id)),
+};
