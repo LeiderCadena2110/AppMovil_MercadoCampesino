@@ -24,7 +24,8 @@ concurrency:
 
 jobs:
   apk:
-    runs-on: ubuntu-latest
+    # ubuntu-24.04 trae el SDK de Android instalado (ANDROID_HOME)
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: app
@@ -43,7 +44,11 @@ jobs:
           java-version: 21
           cache: gradle
 
-      - uses: android-actions/setup-android@v3
+      - name: Revisar el SDK de Android del runner
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          ls "$ANDROID_HOME/platforms" | tail -3
+          echo "sdk.dir=$ANDROID_HOME" > android/local.properties
 
       - name: Instalar dependencias
         run: npm ci
