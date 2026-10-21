@@ -7,8 +7,9 @@ android {
         applicationId "co.edu.ucc.mercadocampesino"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        // En GitHub Actions: VERSION_CODE = número de ejecución, VERSION_NAME = versión de package.json
+        versionCode (System.getenv("VERSION_CODE") ?: "1").toInteger()
+        versionName System.getenv("VERSION_NAME") ?: "1.1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,8 +17,27 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // Firma del APK de producción. Las claves NUNCA se suben al repositorio:
+    // llegan como variables de entorno (secretos de GitHub) o desde keystore.properties local.
+    def propsFirma = new Properties()
+    def archivoProps = rootProject.file('keystore.properties')
+    if (archivoProps.exists()) archivoProps.withInputStream { propsFirma.load(it) }
+    def valor = { String clave -> System.getenv(clave) ?: propsFirma.getProperty(clave) }
+    def rutaKeystore = valor('KEYSTORE_PATH')
+
+    signingConfigs {
+        release {
+            if (rutaKeystore) {
+                storeFile file(rutaKeystore)
+                storePassword valor('KEYSTORE_PASSWORD')
+                keyAlias valor('KEY_ALIAS')
+                keyPassword valor('KEY_PASSWORD')
+            }
+        }
+    }
     buildTypes {
         release {
+            if (rutaKeystore) signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
