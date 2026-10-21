@@ -8,6 +8,9 @@ import { manejarErrores, noEncontrado } from './middlewares/errores.js';
 
 export const app = express();
 
+// Detrás del proxy de Render/Railway: req.ip es la IP real del usuario
+app.set('trust proxy', 1);
+
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(cors({ origin: env.corsOrigen }));
 app.use(express.json({ limit: '100kb' }));

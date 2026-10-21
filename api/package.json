@@ -1,7 +1,7 @@
 {
   "name": "mercado-campesino-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "API REST de Mercado Campesino Digital",
   "main": "index.js",
   "scripts": {
     "test": "node --test test/*.test.js",
@@ -10,7 +10,9 @@
     "db:generar": "drizzle-kit generate",
     "db:migrar": "drizzle-kit migrate",
     "db:seed": "node scripts/seed.js",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "migrar:prod": "node scripts/migrar.js",
+    "start:prod": "node scripts/migrar.js && node src/server.js"
   },
   "keywords": [],
   "author": "",

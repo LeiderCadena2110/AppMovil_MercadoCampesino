@@ -1,0 +1,34 @@
+# Despliegue de la API en Render (https://render.com) con un clic:
+# Dashboard > New > Blueprint > elige este repositorio.
+# Render pedirá los valores marcados con sync: false (no se guardan en GitHub).
+services:
+  - type: web
+    name: mercado-campesino-api
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: api
+    buildCommand: npm ci --omit=dev
+    # Aplica migraciones pendientes y arranca
+    startCommand: npm run start:prod
+    healthCheckPath: /api/salud
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL       # Neon > Connection string (Pooled connection)
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRA
+        value: 7d
+      - key: CLOUDINARY_URL     # recomendado: el disco de Render se borra al reiniciar
+        sync: false
+      - key: GEMINI_API_KEY     # https://aistudio.google.com/apikey (gratis)
+        sync: false
+      - key: GEMINI_MODELO
+        value: gemini-3.6-flash
+      - key: URL_PUBLICA
+        value: https://mercado-campesino-api.onrender.com
+      - key: CORS_ORIGEN
+        value: "*"
