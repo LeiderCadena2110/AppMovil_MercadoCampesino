@@ -96,13 +96,18 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           chmod +x gradlew
+          TAREA=assembleDebug; CARPETA=debug; ARCHIVO=app-debug.apk
           if [ "${{ steps.firma.outputs.tipo }}" = "release" ]; then
-            ./gradlew assembleRelease --no-daemon
-            cp app/build/outputs/apk/release/app-release.apk "$RUNNER_TEMP/MercadoCampesino.apk"
-          else
-            ./gradlew assembleDebug --no-daemon
-            cp app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/MercadoCampesino.apk"
+            TAREA=assembleRelease; CARPETA=release; ARCHIVO=app-release.apk
           fi
+          set -o pipefail
+          if ! ./gradlew "$TAREA" --no-daemon --stacktrace 2>&1 | tee "$RUNNER_TEMP/gradle.log"; then
+            # Muestra el motivo del fallo como anotación (visible en el resumen de la ejecución)
+            MOTIVO=$(grep -A12 -E "What went wrong|FAILURE:|error:" "$RUNNER_TEMP/gradle.log" | head -40 | sed ':a;N;$!ba;s/%/%25/g;s/\r/%0D/g;s/\n/%0A/g')
+            echo "::error title=Gradle falló::${MOTIVO}"
+            exit 1
+          fi
+          cp "app/build/outputs/apk/$CARPETA/$ARCHIVO" "$RUNNER_TEMP/MercadoCampesino.apk"
           NOMBRE="MercadoCampesino-v${{ steps.version.outputs.nombre }}-${{ github.run_number }}.apk"
           mv "$RUNNER_TEMP/MercadoCampesino.apk" "$GITHUB_WORKSPACE/$NOMBRE"
           echo "APK=$NOMBRE" >> "$GITHUB_ENV"
