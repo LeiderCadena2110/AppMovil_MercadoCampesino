@@ -3,7 +3,7 @@ import { IonIcon, IonImg, IonRippleEffect } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { add, leafOutline, locationOutline } from 'ionicons/icons';
 import { ProductoLista } from '../core/models';
-import { CopPipe } from './formato';
+import { CopPipe } from './format';
 
 @Component({
   selector: 'app-producto-card',

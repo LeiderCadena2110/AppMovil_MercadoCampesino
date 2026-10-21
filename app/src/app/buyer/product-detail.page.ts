@@ -6,11 +6,11 @@ import {
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { addOutline, removeOutline, leafOutline, storefrontOutline, checkmarkCircle, chevronForward } from 'ionicons/icons';
-import { CatalogoService } from '../core/catalogo.service';
-import { CarritoService } from '../core/carrito.service';
-import { AvisosService } from '../core/avisos.service';
+import { CatalogoService } from '../core/catalog.service';
+import { CarritoService } from '../core/cart.service';
+import { AvisosService } from '../core/notifications.service';
 import { Producto } from '../core/models';
-import { CopPipe } from '../shared/formato';
+import { CopPipe } from '../shared/format';
 
 @Component({
   selector: 'app-producto-detalle',

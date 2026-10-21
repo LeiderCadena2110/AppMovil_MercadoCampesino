@@ -5,10 +5,10 @@ import {
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { add, trashOutline, leafOutline } from 'ionicons/icons';
-import { MisProductosService } from '../core/mis-productos.service';
-import { AvisosService } from '../core/avisos.service';
+import { MisProductosService } from '../core/my-products.service';
+import { AvisosService } from '../core/notifications.service';
 import { Producto } from '../core/models';
-import { CopPipe } from '../shared/formato';
+import { CopPipe } from '../shared/format';
 
 @Component({
   selector: 'app-mis-productos',

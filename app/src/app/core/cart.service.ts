@@ -1,5 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { almacen } from './almacen';
+import { almacen } from './storage';
 import { ProductoLista } from './models';
 
 export interface ItemCarrito { producto: ProductoLista; cantidad: number; }

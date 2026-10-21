@@ -6,7 +6,7 @@ import {
   IonInputPasswordToggle, IonSpinner, NavController,
 } from '@ionic/angular';
 import { AuthService } from '../core/auth.service';
-import { AvisosService } from '../core/avisos.service';
+import { AvisosService } from '../core/notifications.service';
 
 @Component({
   selector: 'app-login',

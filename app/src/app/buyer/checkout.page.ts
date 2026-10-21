@@ -4,11 +4,11 @@ import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonList, IonListHeader, IonItem, IonLabel,
   IonTextarea, IonRadioGroup, IonRadio, IonButton, IonFooter, IonNote, IonSpinner, NavController,
 } from '@ionic/angular';
-import { CarritoService } from '../core/carrito.service';
-import { PedidosService } from '../core/pedidos.service';
-import { AvisosService } from '../core/avisos.service';
+import { CarritoService } from '../core/cart.service';
+import { PedidosService } from '../core/orders.service';
+import { AvisosService } from '../core/notifications.service';
 import { MetodoEntrega } from '../core/models';
-import { CopPipe } from '../shared/formato';
+import { CopPipe } from '../shared/format';
 
 @Component({
   selector: 'app-checkout',

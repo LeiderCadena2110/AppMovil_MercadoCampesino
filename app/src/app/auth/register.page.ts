@@ -6,9 +6,9 @@ import {
   IonListHeader, NavController,
 } from '@ionic/angular';
 import { AuthService } from '../core/auth.service';
-import { AvisosService } from '../core/avisos.service';
+import { AvisosService } from '../core/notifications.service';
 import { mensajeError } from '../core/auth.interceptor';
-import { CatalogoService } from '../core/catalogo.service';
+import { CatalogoService } from '../core/catalog.service';
 import { Municipio, Rol } from '../core/models';
 
 @Component({

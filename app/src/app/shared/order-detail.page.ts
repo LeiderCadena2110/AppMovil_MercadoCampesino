@@ -7,10 +7,10 @@ import {
 import { addIcons } from 'ionicons';
 import { star, starOutline, callOutline } from 'ionicons/icons';
 import { AuthService } from '../core/auth.service';
-import { PedidosService } from '../core/pedidos.service';
-import { AvisosService } from '../core/avisos.service';
+import { PedidosService } from '../core/orders.service';
+import { AvisosService } from '../core/notifications.service';
 import { EstadoPedido, Pedido } from '../core/models';
-import { CopPipe, EstadoPipe } from './formato';
+import { CopPipe, EstadoPipe } from './format';
 
 const SIGUIENTE: Partial<Record<EstadoPedido, { estado: EstadoPedido; texto: string }>> = {
   ACEPTADO: { estado: 'LISTO', texto: 'Marcar como listo' },

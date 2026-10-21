@@ -5,7 +5,7 @@ import {
 import { addIcons } from 'ionicons';
 import { personCircleOutline, logOutOutline } from 'ionicons/icons';
 import { AuthService } from '../core/auth.service';
-import { AvisosService } from '../core/avisos.service';
+import { AvisosService } from '../core/notifications.service';
 
 /** Perfil compartido por comprador y productor */
 @Component({

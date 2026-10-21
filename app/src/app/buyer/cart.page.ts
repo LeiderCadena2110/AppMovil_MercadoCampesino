@@ -6,8 +6,8 @@ import {
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { addOutline, removeOutline, trashOutline, cartOutline, leafOutline } from 'ionicons/icons';
-import { CarritoService } from '../core/carrito.service';
-import { CopPipe } from '../shared/formato';
+import { CarritoService } from '../core/cart.service';
+import { CopPipe } from '../shared/format';
 
 @Component({
   selector: 'app-carrito',

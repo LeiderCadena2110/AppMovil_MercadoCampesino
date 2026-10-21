@@ -4,10 +4,10 @@ import {
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { checkmarkCircle, callOutline, locationOutline } from 'ionicons/icons';
-import { CatalogoService } from '../core/catalogo.service';
-import { AvisosService } from '../core/avisos.service';
+import { CatalogoService } from '../core/catalog.service';
+import { AvisosService } from '../core/notifications.service';
 import { ProductoLista, Productor } from '../core/models';
-import { CatalogoListaComponent } from './catalogo-lista.component';
+import { CatalogoListaComponent } from './catalog-list.component';
 
 @Component({
   selector: 'app-productor-perfil',

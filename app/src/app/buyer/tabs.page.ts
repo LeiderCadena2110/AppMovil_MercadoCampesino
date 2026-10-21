@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, IonBadge } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { homeOutline, searchOutline, cartOutline, receiptOutline, personOutline } from 'ionicons/icons';
-import { CarritoService } from '../core/carrito.service';
+import { CarritoService } from '../core/cart.service';
 
 @Component({
   selector: 'app-comprador-tabs',

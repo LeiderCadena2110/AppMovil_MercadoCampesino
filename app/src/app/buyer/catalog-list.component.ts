@@ -1,10 +1,10 @@
 import { Component, inject, input } from '@angular/core';
 import { IonGrid, IonRow, IonCol } from '@ionic/angular';
 import { NavController } from '@ionic/angular';
-import { ProductoCardComponent } from '../shared/producto-card.component';
+import { ProductoCardComponent } from '../shared/product-card.component';
 import { ProductoLista } from '../core/models';
-import { CarritoService } from '../core/carrito.service';
-import { AvisosService } from '../core/avisos.service';
+import { CarritoService } from '../core/cart.service';
+import { AvisosService } from '../core/notifications.service';
 
 /** Cuadrícula de productos reutilizada en Inicio y Buscar */
 @Component({

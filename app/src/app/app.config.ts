@@ -5,7 +5,7 @@ import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/auth.interceptor';
 import { AuthService } from './core/auth.service';
-import { CarritoService } from './core/carrito.service';
+import { CarritoService } from './core/cart.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [

@@ -5,13 +5,13 @@ import {
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { sparkles, arrowUp, add, leafOutline } from 'ionicons/icons';
-import { IaService, MensajeIa } from '../core/ia.service';
-import { CarritoService } from '../core/carrito.service';
-import { AvisosService } from '../core/avisos.service';
+import { IaService, MensajeIa } from '../core/ai.service';
+import { CarritoService } from '../core/cart.service';
+import { AvisosService } from '../core/notifications.service';
 import { mensajeError } from '../core/auth.interceptor';
 import { ProductoLista } from '../core/models';
-import { CopPipe } from '../shared/formato';
-import { almacen } from '../core/almacen';
+import { CopPipe } from '../shared/format';
+import { almacen } from '../core/storage';
 
 const CLAVE = 'chat_campi';
 

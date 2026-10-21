@@ -5,10 +5,10 @@ import {
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { optionsOutline } from 'ionicons/icons';
-import { CatalogoService } from '../core/catalogo.service';
-import { AvisosService } from '../core/avisos.service';
+import { CatalogoService } from '../core/catalog.service';
+import { AvisosService } from '../core/notifications.service';
 import { Categoria, Municipio, ProductoLista } from '../core/models';
-import { CatalogoListaComponent } from './catalogo-lista.component';
+import { CatalogoListaComponent } from './catalog-list.component';
 
 @Component({
   selector: 'app-buscar',

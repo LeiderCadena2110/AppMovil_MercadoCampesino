@@ -8,13 +8,13 @@ import { Capacitor } from '@capacitor/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { addIcons } from 'ionicons';
 import { cameraOutline, sparkles } from 'ionicons/icons';
-import { MisProductosService } from '../core/mis-productos.service';
-import { CatalogoService } from '../core/catalogo.service';
-import { AvisosService } from '../core/avisos.service';
+import { MisProductosService } from '../core/my-products.service';
+import { CatalogoService } from '../core/catalog.service';
+import { AvisosService } from '../core/notifications.service';
 import { Categoria, Municipio, UNIDADES } from '../core/models';
-import { IaService, PrecioSugerido } from '../core/ia.service';
+import { IaService, PrecioSugerido } from '../core/ai.service';
 import { AuthService } from '../core/auth.service';
-import { CopPipe } from '../shared/formato';
+import { CopPipe } from '../shared/format';
 
 @Component({
   selector: 'app-producto-form',

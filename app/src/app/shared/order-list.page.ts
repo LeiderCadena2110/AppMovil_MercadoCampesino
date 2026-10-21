@@ -5,10 +5,10 @@ import {
   IonRefresherContent, IonSegment, IonSegmentButton, NavController, RefresherCustomEvent, ViewWillEnter,
 } from '@ionic/angular';
 import { AuthService } from '../core/auth.service';
-import { PedidosService } from '../core/pedidos.service';
-import { AvisosService } from '../core/avisos.service';
+import { PedidosService } from '../core/orders.service';
+import { AvisosService } from '../core/notifications.service';
 import { Pedido } from '../core/models';
-import { CopPipe, EstadoPipe } from './formato';
+import { CopPipe, EstadoPipe } from './format';
 
 /** Lista de pedidos: el comprador ve los suyos; el productor, los que recibe */
 @Component({

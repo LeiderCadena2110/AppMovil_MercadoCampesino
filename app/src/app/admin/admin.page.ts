@@ -7,7 +7,7 @@ import { addIcons } from 'ionicons';
 import { logOutOutline } from 'ionicons/icons';
 import { AdminService } from '../core/admin.service';
 import { AuthService } from '../core/auth.service';
-import { AvisosService } from '../core/avisos.service';
+import { AvisosService } from '../core/notifications.service';
 import { Productor } from '../core/models';
 
 /** Panel web del administrador (/admin): validar productores y ocultar productos */

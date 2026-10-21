@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { IonApp, IonRouterOutlet, Platform } from '@ionic/angular';
 import { App as CapApp } from '@capacitor/app';
-import { AvisosService } from './core/avisos.service';
+import { AvisosService } from './core/notifications.service';
 
 @Component({
   selector: 'app-root',

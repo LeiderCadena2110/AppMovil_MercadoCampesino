@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { NavController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { almacen } from './almacen';
+import { almacen } from './storage';
 import { Rol, Sesion, Usuario } from './models';
 
 const CLAVE = 'sesion';

@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { almacen } from './almacen';
+import { almacen } from './storage';
 import { Categoria, Municipio, PaginaCatalogo, Producto, Productor } from './models';
 
 export interface FiltrosCatalogo { categoria?: number | null; municipio?: number | null; q?: string; pagina?: number; }

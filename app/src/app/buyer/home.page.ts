@@ -9,11 +9,11 @@ import {
   nutritionOutline, leafOutline, ellipseOutline, appsOutline, waterOutline, cafeOutline, flowerOutline,
   basketOutline, cloudOfflineOutline, sparkles,
 } from 'ionicons/icons';
-import { CatalogoService } from '../core/catalogo.service';
-import { AvisosService } from '../core/avisos.service';
+import { CatalogoService } from '../core/catalog.service';
+import { AvisosService } from '../core/notifications.service';
 import { AuthService } from '../core/auth.service';
 import { Categoria, ProductoLista } from '../core/models';
-import { CatalogoListaComponent } from './catalogo-lista.component';
+import { CatalogoListaComponent } from './catalog-list.component';
 
 @Component({
   selector: 'app-inicio',

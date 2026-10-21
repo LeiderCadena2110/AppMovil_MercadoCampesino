@@ -6,11 +6,11 @@ import {
 import { addIcons } from 'ionicons';
 import { addCircleOutline, alertCircleOutline } from 'ionicons/icons';
 import { AuthService } from '../core/auth.service';
-import { PedidosService } from '../core/pedidos.service';
-import { MisProductosService } from '../core/mis-productos.service';
-import { AvisosService } from '../core/avisos.service';
+import { PedidosService } from '../core/orders.service';
+import { MisProductosService } from '../core/my-products.service';
+import { AvisosService } from '../core/notifications.service';
 import { Pedido, Producto } from '../core/models';
-import { CopPipe, EstadoPipe } from '../shared/formato';
+import { CopPipe, EstadoPipe } from '../shared/format';
 
 @Component({
   selector: 'app-panel',
