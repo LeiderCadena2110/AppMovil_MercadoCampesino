@@ -40,6 +40,26 @@ export const productoRepository = {
     return { items, total, pagina, paginas: Math.ceil(total / TAMANO_PAGINA) };
   },
 
+  // Productos disponibles para que la IA los conozca (máx. 80, los más recientes)
+  paraIa: (limite = 80) => db.select(columnasLista).from(productos)
+    .innerJoin(productores, eq(productos.productorId, productores.id))
+    .innerJoin(municipios, eq(productores.municipioId, municipios.id))
+    .innerJoin(categorias, eq(productos.categoriaId, categorias.id))
+    .where(and(eq(productos.activo, true), eq(productos.oculto, false), gt(productos.stock, 0)))
+    .orderBy(desc(productos.creadoEn)).limit(limite),
+
+  // Precios de productos parecidos (misma unidad; misma categoría o nombre similar) para sugerir precio
+  preciosParecidos: ({ categoriaId, unidad, palabra }) => db
+    .select({ nombre: productos.nombre, precio: productos.precio, categoriaId: productos.categoriaId })
+    .from(productos)
+    .where(and(
+      eq(productos.unidad, unidad),
+      eq(productos.oculto, false),
+      palabra ? sql`(${productos.categoriaId} = ${categoriaId} OR ${productos.nombre} ILIKE ${'%' + palabra + '%'})`
+        : eq(productos.categoriaId, categoriaId),
+    ))
+    .limit(200),
+
   detalle: (id) => db.query.productos.findFirst({
     where: and(eq(productos.id, id), eq(productos.oculto, false)),
     with: {

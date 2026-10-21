@@ -61,3 +61,27 @@ export const calificacionSchema = z.object({
   puntaje: z.coerce.number().int().min(1).max(5),
   comentario: z.string().trim().max(300).optional(),
 });
+
+// Inteligencia artificial
+export const asistenteSchema = z.object({
+  mensaje: z.string().trim().min(1, 'escribe una pregunta').max(500),
+  historial: z.array(z.object({
+    rol: z.enum(['usuario', 'ia']),
+    texto: z.string().max(1500),
+  })).max(12).optional(),
+});
+
+export const descripcionIaSchema = z.object({
+  nombre: z.string().trim().min(2).max(120),
+  categoria: z.string().trim().max(60).optional(),
+  unidad: z.string().trim().max(20),
+  municipio: z.string().trim().max(80).optional(),
+  finca: z.string().trim().max(120).optional(),
+  notas: z.string().trim().max(300).optional(),
+});
+
+export const precioIaSchema = z.object({
+  nombre: z.string().trim().min(2).max(120),
+  categoriaId: z.coerce.number().int().positive(),
+  unidad: z.enum(['kg', 'libra', 'arroba', 'unidad', 'bulto', 'atado', 'litro']),
+});

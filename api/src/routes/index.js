@@ -4,12 +4,15 @@ import { verificarToken, verificarRol } from '../middlewares/auth.js';
 import { validar } from '../middlewares/validar.js';
 import {
   registroSchema, loginSchema, productoSchema, catalogoQuery, pedidoSchema, estadoSchema, calificacionSchema,
+  asistenteSchema, descripcionIaSchema, precioIaSchema,
 } from '../schemas.js';
+import { limitePorUsuario } from '../middlewares/limite.js';
 import { authController } from '../controllers/authController.js';
 import { catalogoController } from '../controllers/catalogoController.js';
 import { misProductosController } from '../controllers/misProductosController.js';
 import { pedidoController } from '../controllers/pedidoController.js';
 import { adminController } from '../controllers/adminController.js';
+import { iaController } from '../controllers/iaController.js';
 
 const subida = multer({
   storage: multer.memoryStorage(),
@@ -49,6 +52,13 @@ r.get('/pedidos', verificarToken, pedidoController.listar);
 r.get('/pedidos/:id', verificarToken, pedidoController.detalle);
 r.patch('/pedidos/:id/estado', ...productor, validar(estadoSchema), pedidoController.estado);
 r.post('/pedidos/:id/calificacion', ...comprador, validar(calificacionSchema), pedidoController.calificar);
+
+// Inteligencia artificial (requiere sesión; máx. 15 consultas por minuto por usuario)
+const limiteIa = limitePorUsuario({ maximo: 15, ventanaMs: 60_000 });
+r.get('/ia/estado', iaController.estado);
+r.post('/ia/asistente', verificarToken, limiteIa, validar(asistenteSchema), iaController.asistente);
+r.post('/ia/descripcion', ...productor, limiteIa, validar(descripcionIaSchema), iaController.descripcion);
+r.post('/ia/precio', ...productor, validar(precioIaSchema), iaController.precio);
 
 // Administración
 r.get('/admin/productores', ...admin, adminController.productores);

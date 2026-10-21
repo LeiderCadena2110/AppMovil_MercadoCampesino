@@ -14,4 +14,7 @@ export const env = {
   cloudinaryUrl: process.env.CLOUDINARY_URL ?? '',
   urlPublica: process.env.URL_PUBLICA ?? `http://localhost:${process.env.PORT ?? 3000}`,
   corsOrigen: process.env.CORS_ORIGEN ?? '*',
+  // IA (opcional). Sin clave, la app usa respuestas locales básicas.
+  geminiApiKey: process.env.GEMINI_API_KEY ?? '',
+  geminiModelo: process.env.GEMINI_MODELO || 'gemini-3.6-flash',
 };
