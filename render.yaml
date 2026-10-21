@@ -6,7 +6,7 @@ services:
     name: minga-app-api
     runtime: node
     plan: free
-    region: oregon
+    region: ohio   # misma zona que la base de Neon (AWS us-east-2)
     rootDir: api
     buildCommand: npm ci --omit=dev
     # Aplica migraciones pendientes y arranca
