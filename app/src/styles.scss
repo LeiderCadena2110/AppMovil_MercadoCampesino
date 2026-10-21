@@ -124,7 +124,7 @@ h1 { font-weight: 800; }
 h2, h3 { font-weight: 600; }
 
 ion-title { font-weight: 800; font-size: 1.15rem; }
-ion-toolbar { --border-width: 0; }
+ion-toolbar { --border-width: 0; --background: var(--mc-nube); --color: var(--mc-tinta); }
 ion-header.header-md { box-shadow: none; }
 
 /* Barra superior verde (pantallas de detalle) */

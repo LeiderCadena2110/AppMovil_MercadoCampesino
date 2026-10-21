@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import {
-  IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonInput, IonButton, IonList, IonItem,
+  IonContent, IonHeader, IonToolbar, IonButtons, IonBackButton, IonInput, IonButton, IonList, IonItem,
   IonInputPasswordToggle, IonSpinner, NavController,
 } from '@ionic/angular';
 import { AuthService } from '../core/auth.service';
@@ -10,7 +10,7 @@ import { AvisosService } from '../core/avisos.service';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, RouterLink, IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton,
+  imports: [ReactiveFormsModule, RouterLink, IonContent, IonHeader, IonToolbar, IonButtons, IonBackButton,
     IonInput, IonButton, IonList, IonItem, IonInputPasswordToggle, IonSpinner],
   template: `
     <ion-header class="ion-no-border"><ion-toolbar>

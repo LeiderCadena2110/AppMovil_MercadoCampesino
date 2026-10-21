@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
-  IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonInput, IonButton, IonList, IonItem,
+  IonContent, IonHeader, IonToolbar, IonButtons, IonBackButton, IonInput, IonButton, IonList, IonItem,
   IonSegment, IonSegmentButton, IonLabel, IonSelect, IonSelectOption, IonTextarea, IonInputPasswordToggle, IonSpinner,
   IonListHeader, NavController,
 } from '@ionic/angular';
@@ -12,7 +12,7 @@ import { Municipio, Rol } from '../core/models';
 
 @Component({
   selector: 'app-registro',
-  imports: [ReactiveFormsModule, IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonInput,
+  imports: [ReactiveFormsModule, IonContent, IonHeader, IonToolbar, IonButtons, IonBackButton, IonInput,
     IonButton, IonList, IonItem, IonSegment, IonSegmentButton, IonLabel, IonSelect, IonSelectOption, IonTextarea,
     IonInputPasswordToggle, IonSpinner, IonListHeader],
   template: `
