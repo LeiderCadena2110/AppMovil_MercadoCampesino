@@ -29,7 +29,7 @@ export interface ProductoLista {
 export interface Producto {
   id: number; productorId: number; categoriaId: number; nombre: string; precio: string;
   unidad: string; stock: number; fotoUrl: string | null; miniaturaUrl?: string | null;
-  activo: boolean; oculto: boolean;
+  activo: boolean; oculto: boolean; descripcion?: string | null;
   categoria?: Categoria; productor?: Productor;
 }
 
