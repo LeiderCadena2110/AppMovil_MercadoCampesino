@@ -32,6 +32,14 @@ import { CatalogoListaComponent } from './catalogo-lista.component';
       <div class="cabecera">
         <ion-searchbar class="mc-buscador" placeholder="Papa, queso, café..." [debounce]="0"
           (click)="irABuscar()" (ionFocus)="irABuscar()" readonly />
+
+        <button class="asistente" type="button" (click)="abrirAsistente()">
+          <ion-icon name="sparkles" aria-hidden="true" />
+          <span>
+            <strong>Pregúntale a Campi</strong>
+            <small>Te ayuda a armar el mercado o una receta con lo que hay hoy</small>
+          </span>
+        </button>
       </div>
 
       @if (sinConexion()) {

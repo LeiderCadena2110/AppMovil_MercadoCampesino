@@ -32,6 +32,7 @@ export const routes: Routes = [
       },
       { path: 'producto/:id', loadComponent: () => import('./comprador/producto-detalle.page').then((m) => m.ProductoDetallePage) },
       { path: 'productor/:id', loadComponent: () => import('./comprador/productor-perfil.page').then((m) => m.ProductorPerfilPage) },
+      { path: 'asistente', loadComponent: () => import('./comprador/asistente.page').then((m) => m.AsistentePage) },
       { path: 'checkout', loadComponent: () => import('./comprador/checkout.page').then((m) => m.CheckoutPage) },
       { path: 'pedido/:id', loadComponent: pedidoDetalle },
       { path: '', pathMatch: 'full', redirectTo: 'tabs/inicio' },
