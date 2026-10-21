@@ -7,7 +7,9 @@ try {
   await migrate(db, { migrationsFolder: './drizzle' });
   console.log('Migraciones al día.');
 } catch (e) {
+  // El motivo real (contraseña, SSL, permisos...) viene en e.cause
   console.error('No se pudieron aplicar las migraciones:', e.message);
+  if (e.cause) console.error('Motivo:', e.cause.message ?? e.cause, e.cause.code ? `(código ${e.cause.code})` : '');
   process.exitCode = 1;
 } finally {
   await pool.end();
