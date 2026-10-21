@@ -16,19 +16,20 @@ import { Municipio, Rol } from '../core/models';
     IonButton, IonList, IonItem, IonSegment, IonSegmentButton, IonLabel, IonSelect, IonSelectOption, IonTextarea,
     IonInputPasswordToggle, IonSpinner, IonListHeader],
   template: `
-    <ion-header><ion-toolbar color="primary">
-      <ion-buttons slot="start"><ion-back-button defaultHref="/bienvenida" /></ion-buttons>
-      <ion-title>Crear cuenta</ion-title>
+    <ion-header class="ion-no-border"><ion-toolbar>
+      <ion-buttons slot="start"><ion-back-button defaultHref="/bienvenida" text="" /></ion-buttons>
     </ion-toolbar></ion-header>
     <ion-content class="ion-padding">
-      <p>¿Cómo vas a usar la app?</p>
-      <ion-segment [value]="rol()" (ionChange)="cambiarRol($event.detail.value)">
+      <h1 class="titulo">Crea tu cuenta</h1>
+      <div class="mc-tejido"></div>
+      <p class="sub">¿Cómo vas a usar la app?</p>
+      <ion-segment class="roles" [value]="rol()" (ionChange)="cambiarRol($event.detail.value)">
         <ion-segment-button value="COMPRADOR"><ion-label>Quiero comprar</ion-label></ion-segment-button>
         <ion-segment-button value="PRODUCTOR"><ion-label>Soy productor</ion-label></ion-segment-button>
       </ion-segment>
 
       <form [formGroup]="form" (ngSubmit)="crear()">
-        <ion-list lines="full">
+        <ion-list lines="full" class="caja">
           <ion-item><ion-input label="Nombre completo" labelPlacement="stacked" formControlName="nombre" /></ion-item>
           <ion-item><ion-input label="Correo" labelPlacement="stacked" type="email" formControlName="email" /></ion-item>
           <ion-item><ion-input label="Celular" labelPlacement="stacked" type="tel" formControlName="telefono" /></ion-item>
@@ -40,7 +41,7 @@ import { Municipio, Rol } from '../core/models';
         </ion-list>
 
         @if (rol() === 'PRODUCTOR') {
-          <ion-list lines="full">
+          <ion-list lines="full" class="caja">
             <ion-list-header>Tu finca</ion-list-header>
             <ion-item><ion-input label="Nombre de la finca" labelPlacement="stacked" formControlName="nombreFinca" /></ion-item>
             <ion-item>
@@ -57,6 +58,14 @@ import { Municipio, Rol } from '../core/models';
         </ion-button>
       </form>
     </ion-content>
+  `,
+  styles: `
+    .titulo { font-size: 1.9rem; line-height: 1.05; margin: 4px 0 14px; }
+    .mc-tejido { width: 96px; }
+    .sub { color: var(--mc-barro); margin: 14px 0 10px; }
+    .roles { margin-bottom: 18px; }
+    .caja { border-radius: var(--mc-radio); border: 1px solid var(--mc-borde); padding: 0; margin-bottom: 14px; }
+    ion-list-header { font-family: var(--mc-titulos); font-size: 1.05rem; }
   `,
 })
 export class RegistroPage implements OnInit {

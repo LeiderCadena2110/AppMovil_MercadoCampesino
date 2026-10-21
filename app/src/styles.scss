@@ -166,3 +166,19 @@ ion-toast { --border-radius: var(--mc-radio); font-weight: 700; }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
+
+/* Selector de opciones (segment) tipo píldora, sin mayúsculas */
+ion-segment {
+  --background: var(--mc-superficie);
+  border: 1px solid var(--mc-borde); border-radius: var(--mc-radio); padding: 4px;
+}
+ion-segment-button {
+  text-transform: none; letter-spacing: 0; font-weight: 700; font-size: 0.95rem; min-height: 46px;
+  --indicator-height: 0; --color: var(--ion-color-medium); --color-checked: #fff;
+  border-radius: var(--mc-radio-chico);
+}
+ion-segment-button.segment-button-checked { background: var(--mc-paramo); }
+@media (prefers-color-scheme: dark) {
+  ion-segment-button { --color-checked: #0d2614; }
+  ion-segment-button.segment-button-checked { background: #8fd19e; }
+}

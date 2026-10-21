@@ -13,13 +13,15 @@ import { AvisosService } from '../core/avisos.service';
   imports: [ReactiveFormsModule, RouterLink, IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton,
     IonInput, IonButton, IonList, IonItem, IonInputPasswordToggle, IonSpinner],
   template: `
-    <ion-header><ion-toolbar color="primary">
-      <ion-buttons slot="start"><ion-back-button defaultHref="/bienvenida" /></ion-buttons>
-      <ion-title>Iniciar sesión</ion-title>
+    <ion-header class="ion-no-border"><ion-toolbar>
+      <ion-buttons slot="start"><ion-back-button defaultHref="/bienvenida" text="" /></ion-buttons>
     </ion-toolbar></ion-header>
     <ion-content class="ion-padding">
+      <h1 class="titulo">Qué bueno verte de nuevo</h1>
+      <div class="mc-tejido"></div>
+      <p class="sub">Entra con el correo y la contraseña de tu cuenta.</p>
       <form [formGroup]="form" (ngSubmit)="entrar()">
-        <ion-list lines="full">
+        <ion-list lines="full" class="caja">
           <ion-item><ion-input label="Correo" labelPlacement="stacked" type="email" formControlName="email" autocomplete="email" /></ion-item>
           <ion-item>
             <ion-input label="Contraseña" labelPlacement="stacked" type="password" formControlName="password">
@@ -33,6 +35,12 @@ import { AvisosService } from '../core/avisos.service';
         <ion-button expand="block" fill="clear" routerLink="/registro">¿No tienes cuenta? Regístrate</ion-button>
       </form>
     </ion-content>
+  `,
+  styles: `
+    .titulo { font-size: 1.9rem; line-height: 1.05; margin: 4px 0 14px; max-width: 14ch; }
+    .mc-tejido { width: 96px; }
+    .sub { color: var(--mc-barro); margin: 14px 0 22px; }
+    .caja { border-radius: var(--mc-radio); border: 1px solid var(--mc-borde); padding: 0; }
   `,
 })
 export class LoginPage {
