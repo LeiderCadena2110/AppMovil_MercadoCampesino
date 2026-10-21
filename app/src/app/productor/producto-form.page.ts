@@ -7,16 +7,19 @@ import {
 import { Capacitor } from '@capacitor/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { addIcons } from 'ionicons';
-import { cameraOutline } from 'ionicons/icons';
+import { cameraOutline, sparkles } from 'ionicons/icons';
 import { MisProductosService } from '../core/mis-productos.service';
 import { CatalogoService } from '../core/catalogo.service';
 import { AvisosService } from '../core/avisos.service';
-import { Categoria, UNIDADES } from '../core/models';
+import { Categoria, Municipio, UNIDADES } from '../core/models';
+import { IaService, PrecioSugerido } from '../core/ia.service';
+import { AuthService } from '../core/auth.service';
+import { CopPipe } from '../shared/formato';
 
 @Component({
   selector: 'app-producto-form',
   imports: [ReactiveFormsModule, IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonList, IonItem,
-    IonInput, IonTextarea, IonSelect, IonSelectOption, IonToggle, IonButton, IonIcon, IonImg, IonFooter, IonSpinner],
+    IonInput, IonTextarea, IonSelect, IonSelectOption, IonToggle, IonButton, IonIcon, IonImg, IonFooter, IonSpinner, CopPipe],
   template: `
     <ion-header><ion-toolbar color="primary">
       <ion-buttons slot="start"><ion-back-button defaultHref="/productor/tabs/productos" text="" /></ion-buttons>
@@ -44,10 +47,33 @@ import { Categoria, UNIDADES } from '../core/models';
               @for (u of unidades; track u) { <ion-select-option [value]="u">{{ u }}</ion-select-option> }
             </ion-select>
           </ion-item>
+          <ion-item lines="none" class="ayuda-ia">
+            <div class="ia">
+              <button type="button" class="ia-boton" (click)="sugerirPrecio()" [disabled]="!puedeSugerir() || sugiriendo()">
+                @if (sugiriendo()) { <ion-spinner name="dots" /> } @else { <ion-icon name="sparkles" /> }
+                Sugerir precio
+              </button>
+              @if (sugerencia(); as s) {
+                <p>{{ s.explicacion }}</p>
+                @if (s.sugerido) {
+                  <button type="button" class="usar" (click)="form.controls.precio.setValue(s.sugerido)">Usar {{ s.sugerido | cop }}</button>
+                }
+              }
+            </div>
+          </ion-item>
           <ion-item><ion-input label="Cantidad disponible" labelPlacement="stacked" type="number" inputmode="numeric" formControlName="stock" /></ion-item>
           <ion-item>
             <ion-textarea label="Descripción (opcional)" labelPlacement="stacked" formControlName="descripcion" [autoGrow]="true"
               [counter]="true" maxlength="600" placeholder="Cómo se cultiva, para qué sirve, cuándo se cosechó..." />
+          </ion-item>
+          <ion-item lines="none" class="ayuda-ia">
+            <div class="ia">
+              <button type="button" class="ia-boton" (click)="escribirDescripcion()" [disabled]="form.controls.nombre.invalid || escribiendo()">
+                @if (escribiendo()) { <ion-spinner name="dots" /> } @else { <ion-icon name="sparkles" /> }
+                {{ form.controls.descripcion.value ? 'Mejorar con IA' : 'Escribir con IA' }}
+              </button>
+              <p>La IA usa el nombre, la categoría, tu finca y lo que escribas arriba. Revísala antes de guardar.</p>
+            </div>
           </ion-item>
           <ion-item><ion-toggle formControlName="activo">Visible para compradores</ion-toggle></ion-item>
         </ion-list>
@@ -60,10 +86,19 @@ import { Categoria, UNIDADES } from '../core/models';
     </ion-footer>
   `,
   styles: `
-    .foto { height: 200px; background: var(--ion-color-light); cursor: pointer; }
+    .foto { height: 200px; background: color-mix(in srgb, var(--ion-color-primary) 9%, var(--mc-superficie)); cursor: pointer; }
     .foto ion-img { height: 200px; object-fit: cover; }
     .vacia { height: 100%; display: grid; place-content: center; text-align: center; color: var(--ion-color-medium); }
     .vacia ion-icon { font-size: 48px; justify-self: center; }
+    .ayuda-ia { --background: transparent; }
+    .ia { width: 100%; padding: 4px 0 10px; }
+    .ia p { margin: 8px 0 0; font-size: 0.85rem; color: var(--mc-barro); line-height: 1.4; }
+    .ia-boton { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border-radius: 999px; border: 0;
+      background: var(--mc-paramo); color: #fff; font: inherit; font-weight: 700; font-size: 0.9rem; }
+    .ia-boton ion-icon { color: var(--mc-maiz); }
+    .ia-boton:disabled { opacity: 0.45; }
+    .usar { margin-top: 8px; padding: 8px 14px; border-radius: 999px; border: 0; background: var(--mc-maiz); color: #1f2a12;
+      font: inherit; font-weight: 700; font-size: 0.9rem; }
   `,
 })
 export class ProductoFormPage implements OnInit {
@@ -77,6 +112,12 @@ export class ProductoFormPage implements OnInit {
   vistaPrevia = signal<string | null>(null);
   guardando = signal(false);
   private fotoNueva: Blob | null = null;
+  private ia = inject(IaService);
+  private productor = inject(AuthService).usuario()?.productor;
+  private municipios: Municipio[] = [];
+  escribiendo = signal(false);
+  sugiriendo = signal(false);
+  sugerencia = signal<PrecioSugerido | null>(null);
 
   form = inject(FormBuilder).nonNullable.group({
     nombre: ['', [Validators.required, Validators.minLength(2)]],
@@ -89,12 +130,13 @@ export class ProductoFormPage implements OnInit {
   });
 
   constructor() {
-    addIcons({ cameraOutline });
+    addIcons({ cameraOutline, sparkles });
   }
 
   async ngOnInit() {
     try {
       this.categorias.set(await this.catalogo.categorias());
+      this.catalogo.municipios().then((m) => (this.municipios = m)).catch(() => undefined);
       if (this.id()) {
         const p = (await this.srv.listar()).find((x) => x.id === +this.id()!);
         if (p) {
@@ -104,6 +146,46 @@ export class ProductoFormPage implements OnInit {
       }
     } catch (e) {
       this.avisos.error(e);
+    }
+  }
+
+  puedeSugerir() {
+    const f = this.form.controls;
+    return f.nombre.valid && f.categoriaId.valid && !!f.unidad.value;
+  }
+
+  /** Pide a la IA que redacte (o mejore) la descripción */
+  async escribirDescripcion() {
+    const f = this.form.getRawValue();
+    this.escribiendo.set(true);
+    try {
+      const r = await this.ia.descripcion({
+        nombre: f.nombre,
+        unidad: f.unidad,
+        categoria: this.categorias().find((c) => c.id === f.categoriaId)?.nombre,
+        finca: this.productor?.nombreFinca,
+        municipio: this.municipios.find((m) => m.id === this.productor?.municipioId)?.nombre,
+        notas: f.descripcion || undefined,
+      });
+      this.form.controls.descripcion.setValue(r.descripcion);
+      this.form.controls.descripcion.markAsDirty();
+    } catch (e) {
+      this.avisos.error(e);
+    } finally {
+      this.escribiendo.set(false);
+    }
+  }
+
+  /** Precio sugerido según productos parecidos publicados en la app */
+  async sugerirPrecio() {
+    const f = this.form.getRawValue();
+    this.sugiriendo.set(true);
+    try {
+      this.sugerencia.set(await this.ia.precio({ nombre: f.nombre, categoriaId: f.categoriaId, unidad: f.unidad }));
+    } catch (e) {
+      this.avisos.error(e);
+    } finally {
+      this.sugiriendo.set(false);
     }
   }
 
