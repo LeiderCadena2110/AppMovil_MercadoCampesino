@@ -37,7 +37,7 @@ import { CopPipe } from './formato';
       position: relative; overflow: hidden; margin: 6px; cursor: pointer;
       background: var(--mc-superficie); border: 1px solid var(--mc-borde); border-radius: var(--mc-radio);
     }
-    .foto { position: relative; aspect-ratio: 4 / 3; background: var(--ion-color-light); }
+    .foto { position: relative; aspect-ratio: 4 / 3; background: color-mix(in srgb, var(--ion-color-primary) 9%, var(--mc-superficie)); }
     .foto ion-img { width: 100%; height: 100%; object-fit: cover; }
     .sin-foto { height: 100%; display: grid; place-items: center; font-size: 40px; color: var(--ion-color-primary); }
     .pocas {
