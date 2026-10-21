@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Producto } from './models';
 
-export interface ProductoForm { nombre: string; categoriaId: number; precio: number; unidad: string; stock: number; activo?: boolean; }
+export interface ProductoForm { nombre: string; categoriaId: number; precio: number; unidad: string; stock: number; activo?: boolean; descripcion?: string; }
 
 @Injectable({ providedIn: 'root' })
 export class MisProductosService {

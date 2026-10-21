@@ -46,6 +46,7 @@ export const productos = pgTable('productos', {
   nombre: varchar('nombre', { length: 120 }).notNull(),
   precio: numeric('precio', { precision: 12, scale: 2 }).notNull(),
   unidad: varchar('unidad', { length: 20 }).notNull(), // kg, libra, arroba, unidad, bulto
+  descripcion: text('descripcion'), // la puede redactar el productor o la IA
   stock: integer('stock').notNull(),
   fotoUrl: text('foto_url'),
   activo: boolean('activo').notNull().default(true),

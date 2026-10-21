@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, input, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
-  IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonList, IonItem, IonInput, IonSelect,
+  IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonList, IonItem, IonInput, IonTextarea, IonSelect,
   IonSelectOption, IonToggle, IonButton, IonIcon, IonImg, IonFooter, IonSpinner, NavController,
 } from '@ionic/angular';
 import { Capacitor } from '@capacitor/core';
@@ -16,7 +16,7 @@ import { Categoria, UNIDADES } from '../core/models';
 @Component({
   selector: 'app-producto-form',
   imports: [ReactiveFormsModule, IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonList, IonItem,
-    IonInput, IonSelect, IonSelectOption, IonToggle, IonButton, IonIcon, IonImg, IonFooter, IonSpinner],
+    IonInput, IonTextarea, IonSelect, IonSelectOption, IonToggle, IonButton, IonIcon, IonImg, IonFooter, IonSpinner],
   template: `
     <ion-header><ion-toolbar color="primary">
       <ion-buttons slot="start"><ion-back-button defaultHref="/productor/tabs/productos" text="" /></ion-buttons>
@@ -45,6 +45,10 @@ import { Categoria, UNIDADES } from '../core/models';
             </ion-select>
           </ion-item>
           <ion-item><ion-input label="Cantidad disponible" labelPlacement="stacked" type="number" inputmode="numeric" formControlName="stock" /></ion-item>
+          <ion-item>
+            <ion-textarea label="Descripción (opcional)" labelPlacement="stacked" formControlName="descripcion" [autoGrow]="true"
+              [counter]="true" maxlength="600" placeholder="Cómo se cultiva, para qué sirve, cuándo se cosechó..." />
+          </ion-item>
           <ion-item><ion-toggle formControlName="activo">Visible para compradores</ion-toggle></ion-item>
         </ion-list>
       </form>
@@ -80,6 +84,7 @@ export class ProductoFormPage implements OnInit {
     precio: [0, [Validators.required, Validators.min(1)]],
     unidad: ['kg', Validators.required],
     stock: [0, [Validators.required, Validators.min(0)]],
+    descripcion: ['', Validators.maxLength(600)],
     activo: [true],
   });
 
@@ -93,7 +98,7 @@ export class ProductoFormPage implements OnInit {
       if (this.id()) {
         const p = (await this.srv.listar()).find((x) => x.id === +this.id()!);
         if (p) {
-          this.form.patchValue({ ...p, precio: Number(p.precio) });
+          this.form.patchValue({ ...p, precio: Number(p.precio), descripcion: p.descripcion ?? '' });
           this.vistaPrevia.set(p.fotoUrl);
         }
       }

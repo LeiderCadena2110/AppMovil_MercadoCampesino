@@ -33,6 +33,7 @@ export const productoSchema = z.object({
   precio: z.coerce.number().positive().max(100_000_000),
   unidad: z.enum(['kg', 'libra', 'arroba', 'unidad', 'bulto', 'atado', 'litro']),
   stock: z.coerce.number().int().min(0),
+  descripcion: z.string().trim().max(600).optional(),
   activo: z.boolean().optional(),
 });
 
