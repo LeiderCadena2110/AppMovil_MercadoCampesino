@@ -9,7 +9,8 @@
     "test": "ng test",
     "android": "ng build --configuration development && npx cap sync android && npx cap open android",
     "sincronizar": "ng build --configuration development && npx cap sync android",
-    "android:prod": "ng build && npx cap sync android"
+    "android:prod": "ng build && npx cap sync android",
+    "iconos": "capacitor-assets generate --android --iconBackgroundColor '#1f4d2b' --splashBackgroundColor '#1f4d2b'"
   },
   "private": true,
   "packageManager": "npm@10.9.4",
@@ -38,6 +39,7 @@
     "@angular/build": "^21.2.26",
     "@angular/cli": "^21.2.26",
     "@angular/compiler-cli": "^21.2.0",
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^8.5.3",
     "prettier": "^3.8.1",
     "typescript": "~5.9.2"
