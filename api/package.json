@@ -12,7 +12,7 @@
     "db:seed": "node scripts/seed.js",
     "db:studio": "drizzle-kit studio",
     "migrar:prod": "node scripts/migrar.js",
-    "start:prod": "node scripts/migrar.js && node src/server.js"
+    "start:prod": "node scripts/migrar.js && node scripts/seed.js --solo-base && node src/server.js"
   },
   "keywords": [],
   "author": "",

@@ -13,6 +13,12 @@ async function main() {
   await db.insert(municipios).values(MUNICIPIOS.map((nombre) => ({ nombre }))).onConflictDoNothing();
   await db.insert(categorias).values(CATEGORIAS.map(([nombre, icono]) => ({ nombre, icono }))).onConflictDoNothing();
 
+  // En producción (Render) solo se cargan municipios y categorías, salvo que SEED_DEMO=true
+  if (process.argv.includes('--solo-base') && process.env.SEED_DEMO !== 'true') {
+    console.log('Municipios y categorías al día.');
+    return;
+  }
+
   const ms = await db.select().from(municipios);
   const cs = await db.select().from(categorias);
   const m = (n) => ms.find((x) => x.nombre === n).id;
