@@ -119,26 +119,41 @@ Una sola vez: **Settings › Pages › Source: GitHub Actions**. Después cada p
 
 ## Estructura
 
-```
-api/src/
-├── config/        variables de entorno
-├── db/            schema.js (modelo de datos) e index.js (conexión)
-├── routes/        rutas de la API
-├── controllers/   reciben la petición y responden
-├── services/      reglas de negocio (stock, estados del pedido, IA)
-├── ia/            cliente de Google Gemini
-├── repositories/  consultas a la base con Drizzle
-├── storage/       AlmacenamientoImagenes → CloudinaryStorage / LocalStorage
-└── middlewares/   verificarToken, verificarRol, validar, manejarErrores
+Carpetas y archivos con nombres en inglés; los textos de la app están en español.
 
-app/src/app/
-├── core/          servicios, guards, interceptor, modelos
-├── shared/        tarjeta de producto, pedidos (lista y detalle), formatos
-├── auth/          bienvenida, login, registro
-├── comprador/     pestañas: inicio, buscar, carrito, pedidos, perfil; asistente Campi
-├── productor/     pestañas: panel, productos, pedidos, perfil
-├── perfil/        perfil compartido
-└── admin/         panel web /admin
+```
+api/
+├── drizzle/            migraciones SQL (0000_initial, 0001_product_description)
+├── scripts/            migrate.js (migraciones en producción), seed.js (datos iniciales)
+├── test/               flow.test.js (flujo completo), ai.test.js (IA)
+└── src/
+    ├── app.js · server.js
+    ├── config/         env.js: variables de entorno
+    ├── db/             schema.js (modelo de datos) e index.js (conexión)
+    ├── routes/         index.js: rutas de la API
+    ├── controllers/    auth, catalog, myProducts, order, admin, ai
+    ├── services/       reglas de negocio: auth, product, order, admin, ai
+    ├── repositories/   consultas con Drizzle: product, order, user
+    ├── ai/             gemini.js: cliente de Google Gemini
+    ├── storage/        ImageStorage → CloudinaryStorage / LocalStorage
+    └── middlewares/    auth, validate, rateLimit, errors
+
+app/
+├── assets/             ícono y splash (icon.svg, background.svg, foreground.svg)
+├── android/            proyecto nativo de Capacitor
+└── src/
+    ├── environments/   environment.ts (emulador) y environment.prod.ts (Render)
+    ├── styles.scss     tema visual
+    └── app/
+        ├── core/       servicios (auth, catalog, cart, orders, my-products, ai,
+        │               notifications, storage), guards, interceptor y modelos
+        ├── shared/     product-card, order-list, order-detail, format
+        ├── auth/       welcome, login, register
+        ├── buyer/      tabs: home, search, cart, orders, profile; assistant (Campi),
+        │               product-detail, producer-profile, checkout
+        ├── producer/   tabs: dashboard, my-products; product-form
+        ├── profile/    perfil compartido
+        └── admin/      panel web /admin
 ```
 
 ## Pendiente para la siguiente iteración
