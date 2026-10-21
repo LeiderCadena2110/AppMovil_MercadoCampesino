@@ -6,26 +6,163 @@
 @import '@ionic/angular/css/padding.css';
 @import '@ionic/angular/css/flex-utils.css';
 @import '@ionic/angular/css/display.css';
+@import '@ionic/angular/css/palettes/dark.system.css';
 
-/* Colores de la marca: verde campo y tierra */
+/* Tipografías empaquetadas con la app (funcionan sin internet):
+   - Bricolage Grotesque: títulos con carácter, cálida y cercana.
+   - Atkinson Hyperlegible: cuerpo de texto diseñado para leerse fácil,
+     pensado para usuarios con poca experiencia digital o baja visión (RNF-06). */
+@import '@fontsource/bricolage-grotesque/600.css';
+@import '@fontsource/bricolage-grotesque/800.css';
+@import '@fontsource/atkinson-hyperlegible/400.css';
+@import '@fontsource/atkinson-hyperlegible/700.css';
+
+/* ---------------------------------------------------------------
+   Paleta "Páramo": verde de montaña, maíz, barro y nube de Nariño
+   --------------------------------------------------------------- */
 :root {
-  --ion-color-primary: #2e7d32;
-  --ion-color-primary-rgb: 46, 125, 50;
+  --mc-paramo: #1f4d2b;     /* verde páramo: color principal */
+  --mc-paramo-claro: #2f6b3d;
+  --mc-maiz: #e8b43a;       /* amarillo maíz: acciones de compra */
+  --mc-barro: #6b3f2a;      /* tierra: textos secundarios cálidos */
+  --mc-nube: #f4f6f1;       /* fondo frío, como la neblina del páramo */
+  --mc-tinta: #18221b;      /* texto principal */
+  --mc-borde: #dfe4da;
+  --mc-superficie: #ffffff;
+
+  --mc-radio-grande: 22px;
+  --mc-radio: 14px;
+  --mc-radio-chico: 10px;
+
+  --ion-color-primary: #1f4d2b;
+  --ion-color-primary-rgb: 31, 77, 43;
   --ion-color-primary-contrast: #ffffff;
   --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #286e2c;
-  --ion-color-primary-tint: #438a47;
+  --ion-color-primary-shade: #1b4426;
+  --ion-color-primary-tint: #355f40;
 
-  --ion-color-secondary: #8d6e63;
-  --ion-color-secondary-rgb: 141, 110, 99;
+  --ion-color-secondary: #6b3f2a;
+  --ion-color-secondary-rgb: 107, 63, 42;
   --ion-color-secondary-contrast: #ffffff;
   --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: #7c6157;
-  --ion-color-secondary-tint: #987d73;
+  --ion-color-secondary-shade: #5e3725;
+  --ion-color-secondary-tint: #7a523f;
 
-  --ion-font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --ion-color-tertiary: #e8b43a;
+  --ion-color-tertiary-rgb: 232, 180, 58;
+  --ion-color-tertiary-contrast: #1f2a12;
+  --ion-color-tertiary-contrast-rgb: 31, 42, 18;
+  --ion-color-tertiary-shade: #cc9e33;
+  --ion-color-tertiary-tint: #eabc4e;
+
+  --ion-color-success: #2e7d32;
+  --ion-color-danger: #b3261e;
+
+  --ion-background-color: var(--mc-nube);
+  --ion-background-color-rgb: 244, 246, 241;
+  --ion-text-color: var(--mc-tinta);
+  --ion-text-color-rgb: 24, 34, 27;
+  --ion-toolbar-background: var(--mc-nube);
+  --ion-toolbar-color: var(--mc-tinta);
+  --ion-tab-bar-background: var(--mc-superficie);
+  --ion-tab-bar-color-selected: var(--mc-paramo);
+  --ion-item-background: var(--mc-superficie);
+  --ion-card-background: var(--mc-superficie);
+  --ion-border-color: var(--mc-borde);
+
+  --ion-font-family: 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mc-titulos: 'Bricolage Grotesque', 'Atkinson Hyperlegible', system-ui, sans-serif;
+
+  /* El tejido: franja inspirada en las ruanas y los chumbes de Nariño.
+     Es el único adorno de la marca; aparece en la bienvenida y bajo los títulos. */
+  --mc-tejido: repeating-linear-gradient(
+    90deg,
+    var(--mc-paramo) 0 14px,
+    var(--mc-maiz) 14px 20px,
+    var(--mc-barro) 20px 28px,
+    var(--mc-maiz) 28px 34px,
+    var(--mc-paramo-claro) 34px 48px
+  );
+}
+
+/* Modo oscuro: sigue el ajuste del teléfono */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --mc-nube: #101712;
+    --mc-tinta: #e7ece5;
+    --mc-borde: #2a352d;
+    --mc-superficie: #18211b;
+    --mc-barro: #d9a98f;
+
+    --ion-color-primary: #8fd19e;
+    --ion-color-primary-rgb: 143, 209, 158;
+    --ion-color-primary-contrast: #0d2614;
+    --ion-color-primary-contrast-rgb: 13, 38, 20;
+    --ion-color-primary-shade: #7eb88b;
+    --ion-color-primary-tint: #9ad6a8;
+
+    --ion-background-color: var(--mc-nube);
+    --ion-background-color-rgb: 16, 23, 18;
+    --ion-text-color: var(--mc-tinta);
+    --ion-text-color-rgb: 231, 236, 229;
+    --ion-toolbar-background: var(--mc-nube);
+    --ion-tab-bar-background: var(--mc-superficie);
+    --ion-tab-bar-color-selected: #8fd19e;
+    --ion-item-background: var(--mc-superficie);
+    --ion-card-background: var(--mc-superficie);
+  }
 }
 
 /* Texto un poco más grande para usuarios con poca experiencia digital (RNF-06) */
 html { font-size: 17px; }
-ion-button[size='large'] { min-height: 52px; }
+
+h1, h2, h3, ion-title, .mc-titulo {
+  font-family: var(--mc-titulos);
+  letter-spacing: -0.01em;
+}
+h1 { font-weight: 800; }
+h2, h3 { font-weight: 600; }
+
+ion-title { font-weight: 800; font-size: 1.15rem; }
+ion-toolbar { --border-width: 0; }
+ion-header.header-md { box-shadow: none; }
+
+/* Barra superior verde (pantallas de detalle) */
+ion-toolbar[color='primary'] { --background: var(--mc-paramo); }
+
+ion-button { --border-radius: var(--mc-radio); text-transform: none; letter-spacing: 0; font-weight: 700; }
+ion-button[size='large'] { min-height: 54px; font-size: 1.05rem; }
+
+ion-card {
+  border-radius: var(--mc-radio);
+  box-shadow: none;
+  border: 1px solid var(--mc-borde);
+}
+ion-list[inset='true'], ion-list.list-inset { border-radius: var(--mc-radio); border: 1px solid var(--mc-borde); }
+
+ion-chip { --background: var(--mc-superficie); border: 1px solid var(--mc-borde); font-weight: 700; }
+
+ion-tab-bar { border-top: 1px solid var(--mc-borde); height: 64px; }
+ion-tab-button { font-weight: 700; --ripple-color: var(--mc-maiz); }
+ion-tab-button ion-label { font-size: 12px; }
+
+ion-searchbar.mc-buscador {
+  --background: var(--mc-superficie);
+  --border-radius: var(--mc-radio);
+  --box-shadow: none;
+  --placeholder-opacity: 0.7;
+  padding: 0;
+}
+ion-searchbar.mc-buscador .searchbar-input-container { border: 1px solid var(--mc-borde); border-radius: var(--mc-radio); }
+
+ion-toast { --border-radius: var(--mc-radio); font-weight: 700; }
+
+/* Franja tejida reutilizable */
+.mc-tejido { height: 8px; background: var(--mc-tejido); border-radius: 4px; }
+
+/* Foco visible con teclado (accesibilidad) */
+:focus-visible { outline: 3px solid var(--mc-maiz); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
