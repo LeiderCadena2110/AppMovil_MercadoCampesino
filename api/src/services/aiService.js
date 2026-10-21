@@ -4,8 +4,8 @@
 //  - precio: sugiere un precio a partir de productos parecidos publicados en la app.
 // Si no hay GEMINI_API_KEY (o Gemini falla), cada función tiene un respaldo local
 // para que la app siga funcionando sin internet hacia Google ni costos.
-import { iaDisponible, generarJson } from '../ia/gemini.js';
-import { productoRepository } from '../repositories/productoRepository.js';
+import { iaDisponible, generarJson } from '../ai/gemini.js';
+import { productoRepository } from '../repositories/productRepository.js';
 import { almacenamiento } from '../storage/index.js';
 
 const conMiniatura = (p) => ({ ...p, miniaturaUrl: p.fotoUrl ? almacenamiento.miniatura(p.fotoUrl, 300) : null });

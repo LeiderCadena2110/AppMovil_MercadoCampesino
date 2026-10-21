@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import path from 'node:path';
 import { env } from './config/env.js';
 import rutas from './routes/index.js';
-import { manejarErrores, noEncontrado } from './middlewares/errores.js';
+import { manejarErrores, noEncontrado } from './middlewares/errors.js';
 
 export const app = express();
 

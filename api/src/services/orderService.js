@@ -1,7 +1,7 @@
 import { db } from '../db/index.js';
-import { pedidoRepository } from '../repositories/pedidoRepository.js';
-import { productoRepository } from '../repositories/productoRepository.js';
-import { ErrorApp } from '../middlewares/errores.js';
+import { pedidoRepository } from '../repositories/orderRepository.js';
+import { productoRepository } from '../repositories/productRepository.js';
+import { ErrorApp } from '../middlewares/errors.js';
 
 // Qué estado puede seguir a cada uno
 const TRANSICIONES = {

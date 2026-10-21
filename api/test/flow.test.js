@@ -1,5 +1,5 @@
 // Prueba de punta a punta: registro → publicar → pedido → estados → calificación.
-// Requiere una base con migraciones y seed (npm run db:migrar && npm run db:seed).
+// Requiere una base con migraciones y seed (npm run db:migrate && npm run db:seed).
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import request from 'supertest';

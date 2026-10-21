@@ -34,7 +34,7 @@ jobs:
           cache-dependency-path: api/package-lock.json
       - run: npm ci
       - name: Migraciones (como en producción)
-        run: npm run migrar:prod
+        run: npm run migrate:prod
       - run: npm run db:seed
       - name: Pruebas (flujo completo e IA en modo local)
         run: npm test

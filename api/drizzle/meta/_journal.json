@@ -6,14 +6,14 @@
       "idx": 0,
       "version": "7",
       "when": 1791779014942,
-      "tag": "0000_inicial",
+      "tag": "0000_initial",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
       "when": 1792549184269,
-      "tag": "0001_descripcion_producto",
+      "tag": "0001_product_description",
       "breakpoints": true
     }
   ]

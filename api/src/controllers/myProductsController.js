@@ -1,4 +1,4 @@
-import { productoService } from '../services/productoService.js';
+import { productoService } from '../services/productService.js';
 
 const id = (req) => Number(req.params.id);
 const productorId = (req) => req.usuario.productorId;

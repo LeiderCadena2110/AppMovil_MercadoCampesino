@@ -1,4 +1,4 @@
-import { ErrorApp } from './errores.js';
+import { ErrorApp } from './errors.js';
 
 // Valida req.body (o req.query) con un esquema de zod y deja los datos limpios.
 export const validar = (esquema, origen = 'body') => (req, _res, next) => {

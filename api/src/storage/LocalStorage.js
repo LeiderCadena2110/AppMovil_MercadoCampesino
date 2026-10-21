@@ -1,6 +1,6 @@
 import { mkdir, writeFile, rm } from 'node:fs/promises';
 import path from 'node:path';
-import { AlmacenamientoImagenes } from './AlmacenamientoImagenes.js';
+import { AlmacenamientoImagenes } from './ImageStorage.js';
 import { env } from '../config/env.js';
 
 // Solo para desarrollo: guarda las fotos en la carpeta uploads/ del servidor.

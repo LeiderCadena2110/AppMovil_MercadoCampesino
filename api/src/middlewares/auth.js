@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env.js';
-import { ErrorApp } from './errores.js';
+import { ErrorApp } from './errors.js';
 
 export function verificarToken(req, _res, next) {
   const [tipo, token] = (req.headers.authorization ?? '').split(' ');

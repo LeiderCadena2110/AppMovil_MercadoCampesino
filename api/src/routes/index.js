@@ -1,18 +1,18 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { verificarToken, verificarRol } from '../middlewares/auth.js';
-import { validar } from '../middlewares/validar.js';
+import { validar } from '../middlewares/validate.js';
 import {
   registroSchema, loginSchema, productoSchema, catalogoQuery, pedidoSchema, estadoSchema, calificacionSchema,
   asistenteSchema, descripcionIaSchema, precioIaSchema,
 } from '../schemas.js';
-import { limitePorUsuario } from '../middlewares/limite.js';
+import { limitePorUsuario } from '../middlewares/rateLimit.js';
 import { authController } from '../controllers/authController.js';
-import { catalogoController } from '../controllers/catalogoController.js';
-import { misProductosController } from '../controllers/misProductosController.js';
-import { pedidoController } from '../controllers/pedidoController.js';
+import { catalogoController } from '../controllers/catalogController.js';
+import { misProductosController } from '../controllers/myProductsController.js';
+import { pedidoController } from '../controllers/orderController.js';
 import { adminController } from '../controllers/adminController.js';
-import { iaController } from '../controllers/iaController.js';
+import { iaController } from '../controllers/aiController.js';
 
 const subida = multer({
   storage: multer.memoryStorage(),

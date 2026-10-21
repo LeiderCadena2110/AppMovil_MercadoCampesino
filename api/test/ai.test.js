@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import request from 'supertest';
 import { app } from '../src/app.js';
 import { pool } from '../src/db/index.js';
-import { normalizar } from '../src/services/iaService.js';
+import { normalizar } from '../src/services/aiService.js';
 
 const api = request(app);
 let tokenComp; let tokenProd;

@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from 'cloudinary';
-import { AlmacenamientoImagenes } from './AlmacenamientoImagenes.js';
+import { AlmacenamientoImagenes } from './ImageStorage.js';
 
 // Usa la variable CLOUDINARY_URL (cloudinary://API_KEY:API_SECRET@CLOUD_NAME).
 export class CloudinaryStorage extends AlmacenamientoImagenes {

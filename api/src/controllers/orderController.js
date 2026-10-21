@@ -1,4 +1,4 @@
-import { pedidoService } from '../services/pedidoService.js';
+import { pedidoService } from '../services/orderService.js';
 
 const id = (req) => Number(req.params.id);
 

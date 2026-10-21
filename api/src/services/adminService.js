@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { productores, productos } from '../db/schema.js';
-import { ErrorApp } from '../middlewares/errores.js';
+import { ErrorApp } from '../middlewares/errors.js';
 
 export const adminService = {
   productores: (verificado) => db.query.productores.findMany({

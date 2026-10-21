@@ -1,4 +1,4 @@
-import { ErrorApp } from './errores.js';
+import { ErrorApp } from './errors.js';
 
 // Límite simple de peticiones por usuario (en memoria). Protege la cuota gratis de la IA.
 export function limitePorUsuario({ maximo, ventanaMs }) {

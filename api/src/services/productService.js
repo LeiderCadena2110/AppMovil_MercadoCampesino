@@ -1,9 +1,9 @@
 import { eq } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { productores } from '../db/schema.js';
-import { productoRepository } from '../repositories/productoRepository.js';
+import { productoRepository } from '../repositories/productRepository.js';
 import { almacenamiento } from '../storage/index.js';
-import { ErrorApp } from '../middlewares/errores.js';
+import { ErrorApp } from '../middlewares/errors.js';
 
 const conMiniatura = (p) => ({ ...p, miniaturaUrl: p.fotoUrl ? almacenamiento.miniatura(p.fotoUrl, 300) : null });
 

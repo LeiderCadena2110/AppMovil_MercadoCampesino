@@ -43,7 +43,7 @@ cd api
 npm install
 cp .env.example .env        # en Windows: copy .env.example .env
 # edita .env y pega DATABASE_URL, DIRECT_URL y un JWT_SECRET
-npm run db:migrar           # crea las tablas en Neon
+npm run db:migrate           # crea las tablas en Neon
 npm run db:seed             # municipios, categorías y usuarios de prueba
 npm run dev                 # http://localhost:3000/api
 npm test                    # prueba el flujo completo (usa la base del .env)
@@ -52,7 +52,7 @@ npm test                    # prueba el flujo completo (usa la base del .env)
 Fotos: si `CLOUDINARY_URL` está vacío, se guardan en `api/uploads/`. Para usar Cloudinary,
 pega en `.env` la variable "API environment variable" de tu cuenta.
 
-Si cambias `src/db/schema.js`: `npm run db:generar` crea la migración y `npm run db:migrar` la aplica.
+Si cambias `src/db/schema.js`: `npm run db:generate` crea la migración y `npm run db:migrate` la aplica.
 
 ## 4. App en el navegador
 

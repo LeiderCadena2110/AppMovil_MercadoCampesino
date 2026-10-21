@@ -1,7 +1,7 @@
 import { asc } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { categorias, municipios } from '../db/schema.js';
-import { productoService } from '../services/productoService.js';
+import { productoService } from '../services/productService.js';
 
 const id = (req) => Number(req.params.id);
 

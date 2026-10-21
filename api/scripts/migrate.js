@@ -1,5 +1,5 @@
 // Aplica las migraciones de drizzle/ usando solo dependencias de producción.
-// Lo usa el servidor (Render, Railway...) antes de arrancar: `npm run migrar:prod`.
+// Lo usa el servidor (Render, Railway...) antes de arrancar: `npm run migrate:prod`.
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { db, pool } from '../src/db/index.js';
 

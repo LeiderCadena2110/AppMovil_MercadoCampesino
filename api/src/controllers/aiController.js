@@ -1,4 +1,4 @@
-import { iaService } from '../services/iaService.js';
+import { iaService } from '../services/aiService.js';
 
 export const iaController = {
   estado: (_req, res) => res.json(iaService.estado()),

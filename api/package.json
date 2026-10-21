@@ -7,12 +7,12 @@
     "test": "node --test test/*.test.js",
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
-    "db:generar": "drizzle-kit generate",
-    "db:migrar": "drizzle-kit migrate",
     "db:seed": "node scripts/seed.js",
     "db:studio": "drizzle-kit studio",
-    "migrar:prod": "node scripts/migrar.js",
-    "start:prod": "node scripts/migrar.js && node scripts/seed.js --solo-base && node src/server.js"
+    "start:prod": "node scripts/migrate.js && node scripts/seed.js --solo-base && node src/server.js",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "migrate:prod": "node scripts/migrate.js"
   },
   "keywords": [],
   "author": "",

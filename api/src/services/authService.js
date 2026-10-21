@@ -2,8 +2,8 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { db } from '../db/index.js';
 import { env } from '../config/env.js';
-import { usuarioRepository } from '../repositories/usuarioRepository.js';
-import { ErrorApp } from '../middlewares/errores.js';
+import { usuarioRepository } from '../repositories/userRepository.js';
+import { ErrorApp } from '../middlewares/errors.js';
 
 function firmar(usuario, productorId) {
   return jwt.sign({ sub: usuario.id, rol: usuario.rol, productorId }, env.jwtSecret, { expiresIn: env.jwtExpira });
