@@ -12,7 +12,7 @@ export class CloudinaryStorage extends AlmacenamientoImagenes {
     return new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         {
-          folder: 'mercado-campesino/productos',
+          folder: 'minga-app/productos',
           public_id: nombre,
           overwrite: true,
           // Se guarda ya reducida: ahorra datos al productor y al comprador

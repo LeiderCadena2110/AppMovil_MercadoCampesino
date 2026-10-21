@@ -1,4 +1,4 @@
-# Mercado Campesino Digital
+# Minga App
 
 App Android que conecta campesinos de Nariño con compradores de Pasto.
 
@@ -108,8 +108,8 @@ Rutas: `POST /api/ia/asistente`, `POST /api/ia/descripcion`, `POST /api/ia/preci
   ejecuta el workflow a mano en **Actions › APK Android › Run workflow**.
 - APK firmado (opcional, recomendado para Play Store): crea un keystore
   ```bash
-  keytool -genkey -v -keystore mercado.jks -keyalg RSA -keysize 2048 -validity 10000 -alias mercado
-  base64 -w0 mercado.jks   # copia el resultado
+  keytool -genkey -v -keystore minga.jks -keyalg RSA -keysize 2048 -validity 10000 -alias minga
+  base64 -w0 minga.jks   # copia el resultado
   ```
   y en **Settings › Secrets › Actions** crea `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS` y `KEY_PASSWORD`.
   Sin esos secretos se publica un APK de depuración, que igual se instala en cualquier Android.

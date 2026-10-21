@@ -15,7 +15,7 @@ export class App implements OnInit {
   ngOnInit() {
     // Botón atrás de Android en la raíz de una pestaña: preguntar antes de salir
     this.platform.backButton.subscribeWithPriority(-1, async () => {
-      if (await this.avisos.confirmar('Salir', '¿Quieres cerrar Mercado Campesino?', 'Salir')) CapApp.exitApp();
+      if (await this.avisos.confirmar('Salir', '¿Quieres cerrar Minga App?', 'Salir')) CapApp.exitApp();
     });
   }
 }

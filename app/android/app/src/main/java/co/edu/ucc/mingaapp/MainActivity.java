@@ -1,4 +1,4 @@
-package co.edu.ucc.mercadocampesino;
+package co.edu.ucc.mingaapp;
 
 import com.getcapacitor.BridgeActivity;
 

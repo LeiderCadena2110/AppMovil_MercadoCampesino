@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "co.edu.ucc.mercadocampesino"
+    namespace = "co.edu.ucc.mingaapp"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "co.edu.ucc.mercadocampesino"
+        applicationId "co.edu.ucc.mingaapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         // En GitHub Actions: VERSION_CODE = número de ejecución, VERSION_NAME = versión de package.json

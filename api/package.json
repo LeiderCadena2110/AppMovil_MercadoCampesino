@@ -1,7 +1,7 @@
 {
-  "name": "mercado-campesino-api",
+  "name": "minga-app-api",
   "version": "1.0.0",
-  "description": "API REST de Mercado Campesino Digital",
+  "description": "API REST de Minga App",
   "main": "index.js",
   "scripts": {
     "test": "node --test test/*.test.js",

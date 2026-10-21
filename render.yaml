@@ -3,7 +3,7 @@
 # Render pedirá los valores marcados con sync: false (no se guardan en GitHub).
 services:
   - type: web
-    name: mercado-campesino-api
+    name: minga-app-api
     runtime: node
     plan: free
     region: oregon
@@ -29,6 +29,6 @@ services:
       - key: GEMINI_MODELO
         value: gemini-3.6-flash
       - key: URL_PUBLICA
-        value: https://mercado-campesino-api.onrender.com
+        value: https://minga-app-api.onrender.com
       - key: CORS_ORIGEN
         value: "*"

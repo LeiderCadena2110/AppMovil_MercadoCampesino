@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'co.edu.ucc.mercadocampesino',
-  appName: 'Mercado Campesino',
+  appId: 'co.edu.ucc.mingaapp',
+  appName: 'Minga App',
   webDir: 'dist/app/browser',
   server: {
     // Permite llamar a la API por http mientras desarrollas.

@@ -10,9 +10,9 @@ import { IonContent, IonButton } from '@ionic/angular';
       <main class="portada">
 
         <section class="texto">
-          <h1>Mercado<br />Campesino</h1>
+          <h1>Minga<br />App</h1>
           <div class="mc-tejido"></div>
-          <p>La cosecha de las veredas de Nariño, directo a tu mesa en Pasto. Sin intermediarios.</p>
+          <p>Como en la minga, trabajamos juntos: la cosecha de las veredas de Nariño, directo a tu mesa en Pasto. Sin intermediarios.</p>
         </section>
 
         <!-- Montañas de Nariño dibujadas en SVG: livianas y sin descargas -->

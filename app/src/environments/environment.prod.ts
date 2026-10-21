@@ -2,5 +2,5 @@
 // GitHub Actions la reemplaza con la variable del repositorio API_URL si existe
 // (Settings > Secrets and variables > Actions > Variables).
 export const environment = {
-  apiUrl: 'https://mercado-campesino-api.onrender.com/api',
+  apiUrl: 'https://minga-app-api.onrender.com/api',
 };

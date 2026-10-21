@@ -1,4 +1,4 @@
-// Modelo de datos de Mercado Campesino Digital (Neon / PostgreSQL) con Drizzle ORM.
+// Modelo de datos de Minga App (Neon / PostgreSQL) con Drizzle ORM.
 import { relations } from 'drizzle-orm';
 import {
   pgTable, pgEnum, serial, integer, varchar, text, numeric, boolean, timestamp, index, uniqueIndex,

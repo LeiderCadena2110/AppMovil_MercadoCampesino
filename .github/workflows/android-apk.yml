@@ -81,8 +81,8 @@ jobs:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
           if [ -n "$KEYSTORE_BASE64" ]; then
-            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/mercado.jks"
-            echo "KEYSTORE_PATH=$RUNNER_TEMP/mercado.jks" >> "$GITHUB_ENV"
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/minga.jks"
+            echo "KEYSTORE_PATH=$RUNNER_TEMP/minga.jks" >> "$GITHUB_ENV"
             echo "tipo=release" >> "$GITHUB_OUTPUT"
           else
             echo "tipo=debug" >> "$GITHUB_OUTPUT"
@@ -107,15 +107,15 @@ jobs:
             echo "::error title=Gradle falló::${MOTIVO}"
             exit 1
           fi
-          cp "app/build/outputs/apk/$CARPETA/$ARCHIVO" "$RUNNER_TEMP/MercadoCampesino.apk"
-          NOMBRE="MercadoCampesino-v${{ steps.version.outputs.nombre }}-${{ github.run_number }}.apk"
-          mv "$RUNNER_TEMP/MercadoCampesino.apk" "$GITHUB_WORKSPACE/$NOMBRE"
+          cp "app/build/outputs/apk/$CARPETA/$ARCHIVO" "$RUNNER_TEMP/MingaApp.apk"
+          NOMBRE="MingaApp-v${{ steps.version.outputs.nombre }}-${{ github.run_number }}.apk"
+          mv "$RUNNER_TEMP/MingaApp.apk" "$GITHUB_WORKSPACE/$NOMBRE"
           echo "APK=$NOMBRE" >> "$GITHUB_ENV"
 
       - name: Guardar APK como artifact
         uses: actions/upload-artifact@v5
         with:
-          name: MercadoCampesino-apk
+          name: MingaApp-apk
           path: ${{ env.APK }}
           retention-days: 30
 
@@ -124,10 +124,10 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('v{0}-build{1}', steps.version.outputs.nombre, github.run_number) }}
-          name: Mercado Campesino ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('v{0} (build {1})', steps.version.outputs.nombre, github.run_number) }}
+          name: Minga App ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('v{0} (build {1})', steps.version.outputs.nombre, github.run_number) }}
           files: ${{ env.APK }}
           body: |
-            APK de Mercado Campesino para Android (${{ steps.firma.outputs.tipo }}).
+            APK de Minga App para Android (${{ steps.firma.outputs.tipo }}).
 
             **Cómo instalarlo:** descarga el archivo `.apk` desde el celular, ábrelo y,
             si Android lo pide, permite "Instalar apps desconocidas" para tu navegador.

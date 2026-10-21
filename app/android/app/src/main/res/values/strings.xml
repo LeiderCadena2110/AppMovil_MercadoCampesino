@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Mercado Campesino</string>
-    <string name="title_activity_main">Mercado Campesino</string>
-    <string name="package_name">co.edu.ucc.mercadocampesino</string>
-    <string name="custom_url_scheme">co.edu.ucc.mercadocampesino</string>
+    <string name="app_name">Minga App</string>
+    <string name="title_activity_main">Minga App</string>
+    <string name="package_name">co.edu.ucc.mingaapp</string>
+    <string name="custom_url_scheme">co.edu.ucc.mingaapp</string>
 </resources>
