@@ -46,7 +46,7 @@ import { CopPipe } from '../shared/format';
       </ion-fab>
     </ion-content>
   `,
-  styles: `.sin-foto { display: grid; place-items: center; height: 100%; background: var(--ion-color-light); color: var(--ion-color-primary); font-size: 24px; }`,
+  styles: `.sin-foto { display: grid; place-items: center; height: 100%; background: var(--mc-suelo); color: var(--mc-arcilla); font-size: 24px; }`,
 })
 export class MisProductosPage implements ViewWillEnter {
   private srv = inject(MisProductosService);

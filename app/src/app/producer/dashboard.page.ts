@@ -62,13 +62,13 @@ import { CopPipe, EstadoPipe } from '../shared/format';
     .saludo p { margin: 0; color: var(--mc-barro); font-size: 0.95rem; }
     .saludo h1 { margin: 2px 0 0; font-size: 1.7rem; }
     .revision { display: flex; gap: 8px; align-items: start; margin: 0 0 14px; padding: 12px 14px; border-radius: var(--mc-radio);
-      background: color-mix(in srgb, var(--mc-maiz) 22%, var(--mc-superficie)); font-size: 0.92rem; }
+      background: var(--mc-suelo); font-size: 0.92rem; }
     .resumen { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
     .dato { padding: 14px; border-radius: var(--mc-radio); background: var(--mc-superficie); border: 1px solid var(--mc-borde); }
     .dato strong { display: block; font-family: var(--mc-titulos); font-size: 1.6rem; font-weight: 800; line-height: 1.1; }
     .dato span { font-size: 0.85rem; color: var(--ion-color-medium); }
-    .dato.alerta { background: var(--mc-paramo); border-color: var(--mc-paramo); color: #fff; }
-    .dato.alerta span { color: #cfe0d2; }
+    .dato.alerta { background: var(--mc-marca); border-color: var(--mc-marca); color: var(--mc-marca-texto); }
+    .dato.alerta span { color: var(--mc-marca-suave); }
     .dato.aviso strong { color: var(--mc-barro); }
     .seccion { font-size: 1.15rem; margin: 22px 0 10px; }
     .pedidos { display: grid; gap: 8px; }

@@ -89,7 +89,7 @@ export function textoSeguro(t: string) {
     .limpiar { background: none; border: 0; font: inherit; font-weight: 700; color: var(--ion-color-primary); padding: 8px 12px; }
     .intro { padding: 12px 4px 4px; }
     .sello { width: 56px; height: 56px; border-radius: 18px; display: grid; place-items: center; font-size: 28px;
-      background: var(--mc-paramo); color: var(--mc-maiz); }
+      background: var(--mc-marca); color: var(--mc-destaque); }
     .intro h1 { font-size: 1.8rem; margin: 16px 0 8px; }
     .intro p { color: var(--mc-barro); line-height: 1.5; margin: 0 0 20px; max-width: 40ch; }
     .ideas { display: grid; gap: 8px; }
@@ -99,7 +99,7 @@ export function textoSeguro(t: string) {
     .burbuja { max-width: 85%; align-self: flex-start; padding: 12px 14px; border-radius: 18px 18px 18px 6px;
       background: var(--mc-superficie); border: 1px solid var(--mc-borde); line-height: 1.5; }
     .burbuja p { margin: 0; }
-    .burbuja.mia { align-self: flex-end; border-radius: 18px 18px 6px 18px; background: var(--mc-paramo); border-color: var(--mc-paramo); color: #fff; }
+    .burbuja.mia { align-self: flex-end; border-radius: 18px 18px 6px 18px; background: var(--mc-marca); border-color: var(--mc-marca); color: var(--mc-marca-texto); }
     .pensando { display: flex; align-items: center; gap: 8px; color: var(--ion-color-medium); }
     .sugeridos { display: flex; gap: 10px; overflow-x: auto; padding: 2px 0 6px; scrollbar-width: none; }
     .mini { flex: 0 0 150px; display: grid; gap: 4px; padding: 8px; border-radius: var(--mc-radio); cursor: pointer;
@@ -110,13 +110,13 @@ export function textoSeguro(t: string) {
     .mini strong { font-size: 0.88rem; line-height: 1.2; }
     .mini span { font-size: 0.8rem; color: var(--ion-color-medium); }
     .mini button { margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 8px; border: 0;
-      border-radius: var(--mc-radio-chico); background: var(--mc-maiz); color: #1f2a12; font: inherit; font-weight: 700; font-size: 0.85rem; }
+      border-radius: var(--mc-radio-chico); background: var(--mc-accion); color: var(--mc-accion-texto); font: inherit; font-weight: 700; font-size: 0.85rem; }
     .pie { padding: 8px 12px calc(8px + var(--ion-safe-area-bottom, 0px)); background: var(--ion-background-color); }
     .pie form { display: flex; gap: 8px; }
     .pie input { flex: 1; min-width: 0; height: 50px; padding: 0 16px; border-radius: 25px; border: 1px solid var(--mc-borde);
       background: var(--mc-superficie); color: var(--ion-text-color); font: inherit; }
     .pie button { width: 50px; height: 50px; border-radius: 50%; border: 0; display: grid; place-items: center; font-size: 22px;
-      background: var(--mc-paramo); color: #fff; }
+      background: var(--mc-accion); color: var(--mc-accion-texto); }
     .pie button:disabled { opacity: 0.4; }
     .pie small { display: block; text-align: center; margin-top: 6px; font-size: 0.72rem; color: var(--ion-color-medium); }
   `,

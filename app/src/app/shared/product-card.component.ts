@@ -53,7 +53,7 @@ import { CopPipe } from './format';
     .precio small { display: block; font-family: var(--ion-font-family); font-weight: 400; font-size: 0.75rem; color: var(--ion-color-medium); }
     .agregar {
       width: 40px; height: 40px; border-radius: 50%; border: 0; display: grid; place-items: center; flex-shrink: 0;
-      background: var(--mc-maiz); color: #1f2a12; font-size: 22px; cursor: pointer;
+      background: var(--mc-accion); color: var(--mc-accion-texto); font-size: 22px; cursor: pointer;
     }
     .agregar:active { transform: scale(0.92); }
   `,

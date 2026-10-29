@@ -18,28 +18,47 @@
 @import '@fontsource/atkinson-hyperlegible/700.css';
 
 /* ---------------------------------------------------------------
-   Paleta "Páramo": verde de montaña, maíz, barro y nube de Nariño
-   --------------------------------------------------------------- */
+   Identidad Minga App: Galeras, chagra y tierra de Nariño
+   ---------------------------------------------------------------
+   verde páramo  #1f4d2b  confianza y naturaleza (fondos de marca, encabezados)
+   verde brote   #2b7f3a  acciones principales (botones, agregar, enlaces)
+   amarillo maíz #e0a83a  destacar (categoría elegida, avisos, sellos)
+   barro/arcilla #6b3f2a / #a0522d  textos cálidos y detalles de procedencia
+   Todos los pares de texto cumplen contraste AA (≥ 4.5:1). */
 :root {
-  --mc-paramo: #1f4d2b;     /* verde páramo: color principal */
+  --mc-paramo: #1f4d2b;
   --mc-paramo-claro: #2f6b3d;
-  --mc-maiz: #e8b43a;       /* amarillo maíz: acciones de compra */
-  --mc-barro: #6b3f2a;      /* tierra: textos secundarios cálidos */
-  --mc-nube: #f4f6f1;       /* fondo frío, como la neblina del páramo */
-  --mc-tinta: #18221b;      /* texto principal */
+  --mc-brote: #2b7f3a;
+  --mc-maiz: #e0a83a;
+  --mc-barro: #6b3f2a;
+  --mc-arcilla: #a0522d;
+  --mc-nube: #f3f5ef;       /* fondo: neblina fría del páramo */
+  --mc-tinta: #18221b;
+  --mc-tinta-suave: #5b665e;
   --mc-borde: #dfe4da;
   --mc-superficie: #ffffff;
+  --mc-suelo: #f1e7d6;      /* fondo cálido para avisos y procedencia */
+
+  /* Roles: los componentes usan estos, no los colores directos */
+  --mc-accion: var(--mc-brote);
+  --mc-accion-texto: #ffffff;
+  --mc-destaque: var(--mc-maiz);
+  --mc-destaque-texto: #1f2a12;
+  --mc-marca: var(--mc-paramo);   /* superficies de marca: siempre verde oscuro */
+  --mc-marca-texto: #ffffff;
+  --mc-marca-suave: #cfe0d2;
 
   --mc-radio-grande: 22px;
   --mc-radio: 14px;
   --mc-radio-chico: 10px;
+  --mc-espacio: 16px;
 
-  --ion-color-primary: #1f4d2b;
-  --ion-color-primary-rgb: 31, 77, 43;
+  --ion-color-primary: #2b7f3a;
+  --ion-color-primary-rgb: 43, 127, 58;
   --ion-color-primary-contrast: #ffffff;
   --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #1b4426;
-  --ion-color-primary-tint: #355f40;
+  --ion-color-primary-shade: #266f33;
+  --ion-color-primary-tint: #408c4e;
 
   --ion-color-secondary: #6b3f2a;
   --ion-color-secondary-rgb: 107, 63, 42;
@@ -48,24 +67,24 @@
   --ion-color-secondary-shade: #5e3725;
   --ion-color-secondary-tint: #7a523f;
 
-  --ion-color-tertiary: #e8b43a;
-  --ion-color-tertiary-rgb: 232, 180, 58;
+  --ion-color-tertiary: #e0a83a;
+  --ion-color-tertiary-rgb: 224, 168, 58;
   --ion-color-tertiary-contrast: #1f2a12;
   --ion-color-tertiary-contrast-rgb: 31, 42, 18;
-  --ion-color-tertiary-shade: #cc9e33;
-  --ion-color-tertiary-tint: #eabc4e;
+  --ion-color-tertiary-shade: #c59433;
+  --ion-color-tertiary-tint: #e3b14e;
 
   --ion-color-success: #2e7d32;
   --ion-color-danger: #b3261e;
 
   --ion-background-color: var(--mc-nube);
-  --ion-background-color-rgb: 244, 246, 241;
+  --ion-background-color-rgb: 243, 245, 239;
   --ion-text-color: var(--mc-tinta);
   --ion-text-color-rgb: 24, 34, 27;
   --ion-toolbar-background: var(--mc-nube);
   --ion-toolbar-color: var(--mc-tinta);
   --ion-tab-bar-background: var(--mc-superficie);
-  --ion-tab-bar-color-selected: var(--mc-paramo);
+  --ion-tab-bar-color-selected: var(--mc-accion);
   --ion-item-background: var(--mc-superficie);
   --ion-card-background: var(--mc-superficie);
   --ion-border-color: var(--mc-borde);
@@ -73,8 +92,7 @@
   --ion-font-family: 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --mc-titulos: 'Bricolage Grotesque', 'Atkinson Hyperlegible', system-ui, sans-serif;
 
-  /* El tejido: franja inspirada en las ruanas y los chumbes de Nariño.
-     Es el único adorno de la marca; aparece en la bienvenida y bajo los títulos. */
+  /* El tejido: franja inspirada en las ruanas y los chumbes de Nariño. */
   --mc-tejido: repeating-linear-gradient(
     90deg,
     var(--mc-paramo) 0 14px,
@@ -85,21 +103,27 @@
   );
 }
 
-/* Modo oscuro: sigue el ajuste del teléfono */
+/* Modo oscuro: mismos roles, valores para fondo oscuro (sigue el ajuste del teléfono) */
 @media (prefers-color-scheme: dark) {
   :root {
     --mc-nube: #101712;
     --mc-tinta: #e7ece5;
+    --mc-tinta-suave: #a8b3aa;
     --mc-borde: #2a352d;
     --mc-superficie: #18211b;
+    --mc-suelo: #2a2218;
     --mc-barro: #d9a98f;
+    --mc-arcilla: #e0a283;
 
-    --ion-color-primary: #8fd19e;
-    --ion-color-primary-rgb: 143, 209, 158;
+    --mc-accion: #7fcf8a;
+    --mc-accion-texto: #0d2614;
+
+    --ion-color-primary: #7fcf8a;
+    --ion-color-primary-rgb: 127, 207, 138;
     --ion-color-primary-contrast: #0d2614;
     --ion-color-primary-contrast-rgb: 13, 38, 20;
-    --ion-color-primary-shade: #7eb88b;
-    --ion-color-primary-tint: #9ad6a8;
+    --ion-color-primary-shade: #70b679;
+    --ion-color-primary-tint: #8cd496;
 
     --ion-background-color: var(--mc-nube);
     --ion-background-color-rgb: 16, 23, 18;
@@ -107,7 +131,7 @@
     --ion-text-color-rgb: 231, 236, 229;
     --ion-toolbar-background: var(--mc-nube);
     --ion-tab-bar-background: var(--mc-superficie);
-    --ion-tab-bar-color-selected: #8fd19e;
+    --ion-tab-bar-color-selected: var(--mc-accion);
     --ion-item-background: var(--mc-superficie);
     --ion-card-background: var(--mc-superficie);
   }
@@ -128,10 +152,14 @@ ion-toolbar { --border-width: 0; --background: var(--mc-nube); --color: var(--mc
 ion-header.header-md { box-shadow: none; }
 
 /* Barra superior verde (pantallas de detalle) */
-ion-toolbar[color='primary'] { --background: var(--mc-paramo); }
+ion-toolbar[color='primary'] { --background: var(--mc-marca); --color: var(--mc-marca-texto); }
+ion-toolbar[color='primary'] ion-back-button, ion-toolbar[color='primary'] ion-button { --color: var(--mc-marca-texto); }
 
 ion-button { --border-radius: var(--mc-radio); text-transform: none; letter-spacing: 0; font-weight: 700; }
 ion-button[size='large'] { min-height: 54px; font-size: 1.05rem; }
+/* Respuesta visual al tocar: se hunde un poco */
+ion-button, .mc-tocable { transition: transform 120ms ease, filter 120ms ease; }
+ion-button:active, .mc-tocable:active { transform: scale(0.97); filter: brightness(0.95); }
 
 ion-card {
   border-radius: var(--mc-radio);
@@ -174,11 +202,25 @@ ion-segment {
 }
 ion-segment-button {
   text-transform: none; letter-spacing: 0; font-weight: 700; font-size: 0.95rem; min-height: 46px;
-  --indicator-height: 0; --color: var(--ion-color-medium); --color-checked: #fff;
+  --indicator-height: 0; --color: var(--ion-color-medium); --color-checked: var(--mc-accion-texto);
   border-radius: var(--mc-radio-chico);
 }
-ion-segment-button.segment-button-checked { background: var(--mc-paramo); }
-@media (prefers-color-scheme: dark) {
-  ion-segment-button { --color-checked: #0d2614; }
-  ion-segment-button.segment-button-checked { background: #8fd19e; }
-}
+ion-segment-button.segment-button-checked { background: var(--mc-accion); }
+
+/* ----- Piezas reutilizables ----- */
+
+/* Pantalla vacía o sin resultados: ícono, mensaje y acción */
+.mc-vacio { display: grid; justify-items: center; text-align: center; gap: 8px; padding: 28px 24px; }
+.mc-vacio .mc-vacio-icono { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; font-size: 34px;
+  background: var(--mc-suelo); color: var(--mc-arcilla); }
+.mc-vacio h3 { margin: 6px 0 0; font-size: 1.1rem; }
+.mc-vacio p { margin: 0; color: var(--mc-tinta-suave); max-width: 34ch; line-height: 1.45; }
+
+/* Etiqueta pequeña (sello) */
+.mc-sello { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-size: 0.78rem; font-weight: 700;
+  background: var(--mc-suelo); color: var(--mc-barro); }
+.mc-sello.destaque { background: var(--mc-destaque); color: var(--mc-destaque-texto); }
+
+/* Botón redondo de acción (agregar al carrito, etc.) */
+.mc-boton-redondo { width: 44px; height: 44px; border-radius: 50%; border: 0; display: grid; place-items: center; flex-shrink: 0;
+  background: var(--mc-accion); color: var(--mc-accion-texto); font-size: 22px; cursor: pointer; }

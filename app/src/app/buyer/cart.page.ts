@@ -61,7 +61,7 @@ import { CopPipe } from '../shared/format';
     .vacio { text-align: center; margin-top: 30%; }
     .vacio ion-icon { font-size: 72px; }
     .cantidad { display: flex; align-items: center; }
-    .sin-foto { display: grid; place-items: center; height: 100%; background: var(--ion-color-light); color: var(--ion-color-primary); font-size: 24px; }
+    .sin-foto { display: grid; place-items: center; height: 100%; background: var(--mc-suelo); color: var(--mc-arcilla); font-size: 24px; }
   `,
 })
 export class CarritoPage {

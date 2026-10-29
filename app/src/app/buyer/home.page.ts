@@ -81,11 +81,11 @@ import { CatalogoListaComponent } from './catalog-list.component';
     .asistente {
       display: flex; gap: 12px; align-items: center; text-align: left; width: 100%;
       padding: 14px 16px; border-radius: var(--mc-radio); border: 0; cursor: pointer;
-      background: var(--mc-paramo); color: #fff; font: inherit;
+      background: var(--mc-marca); color: var(--mc-marca-texto); font: inherit;
     }
-    .asistente ion-icon { font-size: 28px; color: var(--mc-maiz); flex-shrink: 0; }
+    .asistente ion-icon { font-size: 28px; color: var(--mc-destaque); flex-shrink: 0; }
     .asistente strong { display: block; font-family: var(--mc-titulos); font-size: 1.05rem; }
-    .asistente small { display: block; color: #cfe0d2; font-size: 0.85rem; margin-top: 2px; }
+    .asistente small { display: block; color: var(--mc-marca-suave); font-size: 0.85rem; margin-top: 2px; }
     .aviso { margin: 12px 16px 0; font-size: 0.9rem; color: var(--mc-barro); display: flex; gap: 6px; align-items: center; }
     .categorias { display: flex; gap: 10px; overflow-x: auto; padding: 16px 16px 4px; scrollbar-width: none; }
     .categorias button {
@@ -96,7 +96,7 @@ import { CatalogoListaComponent } from './catalog-list.component';
       width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center;
       background: var(--mc-superficie); border: 1px solid var(--mc-borde); font-size: 26px; color: var(--ion-color-primary);
     }
-    .categorias button.activa .icono { background: var(--mc-maiz); border-color: var(--mc-maiz); color: #1f2a12; }
+    .categorias button.activa .icono { background: var(--mc-destaque); border-color: var(--mc-destaque); color: var(--mc-destaque-texto); }
     .seccion { margin: 18px 16px 6px; font-size: 1.15rem; }
     .vacio { text-align: center; padding: 24px 32px; color: var(--ion-color-medium); }
     .vacio ion-icon { font-size: 44px; color: var(--ion-color-primary); }

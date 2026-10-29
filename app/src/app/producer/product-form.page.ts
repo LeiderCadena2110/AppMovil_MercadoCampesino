@@ -94,10 +94,10 @@ import { CopPipe } from '../shared/format';
     .ia { width: 100%; padding: 4px 0 10px; }
     .ia p { margin: 8px 0 0; font-size: 0.85rem; color: var(--mc-barro); line-height: 1.4; }
     .ia-boton { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border-radius: 999px; border: 0;
-      background: var(--mc-paramo); color: #fff; font: inherit; font-weight: 700; font-size: 0.9rem; }
-    .ia-boton ion-icon { color: var(--mc-maiz); }
+      background: var(--mc-marca); color: var(--mc-marca-texto); font: inherit; font-weight: 700; font-size: 0.9rem; }
+    .ia-boton ion-icon { color: var(--mc-destaque); }
     .ia-boton:disabled { opacity: 0.45; }
-    .usar { margin-top: 8px; padding: 8px 14px; border-radius: 999px; border: 0; background: var(--mc-maiz); color: #1f2a12;
+    .usar { margin-top: 8px; padding: 8px 14px; border-radius: 999px; border: 0; background: var(--mc-accion); color: var(--mc-accion-texto);
       font: inherit; font-weight: 700; font-size: 0.9rem; }
   `,
 })

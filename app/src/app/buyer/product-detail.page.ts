@@ -57,7 +57,7 @@ import { CopPipe } from '../shared/format';
           <strong>{{ cantidad() }}</strong>
           <button type="button" (click)="cantidad.set(cantidad() + 1)" [disabled]="cantidad() >= p.stock" aria-label="Más"><ion-icon name="add-outline" /></button>
         </div>
-        <ion-button expand="block" size="large" color="tertiary" (click)="agregar(p)">Agregar · {{ +p.precio * cantidad() | cop }}</ion-button>
+        <ion-button expand="block" size="large" (click)="agregar(p)">Agregar · {{ +p.precio * cantidad() | cop }}</ion-button>
       </ion-footer>
     }
   `,
@@ -79,7 +79,7 @@ import { CopPipe } from '../shared/format';
     .finca { display: flex; align-items: center; gap: 12px; width: 100%; margin-top: 20px; padding: 14px; text-align: left;
       border-radius: var(--mc-radio); border: 1px solid var(--mc-borde); background: var(--mc-superficie); font: inherit; color: inherit; cursor: pointer; }
     .avatar { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0;
-      background: var(--mc-paramo); color: var(--mc-maiz); font-size: 22px; }
+      background: var(--mc-marca); color: var(--mc-destaque); font-size: 22px; }
     .datos { flex: 1; }
     .datos strong { display: flex; align-items: center; gap: 4px; }
     .datos small { color: var(--ion-color-medium); }
