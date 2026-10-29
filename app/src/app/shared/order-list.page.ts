@@ -6,6 +6,7 @@ import {
 } from '@ionic/angular';
 import { AuthService } from '../core/auth.service';
 import { PedidosService } from '../core/orders.service';
+import { NovedadesPedidosService } from '../core/order-updates.service';
 import { AvisosService } from '../core/notifications.service';
 import { Pedido } from '../core/models';
 import { CopPipe, EstadoPipe } from './format';
@@ -72,7 +73,10 @@ export class PedidosListaPage implements ViewWillEnter {
     this.filtro() === 'activos' ? !['ENTREGADO', 'RECHAZADO'].includes(p.estado) : ['ENTREGADO', 'RECHAZADO'].includes(p.estado));
 
   // Se recarga cada vez que se entra a la pestaña
+  private novedades = inject(NovedadesPedidosService);
+
   ionViewWillEnter() {
+    this.novedades.marcarVistas();
     this.cargar();
   }
 

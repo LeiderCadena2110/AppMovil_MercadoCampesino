@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, IonBadge } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { homeOutline, searchOutline, cartOutline, receiptOutline, personOutline } from 'ionicons/icons';
 import { CarritoService } from '../core/cart.service';
+import { NovedadesPedidosService } from '../core/order-updates.service';
 
 @Component({
   selector: 'app-comprador-tabs',
@@ -16,14 +17,24 @@ import { CarritoService } from '../core/cart.service';
           <ion-icon name="cart-outline" /><ion-label>Carrito</ion-label>
           @if (carrito.cantidad() > 0) { <ion-badge color="danger">{{ carrito.cantidad() }}</ion-badge> }
         </ion-tab-button>
-        <ion-tab-button tab="pedidos"><ion-icon name="receipt-outline" /><ion-label>Pedidos</ion-label></ion-tab-button>
+        <ion-tab-button tab="pedidos">
+          <ion-icon name="receipt-outline" /><ion-label>Pedidos</ion-label>
+          @if (novedades.novedades() > 0) { <ion-badge color="danger" [attr.aria-label]="novedades.novedades() + ' novedades'">{{ novedades.novedades() }}</ion-badge> }
+        </ion-tab-button>
         <ion-tab-button tab="perfil"><ion-icon name="person-outline" /><ion-label>Perfil</ion-label></ion-tab-button>
       </ion-tab-bar>
     </ion-tabs>
   `,
 })
-export class CompradorTabsPage {
+export class CompradorTabsPage implements OnInit, OnDestroy {
   carrito = inject(CarritoService);
+  novedades = inject(NovedadesPedidosService);
+  ngOnInit() {
+    this.novedades.iniciar();
+  }
+  ngOnDestroy() {
+    this.novedades.detener();
+  }
   constructor() {
     addIcons({ homeOutline, searchOutline, cartOutline, receiptOutline, personOutline });
   }
