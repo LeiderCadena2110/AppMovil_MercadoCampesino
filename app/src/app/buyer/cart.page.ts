@@ -5,6 +5,7 @@ import {
   IonFooter, IonThumbnail, IonImg, IonNote,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
+import { EstadoVacioComponent } from '../shared/empty-state.component';
 import { addOutline, removeOutline, trashOutline, cartOutline, leafOutline } from 'ionicons/icons';
 import { CarritoService } from '../core/cart.service';
 import { CopPipe } from '../shared/format';
@@ -12,16 +13,15 @@ import { CopPipe } from '../shared/format';
 @Component({
   selector: 'app-carrito',
   imports: [RouterLink, IonContent, IonHeader, IonToolbar, IonTitle, IonList, IonListHeader, IonItem, IonLabel, IonButton,
-    IonIcon, IonFooter, IonThumbnail, IonImg, IonNote, CopPipe],
+    IonIcon, IonFooter, IonThumbnail, IonImg, IonNote, CopPipe, EstadoVacioComponent],
   template: `
     <ion-header><ion-toolbar color="primary"><ion-title>Carrito</ion-title></ion-toolbar></ion-header>
     <ion-content>
       @if (carrito.items().length === 0) {
-        <div class="vacio">
-          <ion-icon name="cart-outline" color="medium" />
-          <p>Tu carrito está vacío</p>
+        <app-estado-vacio icono="cart-outline" titulo="Tu carrito está vacío"
+          texto="Agrega productos del catálogo; cada finca recibe su propio pedido.">
           <ion-button routerLink="/comprador/tabs/inicio">Ver productos</ion-button>
-        </div>
+        </app-estado-vacio>
       }
       <!-- Un grupo por finca: cada grupo será un pedido distinto -->
       @for (g of carrito.porProductor(); track g.finca) {
@@ -58,8 +58,6 @@ import { CopPipe } from '../shared/format';
     }
   `,
   styles: `
-    .vacio { text-align: center; margin-top: 30%; }
-    .vacio ion-icon { font-size: 72px; }
     .cantidad { display: flex; align-items: center; }
     .sin-foto { display: grid; place-items: center; height: 100%; background: var(--mc-suelo); color: var(--mc-arcilla); font-size: 24px; }
   `,

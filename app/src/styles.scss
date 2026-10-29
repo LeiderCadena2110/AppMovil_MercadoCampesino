@@ -152,8 +152,12 @@ ion-toolbar { --border-width: 0; --background: var(--mc-nube); --color: var(--mc
 ion-header.header-md { box-shadow: none; }
 
 /* Barra superior verde (pantallas de detalle) */
-ion-toolbar[color='primary'] { --background: var(--mc-marca); --color: var(--mc-marca-texto); }
-ion-toolbar[color='primary'] ion-back-button, ion-toolbar[color='primary'] ion-button { --color: var(--mc-marca-texto); }
+/* Todas las barras superiores con el mismo estilo claro (antes algunas eran verdes):
+   así la navegación se ve igual en todas las pantallas, en modo claro y oscuro */
+ion-toolbar.ion-color-primary {
+  --ion-color-base: var(--mc-nube) !important;
+  --ion-color-contrast: var(--mc-tinta) !important;
+}
 
 ion-button { --border-radius: var(--mc-radio); text-transform: none; letter-spacing: 0; font-weight: 700; }
 ion-button[size='large'] { min-height: 54px; font-size: 1.05rem; }

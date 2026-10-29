@@ -39,13 +39,18 @@ import { CopPipe } from '../shared/format';
           <ion-item><ion-label>{{ g.finca }} <p>{{ g.items.length }} producto(s)</p></ion-label><ion-note slot="end">{{ g.subtotal | cop }}</ion-note></ion-item>
         }
       </ion-list>
+      <p class="ion-padding-horizontal nota">
+        {{ form.controls.metodoEntrega.value === 'RECOGIDA'
+          ? 'Recoges en la finca: no hay costo de envío. El productor te confirmará la hora por WhatsApp o llamada.'
+          : 'Pagas al recibir. El costo del envío no está incluido: lo acuerdas con el productor cuando confirme el pedido.' }}
+      </p>
       @if (carrito.porProductor().length > 1) {
         <p class="ion-padding-horizontal nota">Tu compra se divide en {{ carrito.porProductor().length }} pedidos, uno por finca.</p>
       }
     </ion-content>
     <ion-footer class="ion-padding">
       <ion-button expand="block" size="large" [disabled]="form.invalid || enviando()" (click)="confirmar()">
-        @if (enviando()) { <ion-spinner name="crescent" /> } @else { Hacer pedido · {{ carrito.total() | cop }} }
+        @if (enviando()) { <ion-spinner name="crescent" /> } @else { Hacer pedido · {{ carrito.total() | cop }}{{ form.controls.metodoEntrega.value === 'RECOGIDA' ? '' : ' + envío' }} }
       </ion-button>
     </ion-footer>
   `,
