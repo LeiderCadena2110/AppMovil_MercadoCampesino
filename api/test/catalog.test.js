@@ -39,3 +39,12 @@ test('rechaza un rango de precio al revés', async () => {
   const r = await api.get('/api/productos').query({ precioMin: 9000, precioMax: 100 });
   assert.equal(r.status, 400);
 });
+
+test('el teléfono del productor no aparece en el catálogo público', async () => {
+  const lista = (await api.get('/api/productos')).body.items;
+  const detalle = (await api.get(`/api/productos/${lista[0].id}`)).body;
+  assert.equal(detalle.productor.usuario.telefono, undefined);
+  const finca = (await api.get(`/api/productores/${detalle.productorId}`)).body;
+  assert.equal(finca.usuario.telefono, undefined);
+  assert.ok(finca.usuario.nombre);
+});

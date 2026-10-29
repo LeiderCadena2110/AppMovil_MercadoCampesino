@@ -31,7 +31,8 @@ export const productoService = {
       where: eq(productores.id, id),
       with: {
         municipio: true,
-        usuario: { columns: { nombre: true, telefono: true } },
+        // El teléfono no es público: solo se comparte dentro de un pedido
+        usuario: { columns: { nombre: true } },
         productos: { where: (p, { and, eq: igual }) => and(igual(p.activo, true), igual(p.oculto, false)) },
       },
     });

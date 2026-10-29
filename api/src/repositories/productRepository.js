@@ -78,7 +78,7 @@ export const productoRepository = {
     where: and(eq(productos.id, id), eq(productos.oculto, false)),
     with: {
       categoria: true,
-      productor: { with: { municipio: true, usuario: { columns: { nombre: true, telefono: true } } } },
+      productor: { with: { municipio: true, usuario: { columns: { nombre: true } } } }, // sin teléfono (privacidad)
     },
   }),
 

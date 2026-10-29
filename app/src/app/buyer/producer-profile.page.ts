@@ -1,6 +1,6 @@
 import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import {
-  IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonIcon, IonButton, IonSpinner,
+  IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonIcon, IonSpinner,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { checkmarkCircle, callOutline, locationOutline } from 'ionicons/icons';
@@ -11,7 +11,7 @@ import { CatalogoListaComponent } from './catalog-list.component';
 
 @Component({
   selector: 'app-productor-perfil',
-  imports: [IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonIcon, IonButton, IonSpinner, CatalogoListaComponent],
+  imports: [IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonIcon, IonSpinner, CatalogoListaComponent],
   template: `
     <ion-header><ion-toolbar color="primary">
       <ion-buttons slot="start"><ion-back-button defaultHref="/comprador/tabs/inicio" text="" /></ion-buttons>
@@ -24,9 +24,6 @@ import { CatalogoListaComponent } from './catalog-list.component';
           <p><ion-icon name="location-outline" /> {{ p.municipio?.nombre }}, {{ p.municipio?.departamento }}</p>
           <p>{{ p.usuario?.nombre }}</p>
           @if (p.descripcion) { <p>{{ p.descripcion }}</p> }
-          @if (p.usuario?.telefono) {
-            <ion-button fill="outline" [href]="'tel:' + p.usuario?.telefono"><ion-icon slot="start" name="call-outline" /> Llamar</ion-button>
-          }
           <h2>Productos</h2>
         </div>
         <app-catalogo-lista [productos]="productos()" />
