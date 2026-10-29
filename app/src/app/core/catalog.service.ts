@@ -5,7 +5,14 @@ import { environment } from '../../environments/environment';
 import { almacen } from './storage';
 import { Categoria, Municipio, PaginaCatalogo, Producto, Productor } from './models';
 
-export interface FiltrosCatalogo { categoria?: number | null; municipio?: number | null; q?: string; pagina?: number; }
+export type OrdenCatalogo = 'recientes' | 'precio_asc' | 'precio_desc';
+export interface FiltrosCatalogo {
+  categoria?: number | null; municipio?: number | null; q?: string; pagina?: number;
+  precioMin?: number | null; precioMax?: number | null;
+  /** Disponibilidad: solo productos con al menos esta cantidad */
+  stockMin?: number | null;
+  orden?: OrdenCatalogo; excluir?: number | null;
+}
 
 @Injectable({ providedIn: 'root' })
 export class CatalogoService {
@@ -18,7 +25,12 @@ export class CatalogoService {
     if (f.categoria) params = params.set('categoria', f.categoria);
     if (f.municipio) params = params.set('municipio', f.municipio);
     if (f.q) params = params.set('q', f.q);
-    const esPortada = (f.pagina ?? 1) === 1 && !f.categoria && !f.municipio && !f.q;
+    if (f.precioMin != null) params = params.set('precioMin', f.precioMin);
+    if (f.precioMax != null) params = params.set('precioMax', f.precioMax);
+    if (f.stockMin) params = params.set('stockMin', f.stockMin);
+    if (f.orden && f.orden !== 'recientes') params = params.set('orden', f.orden);
+    if (f.excluir) params = params.set('excluir', f.excluir);
+    const esPortada = (f.pagina ?? 1) === 1 && params.keys().length === 1;
     try {
       const r = await firstValueFrom(this.http.get<PaginaCatalogo>(`${this.api}/productos`, { params }));
       if (esPortada) await almacen.guardar('cache_catalogo', r);

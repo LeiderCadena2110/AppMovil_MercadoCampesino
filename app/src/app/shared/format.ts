@@ -24,3 +24,13 @@ export class EstadoPipe implements PipeTransform {
     return ESTADOS[e]?.[campo] ?? e;
   }
 }
+
+/** "arroba" con 40 → "arrobas"; "kg" no cambia. Uso: {{ 'libra' | unidad: 3 }} → "libras" */
+@Pipe({ name: 'unidad' })
+export class UnidadPipe implements PipeTransform {
+  transform(unidad: string | null | undefined, cantidad = 2) {
+    const u = unidad ?? '';
+    if (Number(cantidad) === 1 || u === 'kg' || !u) return u;
+    return u.endsWith('d') ? `${u}es` : `${u}s`; // unidad → unidades; libra → libras
+  }
+}

@@ -14,7 +14,7 @@ import { AvisosService } from '../core/notifications.service';
     <ion-grid class="ion-no-padding">
       <ion-row>
         @for (p of productos(); track p.id) {
-          <ion-col size="6" size-md="4">
+          <ion-col size="6" size-md="4" size-lg="3">
             <app-producto-card [producto]="p" (abrir)="abrir($event)" (agregar)="agregar($event)" />
           </ion-col>
         }

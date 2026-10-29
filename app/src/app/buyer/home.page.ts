@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import {
   IonContent, IonHeader, IonToolbar, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent,
-  IonRefresher, IonRefresherContent, IonSpinner, IonSearchbar, NavController,
+  IonRefresher, IonRefresherContent, IonSearchbar, IonButton, NavController,
   InfiniteScrollCustomEvent, RefresherCustomEvent,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -14,11 +14,14 @@ import { AvisosService } from '../core/notifications.service';
 import { AuthService } from '../core/auth.service';
 import { Categoria, ProductoLista } from '../core/models';
 import { CatalogoListaComponent } from './catalog-list.component';
+import { CatalogoCargandoComponent } from '../shared/catalog-skeleton.component';
+import { EstadoVacioComponent } from '../shared/empty-state.component';
 
 @Component({
   selector: 'app-inicio',
   imports: [IonContent, IonHeader, IonToolbar, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent,
-    IonRefresher, IonRefresherContent, IonSpinner, IonSearchbar, CatalogoListaComponent],
+    IonRefresher, IonRefresherContent, IonSearchbar, IonButton, CatalogoListaComponent, CatalogoCargandoComponent,
+    EstadoVacioComponent],
   template: `
     <ion-header class="ion-no-border"><ion-toolbar>
       <div class="saludo">
@@ -60,12 +63,24 @@ import { CatalogoListaComponent } from './catalog-list.component';
       <h2 class="seccion">{{ tituloSeccion() }}</h2>
 
       @if (cargando() && productos().length === 0) {
-        <div class="ion-text-center ion-padding"><ion-spinner /></div>
+        <app-catalogo-cargando />
+      } @else if (fallo() && productos().length === 0) {
+        <app-estado-vacio tipo="error" icono="cloud-offline-outline" titulo="No pudimos cargar el catálogo"
+          texto="Revisa tu conexión. Si el servidor estaba dormido, puede tardar hasta un minuto en responder.">
+          <ion-button (click)="cargar(1)">Reintentar</ion-button>
+        </app-estado-vacio>
       } @else if (productos().length === 0) {
-        <div class="vacio">
-          <ion-icon name="leaf-outline" />
-          <p>Todavía no hay cosecha publicada en esta categoría. Prueba con otra o vuelve más tarde.</p>
-        </div>
+        @if (categoria() !== null) {
+          <app-estado-vacio icono="basket-outline" [titulo]="'Todavía no hay productos de ' + tituloSeccion().toLowerCase()"
+            texto="Los productores publican a diario. Mira lo que hay en las otras categorías.">
+            <ion-button fill="outline" (click)="filtrar(null)">Ver todos los productos</ion-button>
+          </app-estado-vacio>
+        } @else {
+          <app-estado-vacio icono="leaf-outline" titulo="Aún no hay cosecha publicada"
+            texto="Cuando los campesinos publiquen sus productos, aparecerán aquí con su precio y de dónde vienen.">
+            <ion-button fill="outline" (click)="cargar(1)">Actualizar</ion-button>
+          </app-estado-vacio>
+        }
       }
       <app-catalogo-lista [productos]="productos()" />
       <ion-infinite-scroll [disabled]="pagina() >= paginas()" (ionInfinite)="masProductos($event)">
@@ -98,8 +113,6 @@ import { CatalogoListaComponent } from './catalog-list.component';
     }
     .categorias button.activa .icono { background: var(--mc-destaque); border-color: var(--mc-destaque); color: var(--mc-destaque-texto); }
     .seccion { margin: 18px 16px 6px; font-size: 1.15rem; }
-    .vacio { text-align: center; padding: 24px 32px; color: var(--ion-color-medium); }
-    .vacio ion-icon { font-size: 44px; color: var(--ion-color-primary); }
   `,
 })
 export class InicioPage implements OnInit {
@@ -117,6 +130,7 @@ export class InicioPage implements OnInit {
   pagina = signal(1);
   paginas = signal(1);
   cargando = signal(false);
+  fallo = signal(false);
   sinConexion = signal(false);
 
   constructor() {
@@ -150,6 +164,7 @@ export class InicioPage implements OnInit {
 
   async cargar(pagina: number) {
     this.cargando.set(true);
+    this.fallo.set(false);
     try {
       const r = await this.catalogo.productos({ categoria: this.categoria(), pagina });
       this.sinConexion.set(!!r.sinConexion);
@@ -157,7 +172,8 @@ export class InicioPage implements OnInit {
       this.pagina.set(r.pagina);
       this.paginas.set(r.paginas);
     } catch (e) {
-      this.avisos.error(e);
+      this.fallo.set(true);
+      if (pagina > 1) this.avisos.error(e);
     } finally {
       this.cargando.set(false);
     }

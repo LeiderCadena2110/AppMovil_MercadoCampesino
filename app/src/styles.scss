@@ -203,7 +203,7 @@ ion-segment {
 ion-segment-button {
   text-transform: none; letter-spacing: 0; font-weight: 700; font-size: 0.95rem; min-height: 46px;
   --indicator-height: 0; --color: var(--ion-color-medium); --color-checked: var(--mc-accion-texto);
-  border-radius: var(--mc-radio-chico);
+  border-radius: var(--mc-radio-chico); --padding-start: 6px; --padding-end: 6px; min-width: 0;
 }
 ion-segment-button.segment-button-checked { background: var(--mc-accion); }
 

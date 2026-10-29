@@ -24,6 +24,8 @@ export interface ProductoLista {
   id: number; nombre: string; precio: string; unidad: string; stock: number;
   fotoUrl: string | null; miniaturaUrl: string | null;
   productorId: number; finca: string; municipio: string; categoria: string;
+  /** Nombre de la persona productora y si la finca está verificada (opcionales en datos guardados viejos) */
+  productor?: string; verificado?: boolean;
 }
 
 export interface Producto {
