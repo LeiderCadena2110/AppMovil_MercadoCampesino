@@ -10,9 +10,10 @@ export class CopPipe implements PipeTransform {
   }
 }
 
+/** Nombres que ve la gente para los estados que maneja la API */
 export const ESTADOS: Record<EstadoPedido, { texto: string; color: string }> = {
-  PENDIENTE: { texto: 'Pendiente', color: 'warning' },
-  ACEPTADO: { texto: 'Aceptado', color: 'primary' },
+  PENDIENTE: { texto: 'Recibido', color: 'warning' },
+  ACEPTADO: { texto: 'Confirmado', color: 'primary' },
   RECHAZADO: { texto: 'Rechazado', color: 'danger' },
   LISTO: { texto: 'Listo', color: 'tertiary' },
   ENTREGADO: { texto: 'Entregado', color: 'success' },
