@@ -22,5 +22,7 @@ export function mensajeError(err: unknown): string {
     if (err.status === 0) return 'Sin conexión con el servidor. Revisa tu internet.';
     return err.error?.error ?? `Error ${err.status}`;
   }
+  // Errores propios de la app (validaciones) traen un mensaje pensado para el usuario
+  if (err instanceof Error && err.message) return err.message;
   return 'Ocurrió un error inesperado';
 }
