@@ -42,6 +42,13 @@ export const catalogoQuery = z.object({
   municipio: z.coerce.number().int().positive().optional(),
   q: z.string().trim().max(60).optional(),
   pagina: z.coerce.number().int().min(1).default(1),
+  precioMin: z.coerce.number().min(0).optional(),
+  precioMax: z.coerce.number().positive().optional(),
+  stockMin: z.coerce.number().int().min(1).optional(),
+  orden: z.enum(['recientes', 'precio_asc', 'precio_desc']).optional(),
+  excluir: z.coerce.number().int().positive().optional(),
+}).refine((f) => f.precioMin == null || f.precioMax == null || f.precioMin <= f.precioMax, {
+  message: 'el precio mínimo no puede ser mayor que el máximo', path: ['precioMin'],
 });
 
 export const pedidoSchema = z.object({
