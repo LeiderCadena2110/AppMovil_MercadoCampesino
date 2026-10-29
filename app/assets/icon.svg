@@ -1,9 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-  <rect width="1024" height="1024" fill="#1f4d2b"/>
-  <!-- montaña -->
-  <path d="M152 640 L372 360 L470 470 L600 300 L872 640 Z" fill="#2f6b3d"/>
-  <!-- campo de maíz con surcos -->
-  <path d="M120 700 C300 600 480 640 620 600 S860 580 904 610 L904 904 L120 904 Z" fill="#e8b43a"/>
-  <path d="M190 790 C380 740 640 740 840 790" fill="none" stroke="#cc9e33" stroke-width="22" stroke-linecap="round"/>
-  <path d="M240 860 C420 820 620 820 800 860" fill="none" stroke="#cc9e33" stroke-width="22" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Símbolo de Minga App: Galeras, surcos y planta (igual que src/app/shared/brand.ts) -->
+  <rect width="200" height="200" fill="#1f4d2b"/>
+  <g transform="translate(100 104) scale(0.78) translate(-100 -120)">
+  <path d="M16 150 C50 120 66 88 82 70 L92 63 L100 70 L108 63 L118 70 C134 88 150 120 184 150 Z" fill="#2f6b3d"/>
+  <path d="M16 150 C50 120 66 88 82 70 L92 63 L100 70 L108 63 L118 70 C134 88 150 120 184 150" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M12 150 H188" stroke="#e0a83a" stroke-width="7" stroke-linecap="round"/>
+  <path d="M44 166 Q100 156 156 166" fill="none" stroke="#e0a83a" stroke-width="5" stroke-linecap="round" opacity=".85"/>
+  <path d="M66 178 Q100 171 134 178" fill="none" stroke="#e0a83a" stroke-width="5" stroke-linecap="round" opacity=".85"/>
+  <path d="M100 150 C100 134 100 120 100 100" fill="none" stroke="#7fcf8a" stroke-width="7" stroke-linecap="round"/>
+  <path d="M100 126 C86 125 73 115 70 100 C86 99 98 109 100 126 Z" fill="#7fcf8a"/>
+  <path d="M100 112 C114 108 127 96 130 81 C114 83 102 94 100 112 Z" fill="#a6dfae"/>
+  </g>
 </svg>
