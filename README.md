@@ -156,8 +156,34 @@ app/
         └── admin/      panel web /admin
 ```
 
+## Identidad visual y experiencia
+
+- **Animación de entrada** (`shared/splash.component.ts`, ~2,5 s): se dibuja el Galeras, nace una planta, se forma
+  el ícono y aparecen "Minga App" y el eslogan *Del campo a tu mesa, sin intermediarios*. Solo SVG y CSS; se salta
+  tocando la pantalla y respeta "reducir movimiento". El símbolo vive en `shared/brand.ts` y `app/assets/icon.svg`.
+- **Colores por rol** en `src/styles.scss`: verde páramo (marca), verde brote (acciones), amarillo maíz (destacar),
+  barro/arcilla (procedencia). Mismos roles en modo claro y oscuro.
+- **Foto de la bienvenida:** `app/public/img/galeras-campo*.webp` (aportada por el autor del proyecto). Si no carga,
+  se muestra una ilustración. Para cambiarla, reemplaza esos archivos (horizontal, el volcán arriba y la gente a la derecha).
+- **Catálogo:** filtros de categoría, municipio, precio, disponibilidad y orden; tarjetas con productor, cantidad y
+  procedencia; estados de carga, vacío y error.
+- **Productor:** formulario por secciones con borrador o publicar, pausar/eliminar con confirmación y precio de
+  referencia (orientativo).
+- **Comprador:** favoritos, procedencia y entrega en el detalle, productos recomendados, línea de tiempo del pedido,
+  avisos de cambios en los pedidos y contacto por WhatsApp/llamada solo dentro de un pedido.
+
 ## Pendiente para la siguiente iteración
 
-- Recuperar contraseña por correo
-- Notificaciones push (Firebase Cloud Messaging)
-- Historial de compras para que Campi recomiende según lo que cada comprador pide seguido
+Estas mejoras necesitan cambios en la base de datos o servicios externos, por eso no se implementaron todavía:
+
+| Mejora | Qué hace falta |
+| --- | --- |
+| Varias fotos por producto | Tabla `producto_fotos (id, producto_id, url, orden)` + ruta para subir/ordenar fotos |
+| Foto del productor | Columna `productores.foto_url` + ruta de subida (reutiliza `storage/`) |
+| Estados "en preparación" y "enviado" | Valores nuevos en el enum `estado_pedido` y reglas de transición en `orderService.js` |
+| Notificaciones con la app cerrada | Firebase Cloud Messaging: proyecto en Firebase, `google-services.json`, tabla de tokens por usuario |
+| Favoritos en varios teléfonos | Tabla `favoritos (usuario_id, producto_id)`; hoy se guardan en el teléfono |
+| Costo de envío en la app | Tarifas por municipio/distancia definidas con los productores; hoy se acuerda por contacto |
+| Vereda de procedencia | Columna `productores.vereda` |
+| Recuperar contraseña | Servicio de correo (por ejemplo Resend o SendGrid) |
+| Recomendaciones personalizadas | Historial de compras para que Campi recomiende según lo que cada comprador pide seguido |
