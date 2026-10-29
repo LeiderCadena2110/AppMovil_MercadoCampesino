@@ -58,7 +58,7 @@ import { CopPipe, UnidadPipe } from './format';
     .sin-foto small { font-size: 0.72rem; font-weight: 700; }
     .pocas { position: absolute; left: 8px; bottom: 8px; }
     .corazon { position: absolute; top: 8px; right: 8px; width: 40px; height: 40px; border-radius: 50%; border: 0; cursor: pointer;
-      display: grid; place-items: center; font-size: 20px; background: rgba(255,255,255,.92); color: var(--mc-tinta); }
+      display: grid; place-items: center; font-size: 20px; background: color-mix(in srgb, var(--mc-superficie) 92%, transparent); color: var(--ion-text-color); }
     .corazon.activo { color: #c62828; }
     .info { display: flex; flex-direction: column; flex: 1; padding: 10px 10px 10px 12px; }
     h3 { font-size: 0.98rem; line-height: 1.2; margin: 0 0 4px; color: var(--ion-text-color);
