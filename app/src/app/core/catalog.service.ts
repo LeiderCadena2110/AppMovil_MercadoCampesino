@@ -3,7 +3,17 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { almacen } from './storage';
-import { Categoria, Municipio, PaginaCatalogo, Producto, Productor } from './models';
+import { Categoria, Municipio, PaginaCatalogo, Producto, ProductoLista, Productor } from './models';
+
+/** Producto del detalle → fila del catálogo (para tarjetas) */
+export function aLista(p: Producto): ProductoLista {
+  return {
+    id: p.id, nombre: p.nombre, precio: p.precio, unidad: p.unidad, stock: p.stock, fotoUrl: p.fotoUrl,
+    miniaturaUrl: p.miniaturaUrl ?? p.fotoUrl, productorId: p.productorId, finca: p.productor?.nombreFinca ?? '',
+    productor: p.productor?.usuario?.nombre, verificado: p.productor?.verificado,
+    municipio: p.productor?.municipio?.nombre ?? '', categoria: p.categoria?.nombre ?? '',
+  };
+}
 
 export type OrdenCatalogo = 'recientes' | 'precio_asc' | 'precio_desc';
 export interface FiltrosCatalogo {

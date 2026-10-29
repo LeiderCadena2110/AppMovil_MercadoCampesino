@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, effect, inject, signal } from '@angular/core';
 import {
   IonContent, IonHeader, IonToolbar, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent,
   IonRefresher, IonRefresherContent, IonSearchbar, IonButton, NavController,
@@ -9,7 +9,9 @@ import {
   nutritionOutline, leafOutline, ellipseOutline, appsOutline, waterOutline, cafeOutline, flowerOutline,
   basketOutline, cloudOfflineOutline, sparkles,
 } from 'ionicons/icons';
-import { CatalogoService } from '../core/catalog.service';
+import { CatalogoService, aLista } from '../core/catalog.service';
+import { FavoritosService } from '../core/favorites.service';
+import { CopPipe } from '../shared/format';
 import { AvisosService } from '../core/notifications.service';
 import { AuthService } from '../core/auth.service';
 import { Categoria, ProductoLista } from '../core/models';
@@ -21,7 +23,7 @@ import { EstadoVacioComponent } from '../shared/empty-state.component';
   selector: 'app-inicio',
   imports: [IonContent, IonHeader, IonToolbar, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent,
     IonRefresher, IonRefresherContent, IonSearchbar, IonButton, CatalogoListaComponent, CatalogoCargandoComponent,
-    EstadoVacioComponent],
+    EstadoVacioComponent, CopPipe],
   template: `
     <ion-header class="ion-no-border"><ion-toolbar>
       <div class="saludo">
@@ -47,6 +49,19 @@ import { EstadoVacioComponent } from '../shared/empty-state.component';
 
       @if (sinConexion()) {
         <p class="aviso"><ion-icon name="cloud-offline-outline" /> Sin conexión: estás viendo los productos guardados.</p>
+      }
+
+      @if (favoritos().length) {
+        <h2 class="seccion">Tus favoritos</h2>
+        <div class="favoritos">
+          @for (p of favoritos(); track p.id) {
+            <button type="button" class="fav mc-tocable" (click)="abrir(p.id)">
+              <span class="fav-foto">@if (p.miniaturaUrl) { <img [src]="p.miniaturaUrl" alt="" loading="lazy" /> } @else { <ion-icon name="leaf-outline" /> }</span>
+              <strong>{{ p.nombre }}</strong>
+              <small>{{ p.precio | cop }} / {{ p.unidad }}</small>
+            </button>
+          }
+        </div>
       }
 
       <nav class="categorias" aria-label="Categorías">
@@ -113,6 +128,14 @@ import { EstadoVacioComponent } from '../shared/empty-state.component';
     }
     .categorias button.activa .icono { background: var(--mc-destaque); border-color: var(--mc-destaque); color: var(--mc-destaque-texto); }
     .seccion { margin: 18px 16px 6px; font-size: 1.15rem; }
+    .favoritos { display: flex; gap: 10px; overflow-x: auto; padding: 4px 16px; scrollbar-width: none; }
+    .fav { flex: 0 0 128px; display: grid; gap: 4px; padding: 8px; text-align: left; border-radius: var(--mc-radio); cursor: pointer;
+      border: 1px solid var(--mc-borde); background: var(--mc-superficie); font: inherit; color: inherit; }
+    .fav-foto { height: 76px; border-radius: var(--mc-radio-chico); overflow: hidden; display: grid; place-items: center;
+      background: var(--mc-suelo); color: var(--mc-arcilla); font-size: 26px; }
+    .fav-foto img { width: 100%; height: 100%; object-fit: cover; }
+    .fav strong { font-size: 0.88rem; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .fav small { color: var(--mc-tinta-suave); font-size: 0.78rem; }
   `,
 })
 export class InicioPage implements OnInit {
@@ -124,6 +147,9 @@ export class InicioPage implements OnInit {
     const h = new Date().getHours();
     return h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches';
   })();
+  private favs = inject(FavoritosService);
+  /** Favoritos con datos frescos de la API (precio y cantidad actuales) */
+  favoritos = signal<ProductoLista[]>([]);
   categorias = signal<Categoria[]>([]);
   productos = signal<ProductoLista[]>([]);
   categoria = signal<number | null>(null);
@@ -136,6 +162,16 @@ export class InicioPage implements OnInit {
   constructor() {
     addIcons({ nutritionOutline, leafOutline, ellipseOutline, appsOutline, waterOutline, cafeOutline, flowerOutline,
       basketOutline, cloudOfflineOutline, sparkles });
+  }
+
+  private cargarFavoritos = effect(() => {
+    const ids = this.favs.ids().slice(0, 10);
+    Promise.all(ids.map((id) => this.catalogo.producto(id).then(aLista).catch(() => null))).then((lista) =>
+      this.favoritos.set(lista.filter((p): p is ProductoLista => !!p && p.stock > 0)));
+  });
+
+  abrir(id: number) {
+    this.nav.navigateForward(['/comprador/producto', id]);
   }
 
   tituloSeccion() {

@@ -1,7 +1,8 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, inject, input, output, signal } from '@angular/core';
 import { IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { add, leafOutline, locationOutline, checkmarkCircle } from 'ionicons/icons';
+import { add, leafOutline, locationOutline, checkmarkCircle, heart, heartOutline } from 'ionicons/icons';
+import { FavoritosService } from '../core/favorites.service';
 import { ProductoLista } from '../core/models';
 import { CopPipe, UnidadPipe } from './format';
 
@@ -18,6 +19,11 @@ import { CopPipe, UnidadPipe } from './format';
           <span class="sin-foto"><ion-icon name="leaf-outline" /><small>Sin foto</small></span>
         }
         @if (producto().stock <= 5) { <span class="mc-sello destaque pocas">Quedan {{ producto().stock }}</span> }
+      </button>
+      <button type="button" class="corazon mc-tocable" [class.activo]="favoritos.es(producto().id)" (click)="favoritos.alternar(producto().id)"
+        [attr.aria-pressed]="favoritos.es(producto().id)"
+        [attr.aria-label]="(favoritos.es(producto().id) ? 'Quitar de favoritos ' : 'Guardar en favoritos ') + producto().nombre">
+        <ion-icon [name]="favoritos.es(producto().id) ? 'heart' : 'heart-outline'" />
       </button>
 
       <div class="info">
@@ -43,7 +49,7 @@ import { CopPipe, UnidadPipe } from './format';
     </article>
   `,
   styles: `
-    .tarjeta { display: flex; flex-direction: column; height: calc(100% - 12px); margin: 6px; overflow: hidden;
+    .tarjeta { position: relative; display: flex; flex-direction: column; height: calc(100% - 12px); margin: 6px; overflow: hidden;
       background: var(--mc-superficie); border: 1px solid var(--mc-borde); border-radius: var(--mc-radio); }
     .foto { position: relative; display: block; width: 100%; aspect-ratio: 4 / 3; padding: 0; border: 0; cursor: pointer;
       background: var(--mc-suelo); }
@@ -51,6 +57,9 @@ import { CopPipe, UnidadPipe } from './format';
     .sin-foto { height: 100%; display: grid; place-content: center; justify-items: center; gap: 2px; color: var(--mc-arcilla); font-size: 34px; }
     .sin-foto small { font-size: 0.72rem; font-weight: 700; }
     .pocas { position: absolute; left: 8px; bottom: 8px; }
+    .corazon { position: absolute; top: 8px; right: 8px; width: 40px; height: 40px; border-radius: 50%; border: 0; cursor: pointer;
+      display: grid; place-items: center; font-size: 20px; background: rgba(255,255,255,.92); color: var(--mc-tinta); }
+    .corazon.activo { color: #c62828; }
     .info { display: flex; flex-direction: column; flex: 1; padding: 10px 10px 10px 12px; }
     h3 { font-size: 0.98rem; line-height: 1.2; margin: 0 0 4px; color: var(--ion-text-color);
       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -71,7 +80,8 @@ export class ProductoCardComponent {
   abrir = output<ProductoLista>();
   agregar = output<ProductoLista>();
   fotoFallo = signal(false);
+  favoritos = inject(FavoritosService);
   constructor() {
-    addIcons({ add, leafOutline, locationOutline, checkmarkCircle });
+    addIcons({ add, leafOutline, locationOutline, checkmarkCircle, heart, heartOutline });
   }
 }
