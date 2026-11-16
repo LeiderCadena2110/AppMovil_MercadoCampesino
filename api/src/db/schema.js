@@ -7,6 +7,8 @@ import {
 export const rolEnum = pgEnum('rol', ['COMPRADOR', 'PRODUCTOR', 'ADMIN']);
 export const estadoPedidoEnum = pgEnum('estado_pedido', ['PENDIENTE', 'ACEPTADO', 'RECHAZADO', 'LISTO', 'ENTREGADO']);
 export const metodoEntregaEnum = pgEnum('metodo_entrega', ['CONTRA_ENTREGA', 'RECOGIDA']);
+// NO_APLICA: se paga al recibir o al recoger. Los demás: pago en línea.
+export const pagoEstadoEnum = pgEnum('pago_estado', ['NO_APLICA', 'PENDIENTE', 'APROBADO', 'RECHAZADO']);
 
 export const usuarios = pgTable('usuarios', {
   id: serial('id').primaryKey(),
@@ -54,6 +56,20 @@ export const productos = pgTable('productos', {
   creadoEn: timestamp('creado_en', { withTimezone: true }).defaultNow().notNull(),
 }, (t) => [index('productos_categoria_idx').on(t.categoriaId), index('productos_productor_idx').on(t.productorId)]);
 
+// Un pago en línea cubre todos los pedidos de una compra (una finca = un pedido).
+// El estado real lo confirma la pasarela por webhook; nunca se toma lo que dice la app.
+export const pagos = pgTable('pagos', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  compradorId: integer('comprador_id').notNull().references(() => usuarios.id),
+  proveedor: varchar('proveedor', { length: 20 }).notNull(), // mercadopago | simulado
+  proveedorId: varchar('proveedor_id', { length: 100 }),      // id de la orden en la pasarela
+  estado: pagoEstadoEnum('estado').notNull().default('PENDIENTE'),
+  monto: numeric('monto', { precision: 12, scale: 2 }).notNull(),
+  urlPago: text('url_pago'),
+  creadoEn: timestamp('creado_en', { withTimezone: true }).defaultNow().notNull(),
+  actualizadoEn: timestamp('actualizado_en', { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [index('pagos_proveedor_idx').on(t.proveedor, t.proveedorId), index('pagos_comprador_idx').on(t.compradorId)]);
+
 export const pedidos = pgTable('pedidos', {
   id: serial('id').primaryKey(),
   compradorId: integer('comprador_id').notNull().references(() => usuarios.id),
@@ -62,6 +78,8 @@ export const pedidos = pgTable('pedidos', {
   total: numeric('total', { precision: 12, scale: 2 }).notNull(),
   direccion: text('direccion').notNull(),
   metodoEntrega: metodoEntregaEnum('metodo_entrega').notNull(),
+  pagoEstado: pagoEstadoEnum('pago_estado').notNull().default('NO_APLICA'),
+  pagoId: uuid('pago_id').references(() => pagos.id),
   creadoEn: timestamp('creado_en', { withTimezone: true }).defaultNow().notNull(),
 }, (t) => [index('pedidos_comprador_idx').on(t.compradorId), index('pedidos_productor_idx').on(t.productorId)]);
 
@@ -134,7 +152,9 @@ export const pedidosRel = relations(pedidos, ({ one, many }) => ({
   productor: one(productores, { fields: [pedidos.productorId], references: [productores.id] }),
   detalles: many(detallePedido),
   calificacion: one(calificaciones, { fields: [pedidos.id], references: [calificaciones.pedidoId] }),
+  pago: one(pagos, { fields: [pedidos.pagoId], references: [pagos.id] }),
 }));
+export const pagosRel = relations(pagos, ({ many }) => ({ pedidos: many(pedidos) }));
 export const detallePedidoRel = relations(detallePedido, ({ one }) => ({
   pedido: one(pedidos, { fields: [detallePedido.pedidoId], references: [pedidos.id] }),
   producto: one(productos, { fields: [detallePedido.productoId], references: [productos.id] }),

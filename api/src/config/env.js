@@ -26,4 +26,10 @@ export const env = {
   geminiModelo: process.env.GEMINI_MODELO || 'gemini-3.6-flash',
   // Notificaciones push (opcional): JSON de la cuenta de servicio de Firebase
   firebaseCuentaServicio: process.env.FIREBASE_SERVICE_ACCOUNT ?? '',
+  // Pagos en línea (opcional). Mercado Pago: credenciales de prueba TEST-... y clave del webhook.
+  mpAccessToken: process.env.MP_ACCESS_TOKEN ?? '',
+  mpWebhookSecret: process.env.MP_WEBHOOK_SECRET ?? '',
+  // Pasarela simulada en producción (para demostrar el flujo sin una cuenta de pagos)
+  pagosSimulados: process.env.PAGOS_SIMULADOS === '1',
+  pagosSimuladosSecreto: process.env.PAGOS_SIMULADOS_SECRETO ?? '',
 };

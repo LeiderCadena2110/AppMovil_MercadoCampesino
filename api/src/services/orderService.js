@@ -6,6 +6,7 @@ import { pedidoRepository, PEDIDOS_POR_PAGINA } from '../repositories/orderRepos
 import { productoRepository } from '../repositories/productRepository.js';
 import { ErrorApp } from '../middlewares/errors.js';
 import { notificaciones } from './notificationService.js';
+import { pagoService } from './paymentService.js';
 
 // Qué estado puede seguir a cada uno
 const TRANSICIONES = {
@@ -23,7 +24,8 @@ export const pedidoService = {
    * reintenta, se devuelve lo que se creó la primera vez ({ repetida: true }).
    */
   async crear(compradorId, datos, clave) {
-    const { direccion, metodoEntrega, items } = datos;
+    const { direccion, metodoEntrega, items, pagarEnLinea } = datos;
+    if (pagarEnLinea && !pagoService.disponible()) throw new ErrorApp(503, 'Los pagos en línea no están disponibles. Elige pagar al recibir.');
     return db.transaction(async (tx) => {
       if (clave) {
         const huella = createHash('sha256').update(JSON.stringify(datos)).digest('hex');
@@ -63,6 +65,7 @@ export const pedidoService = {
         const total = lineas.reduce((s, l) => s + Number(l.precioUnitario) * l.cantidad, 0);
         const pedido = await pedidoRepository.crear({
           compradorId, productorId, direccion, metodoEntrega, total: total.toFixed(2),
+          pagoEstado: pagarEnLinea ? 'PENDIENTE' : 'NO_APLICA',
         }, tx);
         await pedidoRepository.crearDetalles(lineas.map((l) => ({ ...l, pedidoId: pedido.id })), tx);
         creados.push(pedido);
@@ -119,6 +122,10 @@ export const pedidoService = {
       if (pedido.productorId !== usuario.productorId) throw new ErrorApp(403, 'Este pedido no es tuyo');
       if (!TRANSICIONES[pedido.estado].includes(nuevo)) {
         throw new ErrorApp(409, `No se puede pasar de ${pedido.estado} a ${nuevo}`);
+      }
+      // Pago en línea: se acepta solo cuando el pago está aprobado (rechazar sí se puede siempre)
+      if (nuevo === 'ACEPTADO' && ['PENDIENTE', 'RECHAZADO'].includes(pedido.pagoEstado)) {
+        throw new ErrorApp(409, 'Este pedido se paga en línea y el pago aún no está aprobado');
       }
       if (nuevo === 'RECHAZADO') {
         for (const d of pedido.detalles) await productoRepository.devolverStock(d.productoId, d.cantidad, tx);

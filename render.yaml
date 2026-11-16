@@ -34,6 +34,12 @@ services:
         sync: false
       - key: FIREBASE_SERVICE_ACCOUNT   # opcional: notificaciones push (JSON de la cuenta de servicio)
         sync: false
+      - key: MP_ACCESS_TOKEN     # opcional: Mercado Pago (credencial de prueba TEST-...)
+        sync: false
+      - key: MP_WEBHOOK_SECRET   # clave secreta del webhook de Mercado Pago
+        sync: false
+      - key: PAGOS_SIMULADOS     # 1 = pasarela de prueba propia mientras no haya Mercado Pago
+        value: "1"
       - key: URL_PUBLICA
         value: https://minga-app-api.onrender.com
       - key: CORS_ORIGEN

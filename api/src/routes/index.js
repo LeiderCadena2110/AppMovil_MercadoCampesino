@@ -4,7 +4,7 @@ import { verificarToken, verificarRol } from '../middlewares/auth.js';
 import { validar } from '../middlewares/validate.js';
 import {
   registroSchema, loginSchema, refreshSchema, productoSchema, catalogoQuery, pedidoSchema, pedidosQuery, estadoSchema, calificacionSchema,
-  asistenteSchema, descripcionIaSchema, precioIaSchema, dictadoIaSchema, dispositivoSchema,
+  asistenteSchema, descripcionIaSchema, precioIaSchema, dictadoIaSchema, dispositivoSchema, pagoSchema,
 } from '../schemas.js';
 import { limitePorUsuario } from '../middlewares/rateLimit.js';
 import { limiteLogin, limiteRegistro, limiteSesion } from '../middlewares/authLimits.js';
@@ -15,6 +15,7 @@ import { pedidoController } from '../controllers/orderController.js';
 import { adminController } from '../controllers/adminController.js';
 import { iaController } from '../controllers/aiController.js';
 import { notificaciones } from '../services/notificationService.js';
+import { pagoController } from '../controllers/paymentController.js';
 
 const subida = multer({
   storage: multer.memoryStorage(),
@@ -57,6 +58,14 @@ r.get('/pedidos/resumen', ...productor, pedidoController.resumen);
 r.get('/pedidos/:id', verificarToken, pedidoController.detalle);
 r.patch('/pedidos/:id/estado', ...productor, validar(estadoSchema), pedidoController.estado);
 r.post('/pedidos/:id/calificacion', ...comprador, validar(calificacionSchema), pedidoController.calificar);
+
+// Pagos en línea. Los avisos de la pasarela llegan sin sesión: se validan por su firma.
+r.post('/pagos', ...comprador, validar(pagoSchema), pagoController.crear);
+r.get('/pagos/retorno', pagoController.retorno);
+r.get('/pagos/simulado/:cobro', pagoController.paginaSimulada);
+r.post('/pagos/simulado/:cobro/resultado', ...pagoController.resultadoSimulado);
+r.post('/pagos/:proveedor/eventos', pagoController.evento);
+r.get('/pagos/:id', ...comprador, pagoController.estado);
 
 // Notificaciones push: el teléfono registra su token al iniciar sesión y lo borra al salir
 r.post('/dispositivos', verificarToken, validar(dispositivoSchema), async (req, res) => {

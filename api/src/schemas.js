@@ -58,6 +58,8 @@ export const catalogoQuery = z.object({
 export const pedidoSchema = z.object({
   direccion: z.string().trim().min(5),
   metodoEntrega: z.enum(['CONTRA_ENTREGA', 'RECOGIDA']),
+  // true: el comprador paga en línea; el productor puede aceptarlo cuando el pago se apruebe
+  pagarEnLinea: z.boolean().default(false),
   items: z.array(z.object({
     productoId: z.coerce.number().int().positive(),
     cantidad: z.coerce.number().int().positive(),
@@ -109,4 +111,8 @@ export const precioIaSchema = z.object({
 export const dispositivoSchema = z.object({
   token: z.string().trim().min(20).max(4096),
   plataforma: z.enum(['android', 'ios', 'web']).default('android'),
+});
+
+export const pagoSchema = z.object({
+  pedidoIds: z.array(z.coerce.number().int().positive()).min(1).max(20),
 });
