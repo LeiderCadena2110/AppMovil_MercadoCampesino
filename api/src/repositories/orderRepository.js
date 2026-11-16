@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, notInArray } from 'drizzle-orm';
+import { and, desc, eq, gte, inArray, notInArray, sql } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { pedidos, detallePedido, calificaciones } from '../db/schema.js';
 
@@ -33,5 +33,13 @@ export const pedidoRepository = {
   delComprador: (compradorId, opciones) => pagina(pedidos.compradorId, compradorId, opciones),
   delProductor: (productorId, opciones) => pagina(pedidos.productorId, productorId, opciones),
   cambiarEstado: (id, estado, tx = db) => tx.update(pedidos).set({ estado }).where(eq(pedidos.id, id)).returning().then((r) => r[0]),
+  /** Total y número de pedidos entregados por día (hora de Colombia) desde una fecha */
+  ventasPorDia: (productorId, desde) => {
+    const dia = sql`to_char(${pedidos.creadoEn} at time zone 'America/Bogota', 'YYYY-MM-DD')`;
+    return db.select({ fecha: dia, total: sql`coalesce(sum(${pedidos.total}), 0)`, pedidos: sql`count(*)::int` })
+      .from(pedidos)
+      .where(and(eq(pedidos.productorId, productorId), eq(pedidos.estado, 'ENTREGADO'), gte(pedidos.creadoEn, desde)))
+      .groupBy(dia);
+  },
   calificar: (datos) => db.insert(calificaciones).values(datos).returning().then((r) => r[0]),
 };

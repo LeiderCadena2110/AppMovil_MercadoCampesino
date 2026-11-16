@@ -82,6 +82,23 @@ export const pedidoService = {
     return { items: filas.slice(0, PEDIDOS_POR_PAGINA), hayMas: filas.length > PEDIDOS_POR_PAGINA };
   },
 
+  /**
+   * Ventas entregadas de los últimos `dias` días (incluido hoy), un dato por día aunque sea 0.
+   * Las fechas son de Colombia para que "hoy" sea el mismo día que ve el productor.
+   */
+  async resumenVentas(usuario, dias = 7) {
+    const hoy = fechaBogota(new Date());
+    const fechas = Array.from({ length: dias }, (_, i) => sumarDias(hoy, i - dias + 1));
+    // Margen de un día extra por la diferencia horaria; el filtro fino lo hace la fecha local
+    const desde = new Date(`${fechas[0]}T00:00:00-05:00`);
+    const filas = await pedidoRepository.ventasPorDia(usuario.productorId, desde);
+    const porFecha = new Map(filas.map((f) => [f.fecha, f]));
+    const serie = fechas.map((fecha) => ({
+      fecha, total: Number(porFecha.get(fecha)?.total ?? 0), pedidos: Number(porFecha.get(fecha)?.pedidos ?? 0),
+    }));
+    return { dias: serie, total: serie.reduce((s, d) => s + d.total, 0), pedidos: serie.reduce((s, d) => s + d.pedidos, 0) };
+  },
+
   async detalle(usuario, id) {
     const pedido = await pedidoRepository.porId(id);
     if (!pedido) throw new ErrorApp(404, 'Pedido no encontrado');
@@ -114,3 +131,13 @@ export const pedidoService = {
     return pedidoRepository.calificar({ pedidoId: id, puntaje, comentario });
   },
 };
+
+/** "YYYY-MM-DD" del día en Colombia (UTC-5, sin horario de verano) */
+function fechaBogota(d) {
+  return new Date(d.getTime() - 5 * 3600_000).toISOString().slice(0, 10);
+}
+function sumarDias(fecha, n) {
+  const d = new Date(`${fecha}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}

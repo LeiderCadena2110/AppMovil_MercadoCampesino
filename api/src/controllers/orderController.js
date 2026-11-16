@@ -20,6 +20,7 @@ export const pedidoController = {
     // Se sigue respondiendo un arreglo (compatible con versiones viejas de la app)
     res.set('X-Hay-Mas', String(hayMas)).json(items);
   },
+  resumen: async (req, res) => res.json(await pedidoService.resumenVentas(req.usuario, 7)),
   detalle: async (req, res) => res.json(await pedidoService.detalle(req.usuario, id(req))),
   estado: async (req, res) => res.json(await pedidoService.cambiarEstado(req.usuario, id(req), req.body.estado)),
   calificar: async (req, res) => res.status(201).json(await pedidoService.calificar(req.usuario, id(req), req.body)),
