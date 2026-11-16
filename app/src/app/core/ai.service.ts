@@ -6,6 +6,14 @@ import { ProductoLista } from './models';
 
 export interface MensajeIa { rol: 'usuario' | 'ia'; texto: string; productos?: ProductoLista[]; }
 export interface RespuestaAsistente { respuesta: string; productos: ProductoLista[]; fuente: 'gemini' | 'local'; }
+export interface ProductoReconocido {
+  reconocido: boolean; nombre?: string; categoriaId?: number | null; unidad?: string | null;
+  descripcion?: string | null; confianza?: 'alta' | 'media' | 'baja'; fuente: 'gemini' | 'local';
+}
+export interface DictadoEntendido {
+  nombre: string | null; precio: number | null; unidad: string | null; stock: number | null; categoriaId: number | null;
+  fuente: 'gemini' | 'local';
+}
 export interface PrecioSugerido { sugerido: number | null; minimo?: number; maximo?: number; muestras: number; explicacion: string; }
 
 /** Funciones de inteligencia artificial que ofrece la API (/api/ia) */
@@ -22,6 +30,22 @@ export class IaService {
 
   descripcion(datos: { nombre: string; unidad: string; categoria?: string; municipio?: string; finca?: string; notas?: string }) {
     return firstValueFrom(this.http.post<{ descripcion: string }>(`${this.api}/descripcion`, datos));
+  }
+
+  estado() {
+    return firstValueFrom(this.http.get<{ activa: boolean; proveedor: 'gemini' | 'local' }>(`${this.api}/estado`));
+  }
+
+  /** Qué producto se ve en la foto (nombre, categoría, unidad y descripción) */
+  reconocerFoto(foto: Blob) {
+    const datos = new FormData();
+    datos.append('foto', foto, 'foto.jpg');
+    return firstValueFrom(this.http.post<ProductoReconocido>(`${this.api}/foto`, datos));
+  }
+
+  /** Campos del producto a partir de lo que dijo el productor */
+  dictado(texto: string) {
+    return firstValueFrom(this.http.post<DictadoEntendido>(`${this.api}/dictado`, { texto }));
   }
 
   precio(datos: { nombre: string; categoriaId: number; unidad: string }) {

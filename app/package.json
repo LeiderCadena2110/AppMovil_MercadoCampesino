@@ -22,6 +22,7 @@
     "@angular/platform-browser": "^21.2.0",
     "@angular/router": "^21.2.0",
     "@aparajita/capacitor-secure-storage": "^8.0.1",
+    "@capacitor-community/speech-recognition": "7.0.1",
     "@capacitor/android": "^8.5.3",
     "@capacitor/app": "^8.1.2",
     "@capacitor/camera": "^8.2.5",
