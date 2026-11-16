@@ -1,4 +1,5 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, ElementRef, ViewChild, computed, inject, input, output, signal } from '@angular/core';
+import { TransicionesService } from '../core/transitions.service';
 import { IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { add, remove, leafOutline, locationOutline, checkmarkCircle, heart, heartOutline } from 'ionicons/icons';
@@ -18,10 +19,10 @@ import { CopPipe, UnidadPipe } from './format';
   template: `
     <article class="tarjeta">
       <div class="foto-caja">
-        <button type="button" class="foto" (click)="abrir.emit(producto())" [attr.aria-label]="'Ver y comprar ' + producto().nombre">
+        <button type="button" class="foto" (click)="ver()" [attr.aria-label]="'Ver y comprar ' + producto().nombre">
           @if (producto().miniaturaUrl && !fotoFallo()) {
-            <img [src]="producto().miniaturaUrl" [alt]="producto().nombre" loading="lazy" decoding="async"
-              [style.view-transition-name]="nombreTransicion()" (error)="fotoFallo.set(true)" />
+            <img #fotoImg [src]="producto().miniaturaUrl" [alt]="producto().nombre" loading="lazy" decoding="async"
+              (error)="fotoFallo.set(true)" />
           } @else {
             <span class="sin-foto"><ion-icon name="leaf-outline" /><small>Sin foto</small></span>
           }
@@ -35,7 +36,7 @@ import { CopPipe, UnidadPipe } from './format';
         </button>
       </div>
 
-      <button type="button" class="texto" (click)="abrir.emit(producto())">
+      <button type="button" class="texto" (click)="ver()">
         <h3>{{ producto().nombre }}</h3>
         <p class="origen">
           <ion-icon name="location-outline" aria-hidden="true" />
@@ -106,8 +107,9 @@ export class ProductoCardComponent {
   fotoFallo = signal(false);
   favoritos = inject(FavoritosService);
   private carrito = inject(CarritoService);
-  /** Nombre para la transición compartida de la foto hacia el detalle (lo asigna quien navega) */
-  nombreTransicion = signal<string | null>(null);
+  private transiciones = inject(TransicionesService);
+  /** La imagen de la tarjeta (si cargó) para la transición compartida */
+  @ViewChild('fotoImg') fotoImg?: ElementRef<HTMLImageElement>;
 
   enCarrito = computed(() => this.carrito.items().find((i) => i.producto.id === this.producto().id)?.cantidad ?? 0);
 
@@ -118,6 +120,12 @@ export class ProductoCardComponent {
   sumar(ev?: Event) {
     this.carrito.agregar(this.producto(), 1);
     this.agregar.emit({ producto: this.producto(), origen: (ev?.target as HTMLElement | null) ?? null });
+  }
+
+  /** Abre el detalle; la foto viaja hasta la del detalle */
+  ver() {
+    this.abrir.emit(this.producto());
+    this.transiciones.abrirProducto(this.producto(), this.fotoImg?.nativeElement ?? null);
   }
 
   restar() {

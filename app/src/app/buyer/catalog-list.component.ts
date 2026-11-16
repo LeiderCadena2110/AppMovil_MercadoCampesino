@@ -1,6 +1,5 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { IonGrid, IonRow, IonCol } from '@ionic/angular';
-import { NavController } from '@ionic/angular';
 import { ProductoCardComponent } from '../shared/product-card.component';
 import { ProductoLista } from '../core/models';
 
@@ -13,7 +12,7 @@ import { ProductoLista } from '../core/models';
       <ion-row>
         @for (p of productos(); track p.id) {
           <ion-col size="6" size-md="4" size-lg="3">
-            <app-producto-card [producto]="p" (abrir)="abrir($event)" />
+            <app-producto-card [producto]="p" />
           </ion-col>
         }
       </ion-row>
@@ -23,9 +22,4 @@ import { ProductoLista } from '../core/models';
 })
 export class CatalogoListaComponent {
   productos = input.required<ProductoLista[]>();
-  private nav = inject(NavController);
-
-  abrir(p: ProductoLista) {
-    this.nav.navigateForward(['/comprador/producto', p.id]);
-  }
 }

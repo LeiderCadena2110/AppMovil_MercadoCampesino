@@ -118,7 +118,7 @@ import { ProductoCardComponent } from '../shared/product-card.component';
                 <h2>{{ carril.titulo }}</h2>
                 <div class="pista">
                   @for (p of carril.items; track p.id) {
-                    <div class="celda"><app-producto-card [producto]="p" (abrir)="abrir($event.id)" /></div>
+                    <div class="celda"><app-producto-card [producto]="p" /></div>
                   }
                 </div>
               </section>

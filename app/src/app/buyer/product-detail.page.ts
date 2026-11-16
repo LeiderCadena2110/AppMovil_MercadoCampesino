@@ -11,6 +11,7 @@ import {
 } from 'ionicons/icons';
 import { CatalogoService, aLista } from '../core/catalog.service';
 import { FavoritosService } from '../core/favorites.service';
+import { FOTO_COMPARTIDA } from '../core/transitions.service';
 import { CatalogoListaComponent } from './catalog-list.component';
 import { EstadoVacioComponent } from '../shared/empty-state.component';
 import { CarritoService } from '../core/cart.service';
@@ -35,15 +36,31 @@ import { CopPipe, UnidadPipe } from '../shared/format';
       }
     </ion-toolbar></ion-header>
     <ion-content [fullscreen]="true">
+      <!-- Vista previa: llega con la navegación desde la tarjeta y se muestra al instante,
+           mientras se cargan los datos completos -->
+      @if (!producto() && previa(); as v) {
+        @if (v.miniaturaUrl) {
+          <img [src]="v.miniaturaUrl" [alt]="v.nombre" class="foto" data-foto-compartida [style.view-transition-name]="nombreFoto()" />
+        } @else { <div class="foto sin-foto" data-foto-compartida><ion-icon name="leaf-outline" /></div> }
+        <section class="hoja">
+          <span class="categoria">{{ v.categoria }}</span>
+          <h1>{{ v.nombre }}</h1>
+          <p class="precio mc-num">{{ v.precio | cop }} <small>por {{ v.unidad }}</small></p>
+          <div class="cargando-linea"></div><div class="cargando-linea corta"></div>
+        </section>
+      }
       @if (producto(); as p) {
-        <!-- La foto grande solo se descarga en el detalle (RNF-01) -->
-        @if (p.fotoUrl && !fotoFallo()) { <img [src]="p.fotoUrl" [alt]="p.nombre" class="foto" (error)="fotoFallo.set(true)" /> }
+        <!-- La foto grande solo se descarga en el detalle (RNF-01); mientras, se ve la miniatura -->
+        @if ((p.fotoUrl || previa()?.miniaturaUrl) && !fotoFallo()) {
+          <img [src]="p.fotoUrl ?? previa()?.miniaturaUrl" [alt]="p.nombre" class="foto" data-foto-compartida
+            [style.view-transition-name]="nombreFoto()" (error)="fotoFallo.set(true)" />
+        }
         @else { <div class="foto sin-foto"><ion-icon name="leaf-outline" /><small>Sin foto</small></div> }
 
         <section class="hoja">
           <span class="categoria">{{ p.categoria?.nombre }}</span>
           <h1>{{ p.nombre }}</h1>
-          <p class="precio">{{ p.precio | cop }} <small>por {{ p.unidad }}</small></p>
+          <p class="precio mc-num">{{ p.precio | cop }} <small>por {{ p.unidad }}</small></p>
           @if (p.stock > 0 && p.activo) {
             <p class="stock" [class.pocas]="p.stock <= 5">
               {{ p.stock <= 5 ? 'Solo quedan' : 'Hay' }} <strong>{{ p.stock }} {{ p.unidad | unidad: p.stock }}</strong> disponibles
@@ -81,12 +98,12 @@ import { CopPipe, UnidadPipe } from '../shared/format';
           <h2 class="sub relacionados">Más {{ (p.categoria?.nombre ?? 'productos').toLowerCase() }} de la región</h2>
           <app-catalogo-lista [productos]="relacionados()" />
         }
-      } @else if (fallo()) {
+      } @else if (fallo() && !previa()) {
         <app-estado-vacio tipo="error" icono="cloud-offline-outline" titulo="No pudimos cargar el producto"
           texto="Puede que ya no esté publicado o que no haya conexión.">
           <ion-button (click)="cargar()">Reintentar</ion-button>
         </app-estado-vacio>
-      } @else {
+      } @else if (!previa()) {
         <div class="ion-text-center ion-padding cargando"><ion-spinner /></div>
       }
     </ion-content>
@@ -138,6 +155,8 @@ import { CopPipe, UnidadPipe } from '../shared/format';
     .datos small { color: var(--ion-color-medium); }
     .ir { color: var(--ion-color-medium); }
     .cargando { margin-top: 40vh; }
+    .cargando-linea { height: 14px; width: 80%; margin-top: 14px; border-radius: 7px; background: var(--mc-borde); }
+    .cargando-linea.corta { width: 50%; }
     .pie { display: flex; gap: 12px; align-items: center; padding: 12px 16px calc(12px + var(--ion-safe-area-bottom, 0px));
       background: var(--mc-superficie); border-top: 1px solid var(--mc-borde); }
     .pie > ion-button { flex: 1; margin: 0; }
@@ -159,6 +178,10 @@ export class ProductoDetallePage implements OnInit {
   cantidad = signal(1);
   fotoFallo = signal(false);
   fallo = signal(false);
+  /** Producto que llega desde la tarjeta (estado de la navegación) para mostrarlo sin esperar */
+  previa = signal<ProductoLista | null>((history.state?.producto as ProductoLista | undefined) ?? null);
+  /** La foto lleva el nombre de la transición solo al llegar; luego se quita para no repetirlo */
+  nombreFoto = signal<string | null>(FOTO_COMPARTIDA);
 
   constructor() {
     addIcons({ addOutline, removeOutline, leafOutline, storefrontOutline, checkmarkCircle, chevronForward, heart, heartOutline,
@@ -166,6 +189,8 @@ export class ProductoDetallePage implements OnInit {
   }
 
   ngOnInit() {
+    if (this.previa()?.id !== +this.id()) this.previa.set(null);
+    setTimeout(() => this.nombreFoto.set(null), 800);
     this.cargar();
   }
 
