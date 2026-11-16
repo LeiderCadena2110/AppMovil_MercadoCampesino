@@ -18,12 +18,13 @@ import { Categoria, ProductoLista } from '../core/models';
 import { CatalogoListaComponent } from './catalog-list.component';
 import { CatalogoCargandoComponent } from '../shared/catalog-skeleton.component';
 import { EstadoVacioComponent } from '../shared/empty-state.component';
+import { IconoCategoriaComponent } from '../shared/category-icon.component';
 
 @Component({
   selector: 'app-inicio',
   imports: [IonContent, IonHeader, IonToolbar, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent,
     IonRefresher, IonRefresherContent, IonSearchbar, IonButton, CatalogoListaComponent, CatalogoCargandoComponent,
-    EstadoVacioComponent, CopPipe],
+    EstadoVacioComponent, CopPipe, IconoCategoriaComponent],
   template: `
     <ion-header class="ion-no-border"><ion-toolbar>
       <div class="saludo">
@@ -66,11 +67,11 @@ import { EstadoVacioComponent } from '../shared/empty-state.component';
 
       <nav class="categorias" aria-label="Categorías">
         <button type="button" [class.activa]="categoria() === null" (click)="filtrar(null)">
-          <span class="icono"><ion-icon name="basket-outline" /></span>Todo
+          <span class="icono"><app-icono-categoria nombre="todo" [tamano]="30" /></span>Todo
         </button>
         @for (c of categorias(); track c.id) {
           <button type="button" [class.activa]="categoria() === c.id" (click)="filtrar(c.id)">
-            <span class="icono"><ion-icon [name]="(c.icono ?? 'leaf') + '-outline'" /></span>{{ c.nombre }}
+            <span class="icono"><app-icono-categoria [nombre]="c.nombre" [tamano]="30" /></span>{{ c.nombre }}
           </button>
         }
       </nav>
