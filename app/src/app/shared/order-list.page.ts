@@ -22,6 +22,7 @@ import { receiptOutline } from 'ionicons/icons';
     IonRefresherContent, IonSegment, IonSegmentButton, IonInfiniteScroll, IonInfiniteScrollContent, CopPipe, EstadoPipe,
     EstadoVacioComponent],
   styles: `
+    .pago { color: var(--mc-barro); font-weight: 700; }
     .titulo { margin: 10px 16px 0; font-size: 1.7rem; }
     .segmento { padding: 4px 12px 8px; }
   `,
@@ -43,7 +44,11 @@ import { receiptOutline } from 'ionicons/icons';
             <ion-label>
               <h3>Pedido #{{ p.id }} · {{ esProductor ? p.comprador.nombre : p.productor.nombreFinca }}</h3>
               <p>{{ p.creadoEn | date: 'd MMM, h:mm a' }} · {{ p.detalles.length }} producto(s)</p>
-              <ion-note>{{ p.total | cop }}</ion-note>
+              <ion-note>{{ p.total | cop }}
+                @if (p.estado === 'PENDIENTE' && p.pagoEstado === 'PENDIENTE') { · <span class="pago">esperando pago</span> }
+                @else if (p.estado === 'PENDIENTE' && p.pagoEstado === 'RECHAZADO') { · <span class="pago">pago rechazado</span> }
+                @else if (p.pagoEstado === 'APROBADO') { · pagado en línea }
+              </ion-note>
             </ion-label>
             <ion-badge slot="end" [color]="p.estado | estado: 'color'">{{ p.estado | estado }}</ion-badge>
           </ion-item>

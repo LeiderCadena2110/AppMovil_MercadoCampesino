@@ -43,9 +43,14 @@ export interface DetallePedido {
   producto: { id: number; nombre: string; unidad: string; fotoUrl: string | null };
 }
 
+export type PagoEstado = 'NO_APLICA' | 'PENDIENTE' | 'APROBADO' | 'RECHAZADO';
+export interface Pago { id: string; estado: PagoEstado; monto: number; proveedor: 'mercadopago' | 'simulado'; urlPago: string | null; pedidoIds: number[]; }
+
 export interface Pedido {
   id: number; compradorId: number; productorId: number; estado: EstadoPedido; total: string;
   direccion: string; metodoEntrega: MetodoEntrega; creadoEn: string;
+  /** NO_APLICA: se paga al recibir. Los demás: pago en línea */
+  pagoEstado: PagoEstado; pagoId: string | null;
   detalles: DetallePedido[];
   productor: { id: number; nombreFinca: string; usuario: { nombre: string; telefono: string | null } };
   comprador: { id: number; nombre: string; telefono: string | null };

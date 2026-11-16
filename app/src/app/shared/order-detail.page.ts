@@ -3,12 +3,14 @@ import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonButton, IonFooter, IonIcon, IonSpinner, IonTextarea,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { star, starOutline, callOutline, logoWhatsapp, shieldCheckmarkOutline, cloudOfflineOutline } from 'ionicons/icons';
+import { cardOutline, star, starOutline, callOutline, logoWhatsapp, shieldCheckmarkOutline, cloudOfflineOutline } from 'ionicons/icons';
 import { LineaPedidoComponent } from './order-timeline.component';
 import { EstadoVacioComponent } from './empty-state.component';
 import { enlaceLlamada, enlaceWhatsApp } from './contact';
 import { AuthService } from '../core/auth.service';
 import { PedidosService } from '../core/orders.service';
+import { PagosService } from '../core/payments.service';
+import { vibrar } from '../core/haptics';
 import { AvisosService } from '../core/notifications.service';
 import { EstadoPedido, Pedido } from '../core/models';
 import { CopPipe, ESTADOS, UnidadPipe } from './format';
@@ -30,6 +32,18 @@ const SIGUIENTE: Partial<Record<EstadoPedido, { estado: EstadoPedido; texto: str
     </ion-toolbar></ion-header>
     <ion-content class="ion-padding">
       @if (pedido(); as p) {
+        @if (p.estado === 'PENDIENTE' && (p.pagoEstado === 'PENDIENTE' || p.pagoEstado === 'RECHAZADO')) {
+          <p class="aviso-pago" role="status">
+            <ion-icon name="card-outline" />
+            @if (esProductor) {
+              <span>Este pedido se paga en línea. Podrás confirmarlo cuando el pago del comprador se apruebe; te llegará un aviso.</span>
+            } @else if (p.pagoEstado === 'RECHAZADO') {
+              <span>El pago no se aprobó. Tu pedido sigue guardado: vuelve a intentarlo.</span>
+            } @else {
+              <span>Falta el pago. La finca prepara tu pedido cuando el pago se apruebe.</span>
+            }
+          </p>
+        }
         <section class="bloque">
           <app-linea-pedido [estado]="p.estado" [metodo]="p.metodoEntrega" [creado]="p.creadoEn" />
         </section>
@@ -58,7 +72,11 @@ const SIGUIENTE: Partial<Record<EstadoPedido, { estado: EstadoPedido; texto: str
 
         <section class="bloque tarjeta">
           <h2>Entrega</h2>
-          <p class="fila"><span>Forma</span><strong>{{ p.metodoEntrega === 'RECOGIDA' ? 'Se recoge en la finca' : 'Contra entrega (se paga al recibir)' }}</strong></p>
+          <p class="fila"><span>Forma</span><strong>{{ p.metodoEntrega === 'RECOGIDA' ? 'Se recoge en la finca' : (p.pagoEstado === 'NO_APLICA' ? 'Contra entrega (se paga al recibir)' : 'Envío a domicilio') }}</strong></p>
+          <p class="fila"><span>Pago</span>
+            @if (p.pagoEstado === 'NO_APLICA') { <strong>{{ p.metodoEntrega === 'RECOGIDA' ? 'Al recoger' : 'Al recibir' }}</strong> }
+            @else { <strong class="pago" [class]="p.pagoEstado">{{ textoPago[p.pagoEstado] }}</strong> }
+          </p>
           <p class="fila"><span>Dirección</span><strong>{{ p.direccion }}</strong></p>
           <p class="fila"><span>Costo de envío</span><strong>{{ p.metodoEntrega === 'RECOGIDA' ? 'Sin envío' : 'Se acuerda con el productor' }}</strong></p>
         </section>
@@ -100,11 +118,22 @@ const SIGUIENTE: Partial<Record<EstadoPedido, { estado: EstadoPedido; texto: str
       }
     </ion-content>
 
+    @if (!esProductor && pedido(); as p) {
+      @if (p.estado === 'PENDIENTE' && (p.pagoEstado === 'PENDIENTE' || p.pagoEstado === 'RECHAZADO')) {
+        <ion-footer class="ion-no-border pie">
+          <ion-button expand="block" size="large" [disabled]="pagando()" (click)="pagar()">
+            @if (pagando()) { <ion-spinner name="crescent" /> } @else { {{ p.pagoEstado === 'RECHAZADO' ? 'Intentar el pago de nuevo' : 'Pagar ahora' }} · {{ p.total | cop }} }
+          </ion-button>
+        </ion-footer>
+      }
+    }
     @if (esProductor && pedido(); as p) {
       @if (p.estado === 'PENDIENTE') {
         <ion-footer class="ion-no-border pie acciones">
           <ion-button color="danger" fill="outline" size="large" [disabled]="ocupado()" (click)="cambiar('RECHAZADO')">Rechazar</ion-button>
-          <ion-button size="large" [disabled]="ocupado()" (click)="cambiar('ACEPTADO')">Confirmar pedido</ion-button>
+          <ion-button size="large" [disabled]="ocupado() || esperaPago()" (click)="cambiar('ACEPTADO')">
+            {{ esperaPago() ? 'Esperando pago' : 'Confirmar pedido' }}
+          </ion-button>
         </ion-footer>
       } @else if (siguiente(); as s) {
         <ion-footer class="ion-no-border pie">
@@ -131,6 +160,13 @@ const SIGUIENTE: Partial<Record<EstadoPedido, { estado: EstadoPedido; texto: str
     .estrellas { display: flex; font-size: 28px; }
     .pie { padding: 10px 16px calc(10px + var(--ion-safe-area-bottom, 0px)); background: var(--mc-superficie); border-top: 1px solid var(--mc-borde); }
     .acciones { display: flex; gap: 12px; }
+    .aviso-pago { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 16px; padding: 12px 14px; border-radius: var(--mc-radio);
+      background: color-mix(in srgb, var(--mc-destaque) 22%, var(--mc-superficie)); font-size: 0.92rem; }
+    .aviso-pago ion-icon { flex-shrink: 0; font-size: 20px; margin-top: 1px; color: var(--mc-barro); }
+    .pago { padding: 2px 10px; border-radius: 999px; font-size: 0.85rem; }
+    .pago.APROBADO { background: color-mix(in srgb, var(--ion-color-success) 15%, var(--mc-superficie)); color: color-mix(in srgb, var(--ion-color-success) 55%, var(--mc-tinta)); }
+    .pago.PENDIENTE { background: var(--mc-suelo); color: var(--mc-barro); }
+    .pago.RECHAZADO { background: color-mix(in srgb, var(--ion-color-danger) 12%, var(--mc-superficie)); color: color-mix(in srgb, var(--ion-color-danger) 60%, var(--mc-tinta)); }
     .acciones ion-button { flex: 1; margin: 0; }
   `,
 })
@@ -144,6 +180,11 @@ export class PedidoDetallePage implements OnInit {
   puntaje = signal(0);
   comentario = signal('');
   fallo = signal(false);
+  pagando = signal(false);
+  private pagosSrv = inject(PagosService);
+  readonly textoPago: Record<string, string> = { PENDIENTE: 'En línea · pendiente', APROBADO: 'En línea · pagado', RECHAZADO: 'En línea · rechazado' };
+  /** Pedido pagado en línea cuyo pago aún no se aprueba: el productor no puede confirmarlo */
+  esperaPago = computed(() => ['PENDIENTE', 'RECHAZADO'].includes(this.pedido()?.pagoEstado ?? ''));
   siguiente = computed(() => SIGUIENTE[this.pedido()?.estado ?? 'PENDIENTE'] ?? null);
 
   /** Teléfono de la otra parte del pedido */
@@ -155,7 +196,7 @@ export class PedidoDetallePage implements OnInit {
   llamada = computed(() => enlaceLlamada(this.telefono()));
 
   constructor() {
-    addIcons({ star, starOutline, callOutline, logoWhatsapp, shieldCheckmarkOutline, cloudOfflineOutline });
+    addIcons({ cardOutline, star, starOutline, callOutline, logoWhatsapp, shieldCheckmarkOutline, cloudOfflineOutline });
   }
 
   async ngOnInit() {
@@ -178,6 +219,21 @@ export class PedidoDetallePage implements OnInit {
       this.avisos.error(e);
     } finally {
       this.ocupado.set(false);
+    }
+  }
+
+  async pagar() {
+    this.pagando.set(true);
+    try {
+      const estado = await this.pagosSrv.pagar([+this.id()]);
+      await this.cargar();
+      if (estado === 'APROBADO') { vibrar.exito(); this.avisos.exito('¡Pago aprobado!'); }
+      else if (estado === 'RECHAZADO') this.avisos.error(new Error('El pago no se aprobó. Puedes intentarlo de nuevo.'));
+      else this.avisos.exito('Pago en proceso. Te avisaremos cuando se confirme.');
+    } catch (e) {
+      this.avisos.error(e);
+    } finally {
+      this.pagando.set(false);
     }
   }
 
