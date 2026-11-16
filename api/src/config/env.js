@@ -18,9 +18,12 @@ export const env = {
   jwtExpira: process.env.JWT_EXPIRA ?? '15m',
   refreshDias: Number(process.env.REFRESH_DIAS ?? 30),
   cloudinaryUrl: process.env.CLOUDINARY_URL ?? '',
-  urlPublica: process.env.URL_PUBLICA ?? `http://localhost:${process.env.PORT ?? 3000}`,
+  // Render define RENDER_EXTERNAL_URL automáticamente
+  urlPublica: process.env.URL_PUBLICA || process.env.RENDER_EXTERNAL_URL || `http://localhost:${process.env.PORT ?? 3000}`,
   corsOrigen: process.env.CORS_ORIGEN ?? '*',
   // IA (opcional). Sin clave, la app usa respuestas locales básicas.
   geminiApiKey: process.env.GEMINI_API_KEY ?? '',
   geminiModelo: process.env.GEMINI_MODELO || 'gemini-3.6-flash',
+  // Notificaciones push (opcional): JSON de la cuenta de servicio de Firebase
+  firebaseCuentaServicio: process.env.FIREBASE_SERVICE_ACCOUNT ?? '',
 };

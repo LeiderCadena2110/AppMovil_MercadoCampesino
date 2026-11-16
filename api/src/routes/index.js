@@ -4,7 +4,7 @@ import { verificarToken, verificarRol } from '../middlewares/auth.js';
 import { validar } from '../middlewares/validate.js';
 import {
   registroSchema, loginSchema, refreshSchema, productoSchema, catalogoQuery, pedidoSchema, pedidosQuery, estadoSchema, calificacionSchema,
-  asistenteSchema, descripcionIaSchema, precioIaSchema, dictadoIaSchema,
+  asistenteSchema, descripcionIaSchema, precioIaSchema, dictadoIaSchema, dispositivoSchema,
 } from '../schemas.js';
 import { limitePorUsuario } from '../middlewares/rateLimit.js';
 import { limiteLogin, limiteRegistro, limiteSesion } from '../middlewares/authLimits.js';
@@ -14,6 +14,7 @@ import { misProductosController } from '../controllers/myProductsController.js';
 import { pedidoController } from '../controllers/orderController.js';
 import { adminController } from '../controllers/adminController.js';
 import { iaController } from '../controllers/aiController.js';
+import { notificaciones } from '../services/notificationService.js';
 
 const subida = multer({
   storage: multer.memoryStorage(),
@@ -56,6 +57,16 @@ r.get('/pedidos/resumen', ...productor, pedidoController.resumen);
 r.get('/pedidos/:id', verificarToken, pedidoController.detalle);
 r.patch('/pedidos/:id/estado', ...productor, validar(estadoSchema), pedidoController.estado);
 r.post('/pedidos/:id/calificacion', ...comprador, validar(calificacionSchema), pedidoController.calificar);
+
+// Notificaciones push: el teléfono registra su token al iniciar sesión y lo borra al salir
+r.post('/dispositivos', verificarToken, validar(dispositivoSchema), async (req, res) => {
+  await notificaciones.registrarDispositivo(req.usuario.id, req.body);
+  res.status(204).end();
+});
+r.delete('/dispositivos', verificarToken, validar(dispositivoSchema.pick({ token: true })), async (req, res) => {
+  await notificaciones.quitarDispositivo(req.usuario.id, req.body.token);
+  res.status(204).end();
+});
 
 // Inteligencia artificial (requiere sesión; máx. 15 consultas por minuto por usuario)
 const limiteIa = limitePorUsuario({ maximo: 15, ventanaMs: 60_000 });

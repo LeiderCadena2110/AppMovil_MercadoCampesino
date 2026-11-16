@@ -7,6 +7,7 @@ import rutas from './routes/index.js';
 import { pool } from './db/index.js';
 import { tipoAlmacenamiento } from './storage/index.js';
 import { iaService } from './services/aiService.js';
+import { pushDisponible } from './push/fcm.js';
 import { manejarErrores, noEncontrado } from './middlewares/errors.js';
 
 export const app = express();
@@ -30,7 +31,8 @@ app.get('/api/salud', async (_req, res) => {
   }
   const ok = baseDatos === 'ok';
   res.status(ok ? 200 : 503).json({
-    ok, baseDatos, fotos: tipoAlmacenamiento, ia: iaService.estado().proveedor, ms: Date.now() - inicio,
+    ok, baseDatos, fotos: tipoAlmacenamiento, ia: iaService.estado().proveedor,
+    push: pushDisponible() ? 'firebase' : 'sin configurar', ms: Date.now() - inicio,
   });
 });
 app.use('/api', rutas);

@@ -104,6 +104,16 @@ export const solicitudesIdempotentes = pgTable('solicitudes_idempotentes', {
   creadoEn: timestamp('creado_en', { withTimezone: true }).defaultNow().notNull(),
 }, (t) => [primaryKey({ columns: [t.usuarioId, t.clave] }), index('solicitudes_idempotentes_creado_idx').on(t.creadoEn)]);
 
+// Teléfonos donde cada usuario recibe notificaciones push (token de Firebase Cloud Messaging).
+// Un mismo teléfono puede cambiar de usuario: el token es único y se reasigna.
+export const dispositivos = pgTable('dispositivos', {
+  id: serial('id').primaryKey(),
+  usuarioId: integer('usuario_id').notNull().references(() => usuarios.id, { onDelete: 'cascade' }),
+  token: text('token').notNull().unique(),
+  plataforma: varchar('plataforma', { length: 20 }).notNull().default('android'),
+  actualizadoEn: timestamp('actualizado_en', { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [index('dispositivos_usuario_idx').on(t.usuarioId)]);
+
 // Relaciones para consultas con `with`
 export const usuariosRel = relations(usuarios, ({ one, many }) => ({
   productor: one(productores, { fields: [usuarios.id], references: [productores.usuarioId] }),

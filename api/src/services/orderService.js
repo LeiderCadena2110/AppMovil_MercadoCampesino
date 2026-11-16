@@ -5,6 +5,7 @@ import { solicitudesIdempotentes } from '../db/schema.js';
 import { pedidoRepository, PEDIDOS_POR_PAGINA } from '../repositories/orderRepository.js';
 import { productoRepository } from '../repositories/productRepository.js';
 import { ErrorApp } from '../middlewares/errors.js';
+import { notificaciones } from './notificationService.js';
 
 // Qué estado puede seguir a cada uno
 const TRANSICIONES = {
@@ -71,6 +72,10 @@ export const pedidoService = {
           .where(and(eq(solicitudesIdempotentes.usuarioId, compradorId), eq(solicitudesIdempotentes.clave, clave)));
       }
       return { repetida: false, pedidos: creados };
+    }).then((r) => {
+      // Aviso a cada productor. Los que se pagan en línea se avisan cuando el pago se aprueba.
+      if (!r.repetida) for (const p of r.pedidos) if (p.pagoEstado !== 'PENDIENTE') notificaciones.pedidoNuevo(p);
+      return r;
     });
   },
 
@@ -118,8 +123,12 @@ export const pedidoService = {
       if (nuevo === 'RECHAZADO') {
         for (const d of pedido.detalles) await productoRepository.devolverStock(d.productoId, d.cantidad, tx);
       }
-      // Aquí se enviaría la notificación push al comprador (Firebase Cloud Messaging)
-      return pedidoRepository.cambiarEstado(id, nuevo, tx);
+      const actualizado = await pedidoRepository.cambiarEstado(id, nuevo, tx);
+      return { actualizado, finca: pedido.productor.nombreFinca };
+    }).then(({ actualizado, finca }) => {
+      // Después de guardar: aviso push al comprador (no se espera ni rompe la respuesta)
+      notificaciones.estadoCambiado(actualizado, finca);
+      return actualizado;
     });
   },
 

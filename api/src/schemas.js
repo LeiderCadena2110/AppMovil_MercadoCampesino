@@ -105,3 +105,8 @@ export const precioIaSchema = z.object({
   categoriaId: z.coerce.number().int().positive(),
   unidad: z.enum(['kg', 'libra', 'arroba', 'unidad', 'bulto', 'atado', 'litro']),
 });
+
+export const dispositivoSchema = z.object({
+  token: z.string().trim().min(20).max(4096),
+  plataforma: z.enum(['android', 'ios', 'web']).default('android'),
+});
