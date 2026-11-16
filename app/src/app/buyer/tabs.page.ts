@@ -4,6 +4,7 @@ import { addIcons } from 'ionicons';
 import { homeOutline, searchOutline, cartOutline, receiptOutline, personOutline } from 'ionicons/icons';
 import { CarritoService } from '../core/cart.service';
 import { NovedadesPedidosService } from '../core/order-updates.service';
+import { PushService } from '../core/push.service';
 
 @Component({
   selector: 'app-comprador-tabs',
@@ -31,8 +32,10 @@ import { NovedadesPedidosService } from '../core/order-updates.service';
 export class CompradorTabsPage implements OnInit, OnDestroy {
   carrito = inject(CarritoService);
   novedades = inject(NovedadesPedidosService);
+  private push = inject(PushService);
   ngOnInit() {
     this.novedades.iniciar();
+    this.push.iniciar();
   }
   ngOnDestroy() {
     this.novedades.detener();

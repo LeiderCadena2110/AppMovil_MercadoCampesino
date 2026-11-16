@@ -64,6 +64,21 @@ jobs:
           sed -i "s|apiUrl: '.*'|apiUrl: '${{ vars.API_URL }}'|" src/environments/environment.prod.ts
           cat src/environments/environment.prod.ts
 
+      # Notificaciones push: el secreto GOOGLE_SERVICES_JSON (archivo de Firebase) se escribe aquí
+      # y nunca se sube al repositorio. Sin él, el APK funciona igual pero sin notificaciones.
+      - name: Activar notificaciones push (Firebase) si está configurado
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then
+            printf '%s' "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
+            node -e "const j=require('./android/app/google-services.json'); if(!j.client?.some(c=>c.client_info?.android_client_info?.package_name==='co.edu.ucc.mingaapp')) { console.error('::error::google-services.json no tiene la app co.edu.ucc.mingaapp'); process.exit(1) }"
+            sed -i "s|push: false|push: true|" src/environments/environment.prod.ts
+            echo "Notificaciones push activadas"
+          else
+            echo "::notice::Sin el secreto GOOGLE_SERVICES_JSON: APK sin notificaciones push"
+          fi
+
       - name: Compilar la app web (producción)
         run: npx ng build
 

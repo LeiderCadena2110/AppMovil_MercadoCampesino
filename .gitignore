@@ -3,3 +3,6 @@ node_modules/
 dist/
 .angular/
 uploads/
+
+# Archivo de Firebase: lo escribe GitHub Actions desde el secreto GOOGLE_SERVICES_JSON
+app/android/app/google-services.json

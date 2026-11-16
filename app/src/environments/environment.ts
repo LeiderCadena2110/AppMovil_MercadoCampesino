@@ -6,4 +6,6 @@ export const environment = {
   nombre: 'desarrollo',
   /** DSN de Sentry para la app (vacío = sin monitoreo) */
   sentryDsn: '',
+  /** Notificaciones push: requiere android/app/google-services.json (de Firebase) */
+  push: false,
 };

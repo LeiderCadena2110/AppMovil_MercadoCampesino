@@ -6,4 +6,6 @@ export const environment = {
   nombre: 'produccion',
   // GitHub Actions lo reemplaza con la variable SENTRY_DSN_APP si existe
   sentryDsn: '',
+  // GitHub Actions lo pone en true si existe el secreto GOOGLE_SERVICES_JSON (notificaciones push)
+  push: false,
 };

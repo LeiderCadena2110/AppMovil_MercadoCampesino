@@ -2,6 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient, HttpContext, HttpContextToken, HttpErrorResponse } from '@angular/common/http';
 import { NavController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
+import { PushService } from './push.service';
 import { environment } from '../../environments/environment';
 import { almacen } from './storage';
 import { almacenSeguro } from './secure-storage';
@@ -17,6 +18,7 @@ export const SIN_CONEXION = 'SIN_CONEXION';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private push = inject(PushService);
   private http = inject(HttpClient);
   private nav = inject(NavController);
   private sesion = signal<Sesion | null>(null);
@@ -75,6 +77,7 @@ export class AuthService {
 
   async salir() {
     const refreshToken = this.sesion()?.refreshToken;
+    this.push.olvidar(); // antes de borrar la sesión: la petición aún lleva el token
     this.sesion.set(null);
     // Se revoca en el servidor sin esperar: si no hay internet, igual se cierra en el teléfono
     if (refreshToken) {

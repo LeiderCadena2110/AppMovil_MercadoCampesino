@@ -40,6 +40,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Cámara y galería para las fotos de productos -->
     <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Notificaciones push de pedidos (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- Dictar los datos del producto por voz -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
