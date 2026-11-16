@@ -53,8 +53,14 @@ export const productos = pgTable('productos', {
   fotoUrl: text('foto_url'),
   activo: boolean('activo').notNull().default(true),
   oculto: boolean('oculto').notNull().default(false), // moderación del administrador
+  // Id que genera el teléfono al crear el producto (también sin señal): si la sincronización
+  // se repite, no se crea dos veces
+  clienteId: uuid('cliente_id'),
   creadoEn: timestamp('creado_en', { withTimezone: true }).defaultNow().notNull(),
-}, (t) => [index('productos_categoria_idx').on(t.categoriaId), index('productos_productor_idx').on(t.productorId)]);
+}, (t) => [
+  index('productos_categoria_idx').on(t.categoriaId), index('productos_productor_idx').on(t.productorId),
+  uniqueIndex('productos_productor_cliente_uq').on(t.productorId, t.clienteId),
+]);
 
 // Un pago en línea cubre todos los pedidos de una compra (una finca = un pedido).
 // El estado real lo confirma la pasarela por webhook; nunca se toma lo que dice la app.

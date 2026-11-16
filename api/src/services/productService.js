@@ -1,6 +1,6 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { db } from '../db/index.js';
-import { productores } from '../db/schema.js';
+import { productores, productos } from '../db/schema.js';
 import { productoRepository } from '../repositories/productRepository.js';
 import { almacenamiento } from '../storage/index.js';
 import { ErrorApp } from '../middlewares/errors.js';
@@ -42,11 +42,24 @@ export const productoService = {
 
   misProductos: async (productorId) => (await productoRepository.delProductor(productorId)).map(conMiniatura),
 
-  crear: (productorId, datos) => productoRepository.crear({ ...datos, precio: String(datos.precio), productorId }),
+  /**
+   * Con clienteId (lo envía el teléfono) crear es idempotente: si ese producto ya llegó en una
+   * sincronización anterior, se devuelve el existente en vez de crear otro. { producto, repetido }
+   */
+  async crear(productorId, datos) {
+    const fila = { ...datos, precio: String(datos.precio), productorId };
+    if (!datos.clienteId) return { producto: await productoRepository.crear(fila), repetido: false };
+    const [nuevo] = await db.insert(productos).values(fila).onConflictDoNothing().returning();
+    if (nuevo) return { producto: nuevo, repetido: false };
+    const [previo] = await db.select().from(productos)
+      .where(and(eq(productos.productorId, productorId), eq(productos.clienteId, datos.clienteId)));
+    return { producto: previo, repetido: true };
+  },
 
   async actualizar(productorId, id, datos) {
     await propio(productorId, id);
-    return productoRepository.actualizar(id, { ...datos, precio: String(datos.precio) });
+    const { clienteId: _ignorado, ...cambios } = datos; // el id del teléfono no se cambia
+    return productoRepository.actualizar(id, { ...cambios, precio: String(cambios.precio) });
   },
 
   async eliminar(productorId, id) {

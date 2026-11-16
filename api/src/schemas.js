@@ -39,6 +39,8 @@ export const productoSchema = z.object({
   stock: z.coerce.number().int().min(0),
   descripcion: z.string().trim().max(600).optional(),
   activo: z.boolean().optional(),
+  // Solo al crear: id generado en el teléfono para que la sincronización sin señal no duplique
+  clienteId: z.string().uuid().optional(),
 });
 
 export const catalogoQuery = z.object({

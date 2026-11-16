@@ -43,6 +43,13 @@
       "when": 1794829303490,
       "tag": "0005_online_payments",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794834262214,
+      "tag": "0006_product_client_id",
+      "breakpoints": true
     }
   ]
 }
