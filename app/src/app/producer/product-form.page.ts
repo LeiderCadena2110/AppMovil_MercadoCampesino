@@ -1,3 +1,6 @@
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
@@ -52,7 +55,12 @@ const MAX_FOTO_MB = 5;
             <span class="vacia"><ion-icon name="camera-outline" /><strong>Agregar foto</strong><small>Con buena luz y el producto de cerca</small></span>
           }
         </button>
-        @if (errorFoto()) { <p class="error">{{ errorFoto() }}</p> }
+        @if (errorFoto()) { <p class="error" role="alert">{{ errorFoto() }}</p> }
+        @else if (fotosDisponibles() === false) {
+          <p class="nota-foto">Las fotos todavía no están activas en el servidor: puedes publicar sin foto y agregarla después.</p>
+        } @else if (fotosDisponibles() && !vistaPrevia()) {
+          <p class="nota-foto">La foto es obligatoria para publicar. Sin foto puedes guardar como borrador.</p>
+        }
         <!-- En el navegador se usa un selector de archivos; en el teléfono, la cámara -->
         <input type="file" accept="image/jpeg,image/png,image/webp" hidden (change)="desdeArchivo($any($event.target).files?.[0])" />
       </section>
@@ -156,6 +164,7 @@ const MAX_FOTO_MB = 5;
     .caja { border: 0; box-shadow: var(--mc-e1); border-radius: var(--mc-radio); padding: 0; }
     .foto { position: relative; display: block; width: 100%; aspect-ratio: 4 / 3; max-height: 260px; padding: 0; overflow: hidden; cursor: pointer;
       border-radius: var(--mc-radio); border: 2px dashed var(--mc-borde); background: var(--mc-suelo); }
+    .nota-foto { margin: 6px 2px 0; font-size: 0.85rem; color: var(--mc-tinta-suave); }
     .foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .vacia { height: 100%; display: grid; place-content: center; justify-items: center; gap: 4px; color: var(--mc-arcilla); }
     .vacia ion-icon { font-size: 44px; }
@@ -195,6 +204,9 @@ export class ProductoFormPage implements OnInit {
   municipio = computed(() => this.municipios().find((m) => m.id === this.productor?.municipioId)?.nombre ?? '');
   vistaPrevia = signal<string | null>(null);
   errorFoto = signal('');
+  /** El servidor puede guardar fotos (null mientras se consulta /api/salud) */
+  fotosDisponibles = signal<boolean | null>(null);
+  private http = inject(HttpClient);
   guardando = signal(false);
   escribiendo = signal(false);
   sugiriendo = signal(false);
@@ -216,6 +228,9 @@ export class ProductoFormPage implements OnInit {
   }
 
   async ngOnInit() {
+    firstValueFrom(this.http.get<{ fotos?: string }>(`${environment.apiUrl}/salud`))
+      .then((r) => this.fotosDisponibles.set(!!r.fotos && r.fotos !== 'sin configurar'))
+      .catch(() => this.fotosDisponibles.set(null));
     this.catalogo.municipios().then((m) => this.municipios.set(m)).catch(() => undefined);
     try {
       this.categorias.set(await this.catalogo.categorias());
@@ -322,6 +337,12 @@ export class ProductoFormPage implements OnInit {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       this.avisos.error(new Error('Revisa los campos marcados'));
+      return;
+    }
+    // Publicar exige foto cuando el servidor puede guardarlas; el borrador nunca la exige
+    if (publicar && this.fotosDisponibles() && !this.vistaPrevia()) {
+      this.errorFoto.set('Agrega una foto para publicar. Sin foto puedes guardarlo como borrador.');
+      document.querySelector('.foto')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
     this.guardando.set(true);
