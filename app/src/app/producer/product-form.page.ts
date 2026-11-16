@@ -153,7 +153,7 @@ const MAX_FOTO_MB = 5;
       background: var(--mc-suelo); color: var(--mc-barro); font-size: 0.92rem; }
     .bloque { margin-bottom: 22px; }
     h2 { font-size: 1.1rem; margin: 0 0 10px; }
-    .caja { border: 1px solid var(--mc-borde); border-radius: var(--mc-radio); padding: 0; }
+    .caja { border: 0; box-shadow: var(--mc-e1); border-radius: var(--mc-radio); padding: 0; }
     .foto { position: relative; display: block; width: 100%; aspect-ratio: 4 / 3; max-height: 260px; padding: 0; overflow: hidden; cursor: pointer;
       border-radius: var(--mc-radio); border: 2px dashed var(--mc-borde); background: var(--mc-suelo); }
     .foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -169,7 +169,7 @@ const MAX_FOTO_MB = 5;
       background: var(--mc-marca); color: var(--mc-marca-texto); font: inherit; font-weight: 700; font-size: 0.9rem; cursor: pointer; }
     .ia-boton ion-icon { color: var(--mc-destaque); }
     .ia-boton:disabled { opacity: 0.45; }
-    .referencia { margin-top: 10px; padding: 12px 14px; border-radius: var(--mc-radio); background: var(--mc-superficie); border: 1px solid var(--mc-borde); }
+    .referencia { margin-top: 10px; padding: 12px 14px; border-radius: var(--mc-radio); background: var(--mc-superficie); border: 0; box-shadow: var(--mc-e1); }
     .referencia p:first-child { margin: 0; color: var(--ion-text-color); }
     .usar { margin-top: 10px; padding: 10px 16px; min-height: 44px; border-radius: 999px; border: 0; background: var(--mc-accion); color: var(--mc-accion-texto);
       font: inherit; font-weight: 700; font-size: 0.9rem; cursor: pointer; }

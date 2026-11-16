@@ -146,7 +146,7 @@ const SIN_FILTROS: Filtros = { categoria: null, municipio: null, precioMin: null
     .total { margin: 10px 16px 0; color: var(--mc-tinta-suave); font-size: 0.9rem; }
     .seccion { margin: 4px 16px 6px; font-size: 1.15rem; }
     .titulo-modal { margin: 4px 0 14px; }
-    .caja { border: 1px solid var(--mc-borde); border-radius: var(--mc-radio); padding: 0; }
+    .caja { border: 0; box-shadow: var(--mc-e1); border-radius: var(--mc-radio); padding: 0; }
     .sub { font-size: 1rem; margin: 20px 0 8px; }
     .precios { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .error { color: var(--ion-color-danger); font-size: 0.88rem; margin: 6px 0 0; }

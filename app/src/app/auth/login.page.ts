@@ -40,7 +40,7 @@ import { AvisosService } from '../core/notifications.service';
     .titulo { font-size: 1.9rem; line-height: 1.05; margin: 4px 0 14px; max-width: 14ch; }
     .mc-tejido { width: 96px; }
     .sub { color: var(--mc-barro); margin: 14px 0 22px; }
-    .caja { border-radius: var(--mc-radio); border: 1px solid var(--mc-borde); padding: 0; }
+    .caja { border-radius: var(--mc-radio); border: 0; box-shadow: var(--mc-e1); padding: 0; }
   `,
 })
 export class LoginPage {

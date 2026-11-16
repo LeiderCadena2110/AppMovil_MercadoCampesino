@@ -93,17 +93,17 @@ export function textoSeguro(t: string) {
     .intro h1 { font-size: 1.8rem; margin: 16px 0 8px; }
     .intro p { color: var(--mc-barro); line-height: 1.5; margin: 0 0 20px; max-width: 40ch; }
     .ideas { display: grid; gap: 8px; }
-    .ideas button { text-align: left; padding: 14px 16px; border-radius: var(--mc-radio); border: 1px solid var(--mc-borde);
+    .ideas button { text-align: left; padding: 14px 16px; border-radius: var(--mc-radio); border: 0; box-shadow: var(--mc-e1);
       background: var(--mc-superficie); font: inherit; color: inherit; cursor: pointer; }
     .chat { display: flex; flex-direction: column; gap: 10px; padding-bottom: 8px; }
     .burbuja { max-width: 85%; align-self: flex-start; padding: 12px 14px; border-radius: 18px 18px 18px 6px;
-      background: var(--mc-superficie); border: 1px solid var(--mc-borde); line-height: 1.5; }
+      background: var(--mc-superficie); border: 0; box-shadow: var(--mc-e1); line-height: 1.5; }
     .burbuja p { margin: 0; }
     .burbuja.mia { align-self: flex-end; border-radius: 18px 18px 6px 18px; background: var(--mc-marca); border-color: var(--mc-marca); color: var(--mc-marca-texto); }
     .pensando { display: flex; align-items: center; gap: 8px; color: var(--ion-color-medium); }
     .sugeridos { display: flex; gap: 10px; overflow-x: auto; padding: 2px 0 6px; scrollbar-width: none; }
     .mini { flex: 0 0 150px; display: grid; gap: 4px; padding: 8px; border-radius: var(--mc-radio); cursor: pointer;
-      border: 1px solid var(--mc-borde); background: var(--mc-superficie); }
+      border: 0; box-shadow: var(--mc-e2); background: var(--mc-superficie); }
     .mini .foto { height: 84px; border-radius: var(--mc-radio-chico); overflow: hidden; display: grid; place-items: center;
       background: color-mix(in srgb, var(--ion-color-primary) 9%, var(--mc-superficie)); color: var(--ion-color-primary); font-size: 28px; }
     .mini img { width: 100%; height: 100%; object-fit: cover; }

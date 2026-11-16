@@ -81,7 +81,7 @@ import { Municipio, Rol } from '../core/models';
     .mc-tejido { width: 96px; }
     .sub { color: var(--mc-barro); margin: 14px 0 10px; }
     .roles { margin-bottom: 18px; }
-    .caja { border-radius: var(--mc-radio); border: 1px solid var(--mc-borde); padding: 0; margin-bottom: 14px; }
+    .caja { border-radius: var(--mc-radio); border: 0; box-shadow: var(--mc-e1); padding: 0; margin-bottom: 14px; }
     ion-list-header { font-family: var(--mc-titulos); font-size: 1.05rem; }
     .sin-municipios { padding: 10px 0 12px; width: 100%; }
     .sin-municipios strong { font-size: 0.85rem; font-weight: 400; }

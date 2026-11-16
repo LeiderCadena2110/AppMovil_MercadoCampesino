@@ -115,7 +115,7 @@ const SIGUIENTE: Partial<Record<EstadoPedido, { estado: EstadoPedido; texto: str
   `,
   styles: `
     .bloque { margin-bottom: 16px; }
-    .tarjeta { padding: 14px 16px; border-radius: var(--mc-radio); border: 1px solid var(--mc-borde); background: var(--mc-superficie); }
+    .tarjeta { padding: 14px 16px; border-radius: var(--mc-radio); border: 0; box-shadow: var(--mc-e2); background: var(--mc-superficie); }
     h2 { margin: 0 0 10px; font-size: 1.05rem; }
     .persona { margin: 0; display: grid; }
     .persona span { color: var(--mc-tinta-suave); font-size: 0.9rem; }

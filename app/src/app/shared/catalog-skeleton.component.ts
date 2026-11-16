@@ -17,7 +17,7 @@ import { Component, input } from '@angular/core';
   `,
   styles: `
     .rejilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; padding: 6px 12px; }
-    .tarjeta { border: 1px solid var(--mc-borde); border-radius: var(--mc-radio); background: var(--mc-superficie); overflow: hidden; padding-bottom: 12px; }
+    .tarjeta { border: 0; box-shadow: var(--mc-e2); border-radius: var(--mc-radio); background: var(--mc-superficie); overflow: hidden; padding-bottom: 12px; }
     .foto { aspect-ratio: 4 / 3; }
     .linea { height: 12px; margin: 10px 12px 0; border-radius: 6px; width: 55%; }
     .linea.larga { width: 80%; } .linea.corta { width: 35%; }

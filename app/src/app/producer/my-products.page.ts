@@ -100,7 +100,7 @@ function estadoDe(p: Producto) {
     h1 { margin: 0 0 10px; font-size: 1.7rem; }
     .filtros ion-segment-button { font-size: 0.85rem; }
     .lista { display: grid; gap: 12px; padding: 12px 16px 96px; }
-    .producto { border: 1px solid var(--mc-borde); border-radius: var(--mc-radio); background: var(--mc-superficie); overflow: hidden; }
+    .producto { border: 0; box-shadow: var(--mc-e2); border-radius: var(--mc-radio); background: var(--mc-superficie); overflow: hidden; }
     .producto.apagado .mini, .producto.apagado .datos strong { opacity: 0.6; }
     .fila { display: flex; gap: 12px; width: 100%; padding: 12px; border: 0; background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
     .mini { width: 72px; height: 72px; flex-shrink: 0; border-radius: var(--mc-radio-chico); overflow: hidden; display: grid; place-items: center;

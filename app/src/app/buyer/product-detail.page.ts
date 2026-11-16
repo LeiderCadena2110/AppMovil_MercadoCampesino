@@ -130,7 +130,7 @@ import { CopPipe, UnidadPipe } from '../shared/format';
     .entrega ion-icon { font-size: 22px; color: var(--mc-arcilla); flex-shrink: 0; }
     .datos small { display: flex; align-items: center; gap: 3px; }
     .finca { display: flex; align-items: center; gap: 12px; width: 100%; margin-top: 0; padding: 14px; text-align: left;
-      border-radius: var(--mc-radio); border: 1px solid var(--mc-borde); background: var(--mc-superficie); font: inherit; color: inherit; cursor: pointer; }
+      border-radius: var(--mc-radio); border: 0; box-shadow: var(--mc-e2); background: var(--mc-superficie); font: inherit; color: inherit; cursor: pointer; }
     .avatar { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0;
       background: var(--mc-marca); color: var(--mc-destaque); font-family: var(--mc-titulos); font-weight: 800; font-size: 1rem; }
     .datos { flex: 1; }

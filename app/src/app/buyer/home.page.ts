@@ -124,13 +124,13 @@ import { EstadoVacioComponent } from '../shared/empty-state.component';
     }
     .icono {
       width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center;
-      background: var(--mc-superficie); border: 1px solid var(--mc-borde); font-size: 26px; color: var(--ion-color-primary);
+      background: var(--mc-superficie); border: 0; box-shadow: var(--mc-e1); font-size: 26px; color: var(--ion-color-primary);
     }
     .categorias button.activa .icono { background: var(--mc-destaque); border-color: var(--mc-destaque); color: var(--mc-destaque-texto); }
     .seccion { margin: 18px 16px 6px; font-size: 1.15rem; }
     .favoritos { display: flex; gap: 10px; overflow-x: auto; padding: 4px 16px; scrollbar-width: none; }
     .fav { flex: 0 0 128px; display: grid; gap: 4px; padding: 8px; text-align: left; border-radius: var(--mc-radio); cursor: pointer;
-      border: 1px solid var(--mc-borde); background: var(--mc-superficie); font: inherit; color: inherit; }
+      border: 0; box-shadow: var(--mc-e2); background: var(--mc-superficie); font: inherit; color: inherit; }
     .fav-foto { height: 76px; border-radius: var(--mc-radio-chico); overflow: hidden; display: grid; place-items: center;
       background: var(--mc-suelo); color: var(--mc-arcilla); font-size: 26px; }
     .fav-foto img { width: 100%; height: 100%; object-fit: cover; }

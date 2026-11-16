@@ -64,7 +64,7 @@ import { CopPipe, EstadoPipe } from '../shared/format';
     .revision { display: flex; gap: 8px; align-items: start; margin: 0 0 14px; padding: 12px 14px; border-radius: var(--mc-radio);
       background: var(--mc-suelo); font-size: 0.92rem; }
     .resumen { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-    .dato { padding: 14px; border-radius: var(--mc-radio); background: var(--mc-superficie); border: 1px solid var(--mc-borde); }
+    .dato { padding: 14px; border-radius: var(--mc-radio); background: var(--mc-superficie); border: 0; box-shadow: var(--mc-e2); }
     .dato strong { display: block; font-family: var(--mc-titulos); font-size: 1.6rem; font-weight: 800; line-height: 1.1; }
     .dato span { font-size: 0.85rem; color: var(--ion-color-medium); }
     .dato.alerta { background: var(--mc-marca); border-color: var(--mc-marca); color: var(--mc-marca-texto); }
@@ -73,7 +73,7 @@ import { CopPipe, EstadoPipe } from '../shared/format';
     .seccion { font-size: 1.15rem; margin: 22px 0 10px; }
     .pedidos { display: grid; gap: 8px; }
     .pedido { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; text-align: left;
-      padding: 14px; border-radius: var(--mc-radio); border: 1px solid var(--mc-borde); background: var(--mc-superficie);
+      padding: 14px; border-radius: var(--mc-radio); border: 0; box-shadow: var(--mc-e2); background: var(--mc-superficie);
       font: inherit; color: inherit; cursor: pointer; }
     .quien strong { display: block; }
     .quien small { color: var(--ion-color-medium); }

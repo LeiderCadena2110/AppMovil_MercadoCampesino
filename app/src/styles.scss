@@ -17,6 +17,19 @@
 @import '@fontsource/atkinson-hyperlegible/400.css';
 @import '@fontsource/atkinson-hyperlegible/700.css';
 
+/* Cifras: Atkinson dibuja el cero tachado (Ø), que en precios se lee como error.
+   Esta familia toma solo los dígitos (unicode-range) de Bricolage y deja el resto en Atkinson. */
+@font-face {
+  font-family: 'Minga Cifras';
+  src: url('../node_modules/@fontsource/bricolage-grotesque/files/bricolage-grotesque-latin-400-normal.woff2') format('woff2');
+  font-weight: 400; font-display: swap; unicode-range: U+0030-0039;
+}
+@font-face {
+  font-family: 'Minga Cifras';
+  src: url('../node_modules/@fontsource/bricolage-grotesque/files/bricolage-grotesque-latin-700-normal.woff2') format('woff2');
+  font-weight: 700; font-display: swap; unicode-range: U+0030-0039;
+}
+
 /* ---------------------------------------------------------------
    Identidad Minga App: Galeras, chagra y tierra de Nariño
    ---------------------------------------------------------------
@@ -48,9 +61,16 @@
   --mc-marca-texto: #ffffff;
   --mc-marca-suave: #cfe0d2;
 
-  --mc-radio-grande: 22px;
-  --mc-radio: 14px;
-  --mc-radio-chico: 10px;
+  /* Radios: controles 12, tarjetas 18, hojas inferiores 28 */
+  --mc-radio-grande: 28px;
+  --mc-radio: 18px;
+  --mc-radio-chico: 12px;
+
+  /* Elevación: sombras teñidas de verde páramo, suaves (no grises planas) */
+  --mc-e1: 0 1px 2px rgb(24 34 27 / 0.06), 0 1px 1px rgb(24 34 27 / 0.04);
+  --mc-e2: 0 12px 28px -14px rgb(31 77 43 / 0.28), 0 2px 6px -2px rgb(24 34 27 / 0.08);
+  --mc-e3: 0 24px 48px -20px rgb(31 77 43 / 0.35), 0 6px 14px -6px rgb(24 34 27 / 0.12);
+  --mc-curva: cubic-bezier(0.2, 0.8, 0.2, 1); /* salida suave para microinteracciones */
   --mc-espacio: 16px;
 
   --ion-color-primary: #2b7f3a;
@@ -89,7 +109,7 @@
   --ion-card-background: var(--mc-superficie);
   --ion-border-color: var(--mc-borde);
 
-  --ion-font-family: 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --ion-font-family: 'Minga Cifras', 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --mc-titulos: 'Bricolage Grotesque', 'Atkinson Hyperlegible', system-ui, sans-serif;
 
   /* El tejido: franja inspirada en las ruanas y los chumbes de Nariño. */
@@ -117,6 +137,10 @@
 
     --mc-accion: #7fcf8a;
     --mc-accion-texto: #0d2614;
+
+    --mc-e1: 0 1px 2px rgb(0 0 0 / 0.4);
+    --mc-e2: 0 12px 28px -14px rgb(0 0 0 / 0.7), 0 2px 6px -2px rgb(0 0 0 / 0.4);
+    --mc-e3: 0 24px 48px -20px rgb(0 0 0 / 0.8), 0 6px 14px -6px rgb(0 0 0 / 0.5);
 
     --ion-color-primary: #7fcf8a;
     --ion-color-primary-rgb: 127, 207, 138;
@@ -159,7 +183,7 @@ ion-toolbar.ion-color-primary {
   --ion-color-contrast: var(--mc-tinta) !important;
 }
 
-ion-button { --border-radius: var(--mc-radio); text-transform: none; letter-spacing: 0; font-weight: 700; }
+ion-button { --border-radius: var(--mc-radio-chico); text-transform: none; letter-spacing: 0; font-weight: 700; }
 ion-button[size='large'] { min-height: 54px; font-size: 1.05rem; }
 /* Respuesta visual al tocar: se hunde un poco */
 ion-button, .mc-tocable { transition: transform 120ms ease, filter 120ms ease; }
@@ -167,9 +191,15 @@ ion-button:active, .mc-tocable:active { transform: scale(0.97); filter: brightne
 
 ion-card {
   border-radius: var(--mc-radio);
-  box-shadow: none;
-  border: 1px solid var(--mc-borde);
+  box-shadow: var(--mc-e2);
+  border: 0;
 }
+
+/* Precios y cantidades: cifras de ancho fijo, no saltan al cambiar */
+.mc-num { font-family: var(--mc-titulos); font-variant-numeric: tabular-nums; }
+
+/* Superficie flotante reutilizable (tarjetas, bloques) */
+.mc-flotante { background: var(--mc-superficie); border-radius: var(--mc-radio); box-shadow: var(--mc-e2); }
 ion-list[inset='true'], ion-list.list-inset { border-radius: var(--mc-radio); border: 1px solid var(--mc-borde); }
 
 ion-chip { --background: var(--mc-superficie); border: 1px solid var(--mc-borde); font-weight: 700; }
@@ -187,7 +217,8 @@ ion-searchbar.mc-buscador {
 }
 ion-searchbar.mc-buscador .searchbar-input-container { border: 1px solid var(--mc-borde); border-radius: var(--mc-radio); }
 
-ion-toast { --border-radius: var(--mc-radio); font-weight: 700; }
+ion-toast { --border-radius: var(--mc-radio-chico); --box-shadow: var(--mc-e3); font-weight: 700; }
+ion-modal { --border-radius: var(--mc-radio-grande); }
 
 /* Franja tejida reutilizable */
 .mc-tejido { height: 8px; background: var(--mc-tejido); border-radius: 4px; }
