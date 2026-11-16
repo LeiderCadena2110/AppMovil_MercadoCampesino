@@ -1,3 +1,4 @@
+import { VentaDia } from '../shared/sales-chart.component';
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
@@ -29,6 +30,8 @@ export class PedidosService {
     const r = await firstValueFrom(this.http.get<Pedido[]>(this.api, { params, observe: 'response' }));
     return { items: r.body ?? [], hayMas: r.headers.get('X-Hay-Mas') === 'true' };
   }
+  /** Ventas entregadas de los últimos 7 días (solo productor) */
+  resumen = () => firstValueFrom(this.http.get<{ dias: VentaDia[]; total: number; pedidos: number }>(`${this.api}/resumen`));
   detalle = (id: number) => firstValueFrom(this.http.get<Pedido>(`${this.api}/${id}`));
   cambiarEstado = (id: number, estado: EstadoPedido) => firstValueFrom(this.http.patch<Pedido>(`${this.api}/${id}/estado`, { estado }));
   calificar = (id: number, puntaje: number, comentario?: string) =>

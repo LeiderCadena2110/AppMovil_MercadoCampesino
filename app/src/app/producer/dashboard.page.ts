@@ -4,18 +4,21 @@ import {
   IonBadge, NavController, ViewWillEnter,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { addCircleOutline, alertCircleOutline } from 'ionicons/icons';
+import { addCircleOutline, alertCircleOutline, warningOutline, leafOutline } from 'ionicons/icons';
 import { AuthService } from '../core/auth.service';
 import { PedidosService } from '../core/orders.service';
 import { MisProductosService } from '../core/my-products.service';
 import { AvisosService } from '../core/notifications.service';
 import { Pedido, Producto } from '../core/models';
-import { CopPipe, EstadoPipe } from '../shared/format';
+import { CopPipe, EstadoPipe, UnidadPipe } from '../shared/format';
+import { GraficoVentasComponent, VentaDia } from '../shared/sales-chart.component';
+
+const UMBRAL_POCOS = 5;
 
 @Component({
   selector: 'app-panel',
   imports: [IonContent, IonHeader, IonToolbar, IonButton, IonIcon,
-    IonBadge, CopPipe, EstadoPipe],
+    IonBadge, CopPipe, EstadoPipe, UnidadPipe, GraficoVentasComponent],
   template: `
     <ion-header class="ion-no-border"><ion-toolbar>
       <div class="saludo">
@@ -36,6 +39,21 @@ import { CopPipe, EstadoPipe } from '../shared/format';
         <div class="dato"><strong>{{ activos() }}</strong><span>Productos a la venta</span></div>
         <div class="dato" [class.aviso]="agotados() > 0"><strong>{{ agotados() }}</strong><span>Sin cosecha disponible</span></div>
       </section>
+
+      @if (ventas().length) { <app-grafico-ventas [dias]="ventas()" /> }
+
+      @if (pocos().length) {
+        <section class="pocos" aria-labelledby="titulo-pocos">
+          <h2 id="titulo-pocos" class="seccion"><ion-icon name="warning-outline" /> Se están acabando</h2>
+          @for (p of pocos(); track p.id) {
+            <button type="button" class="poco" (click)="editar(p)" [attr.aria-label]="'Actualizar existencias de ' + p.nombre">
+              <span class="mini">@if (p.miniaturaUrl) { <img [src]="p.miniaturaUrl" alt="" /> } @else { <ion-icon name="leaf-outline" /> }</span>
+              <span class="quien"><strong>{{ p.nombre }}</strong><small>Quedan {{ p.stock }} {{ p.unidad | unidad: p.stock }}</small></span>
+              <span class="accion">Actualizar</span>
+            </button>
+          }
+        </section>
+      }
 
       <ion-button expand="block" size="large" (click)="nuevo()"><ion-icon slot="start" name="add-circle-outline" /> Publicar producto</ion-button>
 
@@ -77,6 +95,17 @@ import { CopPipe, EstadoPipe } from '../shared/format';
       font: inherit; color: inherit; cursor: pointer; }
     .quien strong { display: block; }
     .quien small { color: var(--ion-color-medium); }
+    .pocos { display: grid; gap: 8px; margin-bottom: 18px; }
+    .pocos .seccion { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+    .pocos .seccion ion-icon { color: var(--mc-barro); }
+    .poco { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 14px 10px 10px; border: 0; text-align: left;
+      border-radius: var(--mc-radio); background: var(--mc-superficie); box-shadow: var(--mc-e1); font: inherit; color: inherit; cursor: pointer; }
+    .poco .mini { width: 44px; height: 44px; flex-shrink: 0; border-radius: var(--mc-radio-chico); overflow: hidden; display: grid; place-items: center;
+      background: var(--mc-suelo); color: var(--mc-arcilla); }
+    .poco .mini img { width: 100%; height: 100%; object-fit: cover; }
+    .poco .quien { flex: 1; min-width: 0; }
+    .poco .quien small { color: var(--mc-barro); font-weight: 700; }
+    .poco .accion { color: var(--mc-accion); font-weight: 700; font-size: 0.9rem; }
     .calma { color: var(--ion-color-medium); text-align: center; margin-top: 28px; }
   `,
 })
@@ -95,6 +124,10 @@ export class PanelPage implements ViewWillEnter {
   verificado = this.usuario?.productor?.verificado ?? false;
   pedidos = signal<Pedido[]>([]);
   productos = signal<Producto[]>([]);
+  ventas = signal<VentaDia[]>([]);
+  /** Productos a la venta con 5 unidades o menos: avisar antes de que se agoten */
+  pocos = computed(() => this.productos().filter((p) => p.activo && !p.oculto && p.stock > 0 && p.stock <= UMBRAL_POCOS)
+    .sort((a, b) => a.stock - b.stock));
 
   pendientes = computed(() => this.pedidos().filter((p) => ['PENDIENTE', 'ACEPTADO', 'LISTO'].includes(p.estado)));
   activos = computed(() => this.productos().filter((p) => p.activo && p.stock > 0).length);
@@ -106,7 +139,7 @@ export class PanelPage implements ViewWillEnter {
   });
 
   constructor() {
-    addIcons({ addCircleOutline, alertCircleOutline });
+    addIcons({ addCircleOutline, alertCircleOutline, warningOutline, leafOutline });
   }
 
   async ionViewWillEnter() {
@@ -119,10 +152,15 @@ export class PanelPage implements ViewWillEnter {
     } catch (e) {
       this.avisos.error(e);
     }
+    // El gráfico es secundario: si falla, el panel sigue sirviendo
+    this.pedidosSrv.resumen().then((r) => this.ventas.set(r.dias)).catch(() => undefined);
   }
 
   nuevo() {
     this.nav.navigateForward('/productor/producto/nuevo');
+  }
+  editar(p: Producto) {
+    this.nav.navigateForward(['/productor/producto', p.id, 'editar']);
   }
   abrir(p: Pedido) {
     this.nav.navigateForward(['/productor/pedido', p.id]);
