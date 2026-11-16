@@ -48,3 +48,10 @@ test('el teléfono del productor no aparece en el catálogo público', async () 
   assert.equal(finca.usuario.telefono, undefined);
   assert.ok(finca.usuario.nombre);
 });
+
+test('salud informa base de datos, fotos e IA', async () => {
+  const r = await api.get('/api/salud');
+  assert.equal(r.status, 200);
+  assert.equal(r.body.baseDatos, 'ok');
+  assert.ok(r.body.fotos && r.body.ia);
+});

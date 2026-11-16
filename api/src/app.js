@@ -4,6 +4,9 @@ import helmet from 'helmet';
 import path from 'node:path';
 import { env } from './config/env.js';
 import rutas from './routes/index.js';
+import { pool } from './db/index.js';
+import { tipoAlmacenamiento } from './storage/index.js';
+import { iaService } from './services/aiService.js';
 import { manejarErrores, noEncontrado } from './middlewares/errors.js';
 
 export const app = express();
@@ -16,7 +19,20 @@ app.use(cors({ origin: env.corsOrigen, exposedHeaders: ['Idempotent-Replayed', '
 app.use(express.json({ limit: '100kb' }));
 app.use('/uploads', express.static(path.resolve('uploads'), { maxAge: '7d' }));
 
-app.get('/api/salud', (_req, res) => res.json({ ok: true }));
+// Salud: Render la usa para saber si la API puede recibir tráfico (incluye la base de datos)
+app.get('/api/salud', async (_req, res) => {
+  const inicio = Date.now();
+  let baseDatos = 'ok';
+  try {
+    await pool.query('select 1');
+  } catch {
+    baseDatos = 'sin conexión';
+  }
+  const ok = baseDatos === 'ok';
+  res.status(ok ? 200 : 503).json({
+    ok, baseDatos, fotos: tipoAlmacenamiento, ia: iaService.estado().proveedor, ms: Date.now() - inicio,
+  });
+});
 app.use('/api', rutas);
 
 app.use(noEncontrado);
