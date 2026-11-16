@@ -3,11 +3,11 @@ import multer from 'multer';
 import { verificarToken, verificarRol } from '../middlewares/auth.js';
 import { validar } from '../middlewares/validate.js';
 import {
-  registroSchema, loginSchema, productoSchema, catalogoQuery, pedidoSchema, estadoSchema, calificacionSchema,
+  registroSchema, loginSchema, refreshSchema, productoSchema, catalogoQuery, pedidoSchema, estadoSchema, calificacionSchema,
   asistenteSchema, descripcionIaSchema, precioIaSchema,
 } from '../schemas.js';
 import { limitePorUsuario } from '../middlewares/rateLimit.js';
-import { limiteLogin, limiteRegistro } from '../middlewares/authLimits.js';
+import { limiteLogin, limiteRegistro, limiteSesion } from '../middlewares/authLimits.js';
 import { authController } from '../controllers/authController.js';
 import { catalogoController } from '../controllers/catalogController.js';
 import { misProductosController } from '../controllers/myProductsController.js';
@@ -29,6 +29,8 @@ const admin = [verificarToken, verificarRol('ADMIN')];
 // Autenticación
 r.post('/auth/registro', limiteRegistro, validar(registroSchema), authController.registro);
 r.post('/auth/login', limiteLogin, validar(loginSchema), authController.login);
+r.post('/auth/refresh', limiteSesion, validar(refreshSchema), authController.refrescar);
+r.post('/auth/logout', limiteSesion, validar(refreshSchema), authController.salir);
 r.get('/auth/yo', verificarToken, authController.yo);
 
 // Listas públicas para filtros

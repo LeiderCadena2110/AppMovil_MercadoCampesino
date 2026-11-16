@@ -27,6 +27,10 @@ export const loginSchema = z.object({
   password: z.string().min(1),
 });
 
+export const refreshSchema = z.object({
+  refreshToken: z.string().min(20).max(200),
+});
+
 export const productoSchema = z.object({
   nombre: z.string().trim().min(2).max(120),
   categoriaId: z.coerce.number().int().positive(),

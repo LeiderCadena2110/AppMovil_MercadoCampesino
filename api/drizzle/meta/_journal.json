@@ -22,6 +22,13 @@
       "when": 1794814202611,
       "tag": "0002_idempotent_requests",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794814300120,
+      "tag": "0003_sessions",
+      "breakpoints": true
     }
   ]
 }

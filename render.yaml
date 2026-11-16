@@ -21,7 +21,9 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRA
-        value: 7d
+        value: 15m
+      - key: REFRESH_DIAS
+        value: "30"
       - key: CLOUDINARY_URL     # recomendado: el disco de Render se borra al reiniciar
         sync: false
       - key: GEMINI_API_KEY     # https://aistudio.google.com/apikey (gratis)

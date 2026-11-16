@@ -14,7 +14,9 @@ export const env = {
   port: Number(process.env.PORT ?? 3000),
   databaseUrl: requerida('DATABASE_URL'),
   jwtSecret: requerida('JWT_SECRET'),
-  jwtExpira: process.env.JWT_EXPIRA ?? '7d',
+  // Token de acceso corto; la sesión se mantiene con el refresh token (rotativo)
+  jwtExpira: process.env.JWT_EXPIRA ?? '15m',
+  refreshDias: Number(process.env.REFRESH_DIAS ?? 30),
   cloudinaryUrl: process.env.CLOUDINARY_URL ?? '',
   urlPublica: process.env.URL_PUBLICA ?? `http://localhost:${process.env.PORT ?? 3000}`,
   corsOrigen: process.env.CORS_ORIGEN ?? '*',

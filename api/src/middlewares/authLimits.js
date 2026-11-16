@@ -25,3 +25,13 @@ export const limiteRegistro = rateLimit({
   keyGenerator: (req) => ipKeyGenerator(req.ip ?? ''),
   handler: respuesta('Se crearon muchas cuentas desde esta conexión. Inténtalo más tarde.'),
 });
+
+/** Refresh y logout: 60 por minuto por IP (uso normal: uno cada 15 min) */
+export const limiteSesion = rateLimit({
+  windowMs: 60_000,
+  limit: 60,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  keyGenerator: (req) => ipKeyGenerator(req.ip ?? ''),
+  handler: respuesta('Demasiadas solicitudes de sesión. Espera un momento.'),
+});

@@ -1,7 +1,7 @@
 // Modelo de datos de Minga App (Neon / PostgreSQL) con Drizzle ORM.
 import { relations } from 'drizzle-orm';
 import {
-  pgTable, pgEnum, serial, integer, varchar, text, numeric, boolean, timestamp, index, uniqueIndex, primaryKey, jsonb,
+  pgTable, pgEnum, serial, integer, varchar, text, numeric, boolean, timestamp, index, uniqueIndex, primaryKey, jsonb, uuid,
 } from 'drizzle-orm/pg-core';
 
 export const rolEnum = pgEnum('rol', ['COMPRADOR', 'PRODUCTOR', 'ADMIN']);
@@ -79,6 +79,20 @@ export const calificaciones = pgTable('calificaciones', {
   puntaje: integer('puntaje').notNull(),
   comentario: text('comentario'),
 }, (t) => [uniqueIndex('calificaciones_pedido_uq').on(t.pedidoId)]);
+
+// Sesiones: cada inicio de sesión tiene un refresh token (se guarda solo su hash).
+// Al usarlo se rota: el viejo queda revocado y apunta al nuevo. Si alguien presenta uno ya
+// rotado (posible robo), se cierran todas las sesiones de ese usuario.
+export const sesiones = pgTable('sesiones', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  usuarioId: integer('usuario_id').notNull().references(() => usuarios.id, { onDelete: 'cascade' }),
+  tokenHash: varchar('token_hash', { length: 64 }).notNull().unique(),
+  dispositivo: varchar('dispositivo', { length: 200 }),
+  expiraEn: timestamp('expira_en', { withTimezone: true }).notNull(),
+  revocadaEn: timestamp('revocada_en', { withTimezone: true }),
+  reemplazadaPor: uuid('reemplazada_por'),
+  creadoEn: timestamp('creado_en', { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [index('sesiones_usuario_idx').on(t.usuarioId)]);
 
 // Claves de idempotencia de POST /pedidos: si la red reintenta la misma compra,
 // se devuelve el resultado guardado en vez de crear pedidos duplicados.
