@@ -25,25 +25,28 @@ import { mensajeError } from '../core/auth.interceptor';
     </ion-toolbar></ion-header>
     <ion-content>
       <form [formGroup]="form">
-        <ion-list lines="full">
-          <ion-list-header>¿Cómo recibes el pedido?</ion-list-header>
-          <ion-radio-group formControlName="metodoEntrega">
+        <!-- Cada grupo de opciones envuelve su lista (accesible: radiogroup > list > listitem) -->
+        <ion-radio-group formControlName="metodoEntrega" aria-labelledby="t-entrega">
+          <ion-list lines="full" role="presentation">
+            <ion-list-header id="t-entrega">¿Cómo recibes el pedido?</ion-list-header>
             <ion-item><ion-radio value="CONTRA_ENTREGA">{{ pagosDisponibles() ? 'Me lo llevan a domicilio' : 'Me lo llevan (pago contra entrega)' }}</ion-radio></ion-item>
             <ion-item><ion-radio value="RECOGIDA">Lo recojo en la finca</ion-radio></ion-item>
-          </ion-radio-group>
+          </ion-list>
+        </ion-radio-group>
+        <ion-list lines="full">
           <ion-item>
             <ion-textarea label="Dirección y referencias" labelPlacement="stacked" formControlName="direccion" [autoGrow]="true"
               placeholder="Calle 18 # 25-30, barrio Las Cuadras, Pasto" />
           </ion-item>
         </ion-list>
         @if (pagosDisponibles()) {
-          <ion-list lines="full">
-            <ion-list-header>¿Cómo pagas?</ion-list-header>
-            <ion-radio-group formControlName="pago">
+          <ion-radio-group formControlName="pago" aria-labelledby="t-pago">
+            <ion-list lines="full" role="presentation">
+              <ion-list-header id="t-pago">¿Cómo pagas?</ion-list-header>
               <ion-item><ion-radio value="ENTREGA">{{ form.controls.metodoEntrega.value === 'RECOGIDA' ? 'Al recoger' : 'Al recibir (efectivo)' }}</ion-radio></ion-item>
               <ion-item><ion-radio value="LINEA">Pagar ahora en línea<br /><small class="sub">PSE, tarjeta o Nequi, en una página segura</small></ion-radio></ion-item>
-            </ion-radio-group>
-          </ion-list>
+            </ion-list>
+          </ion-radio-group>
         }
       </form>
       <ion-list lines="none">

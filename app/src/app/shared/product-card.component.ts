@@ -73,7 +73,7 @@ import { CopPipe, UnidadPipe } from './format';
     .precio { position: absolute; left: 8px; bottom: 8px; display: inline-flex; align-items: baseline; gap: 2px; padding: 5px 10px; border-radius: 999px;
       background: rgb(255 255 255 / 0.82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
       color: #18221b; font-weight: 800; font-size: 0.95rem; box-shadow: var(--mc-e1); }
-    .precio small { font-family: var(--ion-font-family); font-weight: 400; font-size: 0.72rem; color: #5b665e; }
+    .precio small { font-family: var(--ion-font-family); font-weight: 400; font-size: 0.72rem; color: #46524a; }
     .pocas { position: absolute; left: 8px; top: 8px; padding: 3px 9px; border-radius: 999px; font-size: 0.72rem; font-weight: 700;
       background: var(--mc-destaque); color: var(--mc-destaque-texto); }
     .corazon { position: absolute; top: 8px; right: 8px; width: 38px; height: 38px; border-radius: 50%; border: 0; cursor: pointer;
