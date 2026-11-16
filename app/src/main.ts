@@ -1,3 +1,4 @@
+import { ocultarIconosDecorativos } from './app/core/accessibility';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { registerLocaleData } from '@angular/common';
 import localeEsCo from '@angular/common/locales/es-CO';
@@ -20,6 +21,8 @@ if (conSentry) {
     ignoreErrors: ['Http failure response', 'Sin conexión'],
   });
 }
+
+ocultarIconosDecorativos();
 
 bootstrapApplication(App, {
   ...appConfig,

@@ -110,15 +110,15 @@ function estadoDe(p: Producto) {
     .datos strong { font-size: 1rem; }
     .datos span { font-size: 0.85rem; color: var(--mc-tinta-suave); }
     .estado { justify-self: start; padding: 2px 9px; border-radius: 999px; font-weight: 700; font-size: 0.78rem !important; }
-    .estado.publicado { background: color-mix(in srgb, var(--ion-color-success) 15%, var(--mc-superficie)); color: var(--ion-color-success) !important; }
+    .estado.publicado { background: color-mix(in srgb, var(--ion-color-success) 15%, var(--mc-superficie)); color: color-mix(in srgb, var(--ion-color-success) 55%, var(--mc-tinta)) !important; }
     .estado.borrador { background: var(--mc-suelo); color: var(--mc-barro) !important; }
     .estado.agotado { background: var(--mc-destaque); color: var(--mc-destaque-texto) !important; }
-    .estado.oculto { background: color-mix(in srgb, var(--ion-color-danger) 12%, var(--mc-superficie)); color: var(--ion-color-danger) !important; }
+    .estado.oculto { background: color-mix(in srgb, var(--ion-color-danger) 12%, var(--mc-superficie)); color: color-mix(in srgb, var(--ion-color-danger) 60%, var(--mc-tinta)) !important; }
     .acciones { display: flex; border-top: 1px solid var(--mc-borde); }
     .acciones button { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 46px; border: 0;
       background: none; color: var(--mc-accion); font: inherit; font-weight: 700; font-size: 0.88rem; cursor: pointer; }
     .acciones button + button { border-left: 1px solid var(--mc-borde); }
-    .acciones button.peligro { color: var(--ion-color-danger); }
+    .acciones button.peligro { color: color-mix(in srgb, var(--ion-color-danger) 60%, var(--mc-tinta)); }
     .acciones button:disabled { opacity: 0.4; }
   `,
 })

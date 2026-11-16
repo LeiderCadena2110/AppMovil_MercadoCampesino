@@ -90,7 +90,7 @@ import { CopPipe, UnidadPipe } from './format';
       display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
     .agregar, .contador { margin-top: auto; }
     .agregar { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; height: 42px; margin-top: 10px; border: 0;
-      border-radius: 999px; background: color-mix(in srgb, var(--mc-accion) 14%, var(--mc-superficie)); color: var(--mc-accion);
+      border-radius: 999px; background: color-mix(in srgb, var(--mc-accion) 14%, var(--mc-superficie)); color: color-mix(in srgb, var(--mc-accion) 78%, var(--mc-tinta));
       font: inherit; font-weight: 700; font-size: 0.9rem; cursor: pointer; }
     .contador { display: flex; align-items: center; justify-content: space-between; height: 42px; margin-top: 10px; padding: 3px;
       border-radius: 999px; background: color-mix(in srgb, var(--mc-accion) 14%, var(--mc-superficie)); }
