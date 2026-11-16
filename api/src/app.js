@@ -12,7 +12,7 @@ export const app = express();
 app.set('trust proxy', 1);
 
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-app.use(cors({ origin: env.corsOrigen }));
+app.use(cors({ origin: env.corsOrigen, exposedHeaders: ['Idempotent-Replayed'] }));
 app.use(express.json({ limit: '100kb' }));
 app.use('/uploads', express.static(path.resolve('uploads'), { maxAge: '7d' }));
 

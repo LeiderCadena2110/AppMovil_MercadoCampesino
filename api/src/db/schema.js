@@ -1,7 +1,7 @@
 // Modelo de datos de Minga App (Neon / PostgreSQL) con Drizzle ORM.
 import { relations } from 'drizzle-orm';
 import {
-  pgTable, pgEnum, serial, integer, varchar, text, numeric, boolean, timestamp, index, uniqueIndex,
+  pgTable, pgEnum, serial, integer, varchar, text, numeric, boolean, timestamp, index, uniqueIndex, primaryKey, jsonb,
 } from 'drizzle-orm/pg-core';
 
 export const rolEnum = pgEnum('rol', ['COMPRADOR', 'PRODUCTOR', 'ADMIN']);
@@ -79,6 +79,16 @@ export const calificaciones = pgTable('calificaciones', {
   puntaje: integer('puntaje').notNull(),
   comentario: text('comentario'),
 }, (t) => [uniqueIndex('calificaciones_pedido_uq').on(t.pedidoId)]);
+
+// Claves de idempotencia de POST /pedidos: si la red reintenta la misma compra,
+// se devuelve el resultado guardado en vez de crear pedidos duplicados.
+export const solicitudesIdempotentes = pgTable('solicitudes_idempotentes', {
+  usuarioId: integer('usuario_id').notNull().references(() => usuarios.id, { onDelete: 'cascade' }),
+  clave: varchar('clave', { length: 64 }).notNull(),
+  huella: varchar('huella', { length: 64 }).notNull(), // sha256 del cuerpo: la misma clave no sirve para otra compra
+  respuesta: jsonb('respuesta'),
+  creadoEn: timestamp('creado_en', { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [primaryKey({ columns: [t.usuarioId, t.clave] }), index('solicitudes_idempotentes_creado_idx').on(t.creadoEn)]);
 
 // Relaciones para consultas con `with`
 export const usuariosRel = relations(usuarios, ({ one, many }) => ({

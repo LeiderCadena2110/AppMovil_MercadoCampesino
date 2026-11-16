@@ -5,7 +5,7 @@ import {
   IonTextarea, IonRadioGroup, IonRadio, IonButton, IonFooter, IonNote, IonSpinner, NavController,
 } from '@ionic/angular';
 import { CarritoService } from '../core/cart.service';
-import { PedidosService } from '../core/orders.service';
+import { PedidosService, nuevaClave } from '../core/orders.service';
 import { AvisosService } from '../core/notifications.service';
 import { MetodoEntrega } from '../core/models';
 import { CopPipe } from '../shared/format';
@@ -62,6 +62,9 @@ export class CheckoutPage {
   private avisos = inject(AvisosService);
   private nav = inject(NavController);
   enviando = signal(false);
+  /** Se conserva mientras se reintenta la misma compra; si cambia la compra, se genera otra */
+  private clave = nuevaClave();
+  private ultimoIntento = '';
   form = inject(FormBuilder).nonNullable.group({
     metodoEntrega: ['CONTRA_ENTREGA' as MetodoEntrega, Validators.required],
     direccion: ['', [Validators.required, Validators.minLength(5)]],
@@ -70,10 +73,16 @@ export class CheckoutPage {
   async confirmar() {
     this.enviando.set(true);
     try {
-      const creados = await this.pedidos.crear({
+      const datos = {
         ...this.form.getRawValue(),
         items: this.carrito.items().map((i) => ({ productoId: i.producto.id, cantidad: i.cantidad })),
-      });
+      };
+      const huella = JSON.stringify(datos);
+      if (this.ultimoIntento && huella !== this.ultimoIntento) this.clave = nuevaClave();
+      this.ultimoIntento = huella;
+      const creados = await this.pedidos.crear(datos, this.clave);
+      this.clave = nuevaClave();
+      this.ultimoIntento = '';
       this.carrito.vaciar();
       await this.avisos.exito(creados.length > 1 ? `${creados.length} pedidos enviados` : 'Pedido enviado');
       // navigateRoot reinicia la pila: "atrás" no regresa al checkout

@@ -15,6 +15,13 @@
       "when": 1792549184269,
       "tag": "0001_product_description",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794814202611,
+      "tag": "0002_idempotent_requests",
+      "breakpoints": true
     }
   ]
 }

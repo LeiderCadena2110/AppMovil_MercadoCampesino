@@ -1,4 +1,7 @@
+import { createHash } from 'node:crypto';
+import { and, eq, lt, sql } from 'drizzle-orm';
 import { db } from '../db/index.js';
+import { solicitudesIdempotentes } from '../db/schema.js';
 import { pedidoRepository } from '../repositories/orderRepository.js';
 import { productoRepository } from '../repositories/productRepository.js';
 import { ErrorApp } from '../middlewares/errors.js';
@@ -13,9 +16,36 @@ const TRANSICIONES = {
 };
 
 export const pedidoService = {
-  // Un carrito con productos de varios productores genera un pedido por productor
-  async crear(compradorId, { direccion, metodoEntrega, items }) {
+  /**
+   * Un carrito con productos de varios productores genera un pedido por productor.
+   * Con `clave` (encabezado Idempotency-Key) la compra se registra una sola vez: si la red
+   * reintenta, se devuelve lo que se creó la primera vez ({ repetida: true }).
+   */
+  async crear(compradorId, datos, clave) {
+    const { direccion, metodoEntrega, items } = datos;
     return db.transaction(async (tx) => {
+      if (clave) {
+        const huella = createHash('sha256').update(JSON.stringify(datos)).digest('hex');
+        // Si otra petición con la misma clave está en curso, este INSERT espera a que termine
+        const [nueva] = await tx.insert(solicitudesIdempotentes)
+          .values({ usuarioId: compradorId, clave, huella })
+          .onConflictDoNothing()
+          .returning({ clave: solicitudesIdempotentes.clave });
+        if (!nueva) {
+          const previa = await tx.query.solicitudesIdempotentes.findFirst({
+            where: and(eq(solicitudesIdempotentes.usuarioId, compradorId), eq(solicitudesIdempotentes.clave, clave)),
+          });
+          if (previa?.huella !== huella) throw new ErrorApp(422, 'Esta clave de pedido ya se usó para otra compra');
+          if (previa.respuesta) return { repetida: true, pedidos: previa.respuesta };
+          throw new ErrorApp(409, 'Este pedido ya se está procesando');
+        }
+        // Limpieza: las claves de este comprador de hace más de un día ya no se necesitan
+        await tx.delete(solicitudesIdempotentes).where(and(
+          eq(solicitudesIdempotentes.usuarioId, compradorId),
+          lt(solicitudesIdempotentes.creadoEn, sql`now() - interval '1 day'`),
+        ));
+      }
+
       const porProductor = new Map();
       for (const { productoId, cantidad } of items) {
         const p = await productoRepository.porId(productoId, tx);
@@ -36,7 +66,11 @@ export const pedidoService = {
         await pedidoRepository.crearDetalles(lineas.map((l) => ({ ...l, pedidoId: pedido.id })), tx);
         creados.push(pedido);
       }
-      return creados;
+      if (clave) {
+        await tx.update(solicitudesIdempotentes).set({ respuesta: creados })
+          .where(and(eq(solicitudesIdempotentes.usuarioId, compradorId), eq(solicitudesIdempotentes.clave, clave)));
+      }
+      return { repetida: false, pedidos: creados };
     });
   },
 
