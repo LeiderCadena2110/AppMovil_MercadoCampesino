@@ -4,8 +4,8 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ProductoLista } from './models';
 
-export interface MensajeIa { rol: 'usuario' | 'ia'; texto: string; productos?: ProductoLista[]; }
-export interface RespuestaAsistente { respuesta: string; productos: ProductoLista[]; fuente: 'gemini' | 'local'; }
+export interface MensajeIa { rol: 'usuario' | 'ia'; texto: string; productos?: ProductoLista[]; consultas?: string[]; }
+export interface RespuestaAsistente { respuesta: string; productos: ProductoLista[]; consultas?: string[]; fuente: 'gemini' | 'local'; }
 export interface ProductoReconocido {
   reconocido: boolean; nombre?: string; categoriaId?: number | null; unidad?: string | null;
   descripcion?: string | null; confianza?: 'alta' | 'media' | 'baja'; fuente: 'gemini' | 'local';
@@ -14,7 +14,11 @@ export interface DictadoEntendido {
   nombre: string | null; precio: number | null; unidad: string | null; stock: number | null; categoriaId: number | null;
   fuente: 'gemini' | 'local';
 }
-export interface PrecioSugerido { sugerido: number | null; minimo?: number; maximo?: number; muestras: number; explicacion: string; }
+export interface PrecioSugerido {
+  sugerido: number | null; minimo?: number; maximo?: number; muestras: number; explicacion: string;
+  /** % de cambio frente a las dos semanas anteriores (solo con historial) */
+  tendencia?: number | null; fuente?: 'historial' | 'catalogo';
+}
 
 /** Funciones de inteligencia artificial que ofrece la API (/api/ia) */
 @Injectable({ providedIn: 'root' })

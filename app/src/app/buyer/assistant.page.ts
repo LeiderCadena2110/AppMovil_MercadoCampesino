@@ -4,7 +4,7 @@ import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonFooter, IonIcon, IonSpinner, NavController,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { sparkles, arrowUp, add, leafOutline } from 'ionicons/icons';
+import { searchOutline, sparkles, arrowUp, add, leafOutline } from 'ionicons/icons';
 import { IaService, MensajeIa } from '../core/ai.service';
 import { CarritoService } from '../core/cart.service';
 import { AvisosService } from '../core/notifications.service';
@@ -51,6 +51,9 @@ export function textoSeguro(t: string) {
         @for (m of mensajes(); track $index) {
           <div class="burbuja" [class.mia]="m.rol === 'usuario'">
             <p [innerHTML]="html(m.texto)"></p>
+            @if (m.consultas?.length && m.consultas; as cs) {
+              <p class="fuentes"><ion-icon name="search-outline" aria-hidden="true" /> Consultó: {{ cs.join(', ') }}</p>
+            }
           </div>
           @if (m.productos?.length) {
             <div class="sugeridos">
@@ -86,6 +89,7 @@ export function textoSeguro(t: string) {
     </ion-footer>
   `,
   styles: `
+    .fuentes { display: flex; align-items: center; gap: 4px; margin: 6px 0 0 !important; font-size: 0.75rem; color: var(--mc-tinta-suave); }
     .limpiar { background: none; border: 0; font: inherit; font-weight: 700; color: var(--ion-color-primary); padding: 8px 12px; }
     .intro { padding: 12px 4px 4px; }
     .sello { width: 56px; height: 56px; border-radius: 18px; display: grid; place-items: center; font-size: 28px;
@@ -138,7 +142,7 @@ export class AsistentePage {
   texto = '';
 
   constructor() {
-    addIcons({ sparkles, arrowUp, add, leafOutline });
+    addIcons({ searchOutline, sparkles, arrowUp, add, leafOutline });
     // La conversación se guarda en el teléfono para retomarla después
     almacen.leer<MensajeIa[]>(CLAVE).then((m) => m && this.mensajes.set(m));
   }
@@ -155,7 +159,7 @@ export class AsistentePage {
     this.bajar();
     try {
       const r = await this.ia.asistente(mensaje, historial);
-      this.mensajes.update((m) => [...m, { rol: 'ia', texto: r.respuesta, productos: r.productos }]);
+      this.mensajes.update((m) => [...m, { rol: 'ia', texto: r.respuesta, productos: r.productos, consultas: r.consultas }]);
       almacen.guardar(CLAVE, this.mensajes().slice(-20));
     } catch (e) {
       this.mensajes.update((m) => [...m, { rol: 'ia', texto: `No pude responder: ${mensajeError(e)}` }]);

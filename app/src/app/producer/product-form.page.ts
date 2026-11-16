@@ -10,7 +10,7 @@ import {
 import { Capacitor } from '@capacitor/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { addIcons } from 'ionicons';
-import { cloudOfflineOutline, mic, cameraOutline, sparkles, trashOutline, locationOutline, swapHorizontalOutline, informationCircleOutline } from 'ionicons/icons';
+import { trendingUp, trendingDown, cloudOfflineOutline, mic, cameraOutline, sparkles, trashOutline, locationOutline, swapHorizontalOutline, informationCircleOutline } from 'ionicons/icons';
 import { MisProductosService, ProductoForm } from '../core/my-products.service';
 import { CatalogoService } from '../core/catalog.service';
 import { AvisosService } from '../core/notifications.service';
@@ -149,8 +149,14 @@ const MAX_FOTO_MB = 5;
             </button>
             @if (sugerencia(); as s) {
               <div class="referencia">
+                @if (s.tendencia != null && (s.tendencia >= 3 || s.tendencia <= -3)) {
+                  <p class="tendencia" [class.sube]="s.tendencia > 0">
+                    <ion-icon [name]="s.tendencia > 0 ? 'trending-up' : 'trending-down'" aria-hidden="true" />
+                    {{ s.tendencia > 0 ? 'Subiendo' : 'Bajando' }} {{ porcentaje(s.tendencia) }} en dos semanas
+                  </p>
+                }
                 <p>{{ s.explicacion }}</p>
-                <p class="nota">Es solo una orientación con base en lo publicado en Minga App, no un precio garantizado. Tú decides el precio final.</p>
+                <p class="nota">Es solo una orientación con base en los precios publicados y pedidos en Minga App, no un precio garantizado. Tú decides el precio final.</p>
                 @if (s.sugerido) {
                   <button type="button" class="usar mc-tocable" (click)="usarPrecio(s.sugerido)">Usar {{ s.sugerido | cop }}</button>
                 }
@@ -219,6 +225,9 @@ const MAX_FOTO_MB = 5;
     .ia-boton ion-icon { color: var(--mc-destaque); }
     .ia-boton:disabled { opacity: 0.45; }
     .referencia { margin-top: 10px; padding: 12px 14px; border-radius: var(--mc-radio); background: var(--mc-superficie); border: 0; box-shadow: var(--mc-e1); }
+    .tendencia { display: inline-flex; align-items: center; gap: 6px; margin: 0 0 6px !important; padding: 3px 10px; border-radius: 999px;
+      font-weight: 700; font-size: 0.85rem; background: var(--mc-suelo); color: var(--mc-barro) !important; }
+    .tendencia.sube { background: color-mix(in srgb, var(--ion-color-success) 14%, var(--mc-superficie)); color: color-mix(in srgb, var(--ion-color-success) 55%, var(--mc-tinta)) !important; }
     .referencia p:first-child { margin: 0; color: var(--ion-text-color); }
     .usar { margin-top: 10px; padding: 10px 16px; min-height: 44px; border-radius: 999px; border: 0; background: var(--mc-accion); color: var(--mc-accion-texto);
       font: inherit; font-weight: 700; font-size: 0.9rem; cursor: pointer; }
@@ -278,7 +287,7 @@ export class ProductoFormPage implements OnInit {
   });
 
   constructor() {
-    addIcons({ cloudOfflineOutline, mic, cameraOutline, sparkles, trashOutline, locationOutline, swapHorizontalOutline, informationCircleOutline });
+    addIcons({ trendingUp, trendingDown, cloudOfflineOutline, mic, cameraOutline, sparkles, trashOutline, locationOutline, swapHorizontalOutline, informationCircleOutline });
   }
 
   async ngOnInit() {
@@ -334,6 +343,11 @@ export class ProductoFormPage implements OnInit {
   puedeSugerir() {
     const f = this.form.controls;
     return f.nombre.valid && f.categoriaId.valid && !!f.unidad.value;
+  }
+
+  /** 6.4 → "+6,4 %" (formato colombiano) */
+  porcentaje(t: number) {
+    return `${t > 0 ? '+' : ''}${t.toLocaleString('es-CO')} %`;
   }
 
   usarPrecio(valor: number) {
