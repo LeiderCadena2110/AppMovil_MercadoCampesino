@@ -50,6 +50,13 @@
       "when": 1794834262214,
       "tag": "0006_product_client_id",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794834934074,
+      "tag": "0007_farm_locations",
+      "breakpoints": true
     }
   ]
 }

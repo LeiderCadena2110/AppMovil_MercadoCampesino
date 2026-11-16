@@ -1,7 +1,7 @@
 // Modelo de datos de Minga App (Neon / PostgreSQL) con Drizzle ORM.
 import { relations } from 'drizzle-orm';
 import {
-  pgTable, pgEnum, serial, integer, varchar, text, numeric, boolean, timestamp, index, uniqueIndex, primaryKey, jsonb, uuid,
+  pgTable, pgEnum, serial, integer, doublePrecision, varchar, text, numeric, boolean, timestamp, index, uniqueIndex, primaryKey, jsonb, uuid,
 } from 'drizzle-orm/pg-core';
 
 export const rolEnum = pgEnum('rol', ['COMPRADOR', 'PRODUCTOR', 'ADMIN']);
@@ -24,6 +24,9 @@ export const municipios = pgTable('municipios', {
   id: serial('id').primaryKey(),
   nombre: varchar('nombre', { length: 80 }).notNull().unique(),
   departamento: varchar('departamento', { length: 80 }).notNull().default('Nariño'),
+  // Centro aproximado del casco urbano (para ubicar las fincas que no marcaron su punto)
+  lat: doublePrecision('lat'),
+  lng: doublePrecision('lng'),
 });
 
 export const productores = pgTable('productores', {
@@ -33,6 +36,10 @@ export const productores = pgTable('productores', {
   municipioId: integer('municipio_id').notNull().references(() => municipios.id),
   descripcion: text('descripcion'),
   verificado: boolean('verificado').notNull().default(false),
+  // Punto exacto de la finca (opcional, lo marca el productor). Es privado:
+  // al público solo se muestra redondeado (~1 km).
+  lat: doublePrecision('lat'),
+  lng: doublePrecision('lng'),
 });
 
 export const categorias = pgTable('categorias', {

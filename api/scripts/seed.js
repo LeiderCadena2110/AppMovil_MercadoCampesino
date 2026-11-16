@@ -2,15 +2,17 @@
 import bcrypt from 'bcryptjs';
 import { db, pool } from '../src/db/index.js';
 import { municipios, categorias, usuarios, productores, productos } from '../src/db/schema.js';
+import { MUNICIPIOS } from '../src/db/municipalities.js';
 
-const MUNICIPIOS = ['Pasto', 'Ipiales', 'Túquerres', 'La Unión', 'Sandoná', 'Buesaco', 'Tangua', 'Yacuanquer', 'Samaniego', 'La Florida', 'Chachagüí', 'Consacá'];
 const CATEGORIAS = [
   ['Frutas', 'nutrition'], ['Verduras', 'leaf'], ['Tubérculos', 'ellipse'], ['Granos', 'apps'],
   ['Lácteos', 'water'], ['Café', 'cafe'], ['Hierbas', 'flower'],
 ];
 
 async function main() {
-  await db.insert(municipios).values(MUNICIPIOS.map((nombre) => ({ nombre }))).onConflictDoNothing();
+  for (const [nombre, lat, lng] of MUNICIPIOS) {
+    await db.insert(municipios).values({ nombre, lat, lng }).onConflictDoUpdate({ target: municipios.nombre, set: { lat, lng } });
+  }
   await db.insert(categorias).values(CATEGORIAS.map(([nombre, icono]) => ({ nombre, icono }))).onConflictDoNothing();
 
   // En producción (Render) solo se cargan municipios y categorías, salvo que SEED_DEMO=true

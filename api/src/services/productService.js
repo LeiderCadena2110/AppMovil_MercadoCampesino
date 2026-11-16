@@ -4,6 +4,7 @@ import { productores, productos } from '../db/schema.js';
 import { productoRepository } from '../repositories/productRepository.js';
 import { almacenamiento } from '../storage/index.js';
 import { ErrorApp } from '../middlewares/errors.js';
+import { ubicacionPublica } from './mapService.js';
 
 const conMiniatura = (p) => ({ ...p, miniaturaUrl: p.fotoUrl ? almacenamiento.miniatura(p.fotoUrl, 300) : null });
 
@@ -29,6 +30,7 @@ export const productoService = {
   async perfilProductor(id) {
     const productor = await db.query.productores.findFirst({
       where: eq(productores.id, id),
+      columns: { lat: false, lng: false }, // el punto exacto es privado: se da la ubicación aproximada
       with: {
         municipio: true,
         // El teléfono no es público: solo se comparte dentro de un pedido
@@ -37,7 +39,8 @@ export const productoService = {
       },
     });
     if (!productor) throw new ErrorApp(404, 'Productor no encontrado');
-    return { ...productor, productos: productor.productos.map(conMiniatura) };
+    const [exacta] = await db.select({ lat: productores.lat, lng: productores.lng }).from(productores).where(eq(productores.id, id));
+    return { ...productor, ubicacion: ubicacionPublica({ id, ...exacta }, productor.municipio), productos: productor.productos.map(conMiniatura) };
   },
 
   misProductos: async (productorId) => (await productoRepository.delProductor(productorId)).map(conMiniatura),

@@ -4,7 +4,7 @@ import { verificarToken, verificarRol } from '../middlewares/auth.js';
 import { validar } from '../middlewares/validate.js';
 import {
   registroSchema, loginSchema, refreshSchema, productoSchema, catalogoQuery, pedidoSchema, pedidosQuery, estadoSchema, calificacionSchema,
-  asistenteSchema, descripcionIaSchema, precioIaSchema, dictadoIaSchema, dispositivoSchema, pagoSchema,
+  asistenteSchema, descripcionIaSchema, precioIaSchema, dictadoIaSchema, dispositivoSchema, pagoSchema, ubicacionSchema,
 } from '../schemas.js';
 import { limitePorUsuario } from '../middlewares/rateLimit.js';
 import { limiteLogin, limiteRegistro, limiteSesion } from '../middlewares/authLimits.js';
@@ -16,6 +16,7 @@ import { adminController } from '../controllers/adminController.js';
 import { iaController } from '../controllers/aiController.js';
 import { notificaciones } from '../services/notificationService.js';
 import { pagoController } from '../controllers/paymentController.js';
+import { mapaService } from '../services/mapService.js';
 
 const subida = multer({
   storage: multer.memoryStorage(),
@@ -43,6 +44,11 @@ r.get('/municipios', catalogoController.municipios);
 r.get('/productos', validar(catalogoQuery, 'query'), catalogoController.productos);
 r.get('/productos/:id', catalogoController.producto);
 r.get('/productores/:id', catalogoController.productor);
+
+// Mapa de fincas (público; ubicaciones aproximadas) y ubicación de la finca propia
+r.get('/mapa/fincas', async (_req, res) => res.json(await mapaService.fincas()));
+r.put('/mi-finca/ubicacion', ...productor, validar(ubicacionSchema), async (req, res) => res.json(await mapaService.fijarUbicacion(req.usuario.productorId, req.body)));
+r.delete('/mi-finca/ubicacion', ...productor, async (req, res) => res.json(await mapaService.fijarUbicacion(req.usuario.productorId, null)));
 
 // Productos del productor
 r.get('/mis-productos', ...productor, misProductosController.listar);

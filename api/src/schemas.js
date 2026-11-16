@@ -118,3 +118,8 @@ export const dispositivoSchema = z.object({
 export const pagoSchema = z.object({
   pedidoIds: z.array(z.coerce.number().int().positive()).min(1).max(20),
 });
+
+export const ubicacionSchema = z.object({
+  lat: z.coerce.number().min(-90).max(90),
+  lng: z.coerce.number().min(-180).max(180),
+});
