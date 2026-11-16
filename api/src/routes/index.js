@@ -7,6 +7,7 @@ import {
   asistenteSchema, descripcionIaSchema, precioIaSchema,
 } from '../schemas.js';
 import { limitePorUsuario } from '../middlewares/rateLimit.js';
+import { limiteLogin, limiteRegistro } from '../middlewares/authLimits.js';
 import { authController } from '../controllers/authController.js';
 import { catalogoController } from '../controllers/catalogController.js';
 import { misProductosController } from '../controllers/myProductsController.js';
@@ -26,8 +27,8 @@ const comprador = [verificarToken, verificarRol('COMPRADOR')];
 const admin = [verificarToken, verificarRol('ADMIN')];
 
 // Autenticación
-r.post('/auth/registro', validar(registroSchema), authController.registro);
-r.post('/auth/login', validar(loginSchema), authController.login);
+r.post('/auth/registro', limiteRegistro, validar(registroSchema), authController.registro);
+r.post('/auth/login', limiteLogin, validar(loginSchema), authController.login);
 r.get('/auth/yo', verificarToken, authController.yo);
 
 // Listas públicas para filtros
