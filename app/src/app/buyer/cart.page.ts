@@ -136,6 +136,14 @@ function iniciales(finca: string) {
       display: grid; place-items: center; font-size: 18px; cursor: pointer; }
     .contador button:disabled { opacity: 0.35; }
     .contador strong { min-width: 20px; text-align: center; }
+    /* En pantallas angostas el contador baja debajo del nombre para no cortarlo */
+    @media (max-width: 360px) {
+      .fila { flex-wrap: wrap; }
+      .datos { flex-basis: calc(100% - 72px); }
+      .contador { margin-left: 72px; }
+      .finca header { flex-wrap: wrap; }
+      .subtotal { margin-left: 56px; }
+    }
     .pie { padding: 12px 16px calc(12px + var(--ion-safe-area-bottom, 0px)); background: var(--mc-superficie); box-shadow: var(--mc-e2); }
     .total { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
     .total span { color: var(--mc-tinta-suave); font-weight: 600; }
