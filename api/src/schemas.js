@@ -96,6 +96,10 @@ export const descripcionIaSchema = z.object({
   notas: z.string().trim().max(300).optional(),
 });
 
+export const dictadoIaSchema = z.object({
+  texto: z.string().trim().min(2, 'No se escuchó nada').max(500),
+});
+
 export const precioIaSchema = z.object({
   nombre: z.string().trim().min(2).max(120),
   categoriaId: z.coerce.number().int().positive(),

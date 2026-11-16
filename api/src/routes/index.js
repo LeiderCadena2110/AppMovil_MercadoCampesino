@@ -4,7 +4,7 @@ import { verificarToken, verificarRol } from '../middlewares/auth.js';
 import { validar } from '../middlewares/validate.js';
 import {
   registroSchema, loginSchema, refreshSchema, productoSchema, catalogoQuery, pedidoSchema, pedidosQuery, estadoSchema, calificacionSchema,
-  asistenteSchema, descripcionIaSchema, precioIaSchema,
+  asistenteSchema, descripcionIaSchema, precioIaSchema, dictadoIaSchema,
 } from '../schemas.js';
 import { limitePorUsuario } from '../middlewares/rateLimit.js';
 import { limiteLogin, limiteRegistro, limiteSesion } from '../middlewares/authLimits.js';
@@ -62,6 +62,8 @@ const limiteIa = limitePorUsuario({ maximo: 15, ventanaMs: 60_000 });
 r.get('/ia/estado', iaController.estado);
 r.post('/ia/asistente', verificarToken, limiteIa, validar(asistenteSchema), iaController.asistente);
 r.post('/ia/descripcion', ...productor, limiteIa, validar(descripcionIaSchema), iaController.descripcion);
+r.post('/ia/dictado', ...productor, limiteIa, validar(dictadoIaSchema), iaController.dictado);
+r.post('/ia/foto', ...productor, limiteIa, subida.single('foto'), iaController.foto);
 r.post('/ia/precio', ...productor, validar(precioIaSchema), iaController.precio);
 
 // Administración

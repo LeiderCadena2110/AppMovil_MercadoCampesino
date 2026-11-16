@@ -10,7 +10,8 @@ export const iaDisponible = () => Boolean(env.geminiApiKey);
  * Pide una respuesta a Gemini.
  * @param {object} opciones
  * @param {string} opciones.sistema   Instrucciones fijas (rol del asistente, reglas, datos del catálogo)
- * @param {{rol: 'usuario'|'ia', texto: string}[]} opciones.mensajes  Conversación
+ * @param {{rol: 'usuario'|'ia', texto: string, imagen?: {mime: string, datos: Buffer}}[]} opciones.mensajes
+ *        Conversación; un mensaje puede llevar una imagen (visión)
  * @param {object} [opciones.esquema]  Si se envía, la respuesta llega como JSON con esa forma
  * @returns {Promise<string>} texto (o JSON en texto) generado
  */
@@ -19,7 +20,13 @@ export async function generar({ sistema, mensajes, esquema, temperatura = 0.6 })
 
   const cuerpo = {
     systemInstruction: { parts: [{ text: sistema }] },
-    contents: mensajes.map((m) => ({ role: m.rol === 'ia' ? 'model' : 'user', parts: [{ text: m.texto }] })),
+    contents: mensajes.map((m) => ({
+      role: m.rol === 'ia' ? 'model' : 'user',
+      parts: [
+        ...(m.imagen ? [{ inlineData: { mimeType: m.imagen.mime, data: m.imagen.datos.toString('base64') } }] : []),
+        { text: m.texto },
+      ],
+    })),
     generationConfig: {
       temperature: temperatura,
       maxOutputTokens: 1024,
