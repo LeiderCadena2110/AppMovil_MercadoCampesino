@@ -84,11 +84,17 @@ test('mis_pedidos solo devuelve los pedidos de quien pregunta', async () => {
 });
 
 test('historial_precio responde con semanas, tendencia y precio esperado', async () => {
+  // Un producto propio de esta prueba: su precio publicado queda en el historial
+  const palabra = `granadilla${randomUUID().slice(0, 6)}`;
+  const categoriaId = (await api.get('/api/categorias')).body[0].id;
+  await api.post('/api/mis-productos').set('Authorization', `Bearer ${productor}`)
+    .send({ nombre: palabra, categoriaId, precio: 3000, unidad: 'kg', stock: 10, activo: false });
   let datos;
-  simularGemini([{ herramienta: 'historial_precio', args: { producto: 'papa pastusa' } }, (c) => { datos = respuestaDe(c).response.resultado; return { texto: 'Estable.' }; }]);
+  simularGemini([{ herramienta: 'historial_precio', args: { producto: palabra } }, (c) => { datos = respuestaDe(c).response.resultado; return { texto: 'Estable.' }; }]);
   const r = await preguntar('¿La papa está subiendo?');
   assert.equal(r.status, 200);
-  assert.ok(Array.isArray(datos.semanas) && datos.semanas.length > 0);
+  assert.equal(datos.semanas.length, 1);
+  assert.equal(datos.semanas[0].precio, 3000);
   assert.ok('tendenciaPorcentaje' in datos && 'precioEsperado' in datos);
 });
 

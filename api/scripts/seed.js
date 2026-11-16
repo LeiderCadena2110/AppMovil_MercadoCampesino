@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { db, pool } from '../src/db/index.js';
 import { municipios, categorias, usuarios, productores, productos } from '../src/db/schema.js';
 import { MUNICIPIOS } from '../src/db/municipalities.js';
+import { registrarPrecio } from '../src/repositories/priceHistoryRepository.js';
 
 const CATEGORIAS = [
   ['Frutas', 'nutrition'], ['Verduras', 'leaf'], ['Tubérculos', 'ellipse'], ['Granos', 'apps'],
@@ -44,13 +45,15 @@ async function main() {
     usuarioId: prodUser.id, nombreFinca: 'Finca El Encano', municipioId: m('Pasto'), verificado: true,
     descripcion: 'Papa, cebolla y hortalizas cultivadas cerca a la Laguna de La Cocha.',
   }).returning();
-  await db.insert(productos).values([
+  const creados = await db.insert(productos).values([
     { productorId: prod.id, categoriaId: c('Tubérculos'), nombre: 'Papa pastusa', precio: '45000', unidad: 'arroba', stock: 40 },
     { productorId: prod.id, categoriaId: c('Tubérculos'), nombre: 'Papa amarilla (criolla)', precio: '3500', unidad: 'libra', stock: 120 },
     { productorId: prod.id, categoriaId: c('Verduras'), nombre: 'Cebolla junca', precio: '2500', unidad: 'atado', stock: 60 },
     { productorId: prod.id, categoriaId: c('Verduras'), nombre: 'Zanahoria', precio: '2000', unidad: 'libra', stock: 80 },
     { productorId: prod.id, categoriaId: c('Lácteos'), nombre: 'Queso campesino', precio: '14000', unidad: 'libra', stock: 15 },
-  ]);
+  ]).returning();
+  // Primer punto del historial de precios de cada producto
+  for (const p of creados) await registrarPrecio(p, 'publicado');
   console.log('Datos de prueba creados. Contraseña de todos: Clave1234');
 }
 
