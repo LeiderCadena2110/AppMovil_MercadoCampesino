@@ -284,3 +284,9 @@ ion-segment-button.segment-button-checked { background: var(--mc-accion); }
 /* Botón redondo de acción (agregar al carrito, etc.) */
 .mc-boton-redondo { width: 44px; height: 44px; border-radius: 50%; border: 0; display: grid; place-items: center; flex-shrink: 0;
   background: var(--mc-accion); color: var(--mc-accion-texto); font-size: 22px; cursor: pointer; }
+
+/* Aviso con "Deshacer": píldora oscura sobre el pie, botón en color maíz */
+ion-toast.mc-toast-deshacer {
+  --background: #1f2b22; --color: #fff; --button-color: var(--mc-maiz);
+  --border-radius: 16px; --box-shadow: var(--mc-e3); --start: 12px; --end: 12px; font-weight: 600;
+}

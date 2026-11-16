@@ -12,9 +12,12 @@ export class CarritoService {
 
   /** Agrupa por finca: cada grupo se convierte en un pedido */
   readonly porProductor = computed(() => {
-    const grupos = new Map<number, { finca: string; items: ItemCarrito[]; subtotal: number }>();
+    type Grupo = { productorId: number; finca: string; productor?: string; municipio: string; verificado?: boolean; items: ItemCarrito[]; subtotal: number };
+    const grupos = new Map<number, Grupo>();
     for (const i of this.items()) {
-      const g = grupos.get(i.producto.productorId) ?? { finca: i.producto.finca, items: [], subtotal: 0 };
+      const p = i.producto;
+      const g = grupos.get(p.productorId) ??
+        { productorId: p.productorId, finca: p.finca, productor: p.productor, municipio: p.municipio, verificado: p.verificado, items: [], subtotal: 0 };
       g.items.push(i);
       g.subtotal += Number(i.producto.precio) * i.cantidad;
       grupos.set(i.producto.productorId, g);
@@ -42,6 +45,13 @@ export class CarritoService {
 
   quitar(productoId: number) {
     this.fijar(this.items().filter((i) => i.producto.id !== productoId));
+  }
+
+  /** Devuelve un ítem quitado a su posición original (para "Deshacer") */
+  restaurar(item: ItemCarrito, posicion: number) {
+    const lista = this.items().filter((i) => i.producto.id !== item.producto.id);
+    lista.splice(Math.min(posicion, lista.length), 0, item);
+    this.fijar(lista);
   }
 
   vaciar() {

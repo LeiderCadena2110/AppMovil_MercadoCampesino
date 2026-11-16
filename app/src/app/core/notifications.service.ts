@@ -17,6 +17,19 @@ export class AvisosService {
     await t.present();
   }
 
+  /** Aviso con botón "Deshacer" (abajo, sobre la barra); llama a la acción si se toca */
+  async deshacer(mensaje: string, accion: () => void) {
+    await this.toast.dismiss().catch(() => undefined);
+    const t = await this.toast.create({
+      message: mensaje, duration: 4500, position: 'bottom', cssClass: 'mc-toast-deshacer',
+      // Se ancla sobre el pie de la página o la barra de pestañas para no taparlos
+      positionAnchor: (document.querySelector('ion-router-outlet .ion-page:not(.ion-page-hidden) ion-footer')
+        ?? document.querySelector('ion-tab-bar')) as HTMLElement | undefined ?? undefined,
+      buttons: [{ text: 'Deshacer', role: 'undo', handler: accion }],
+    });
+    await t.present();
+  }
+
   async confirmar(titulo: string, mensaje: string, aceptar = 'Sí'): Promise<boolean> {
     const a = await this.alert.create({
       header: titulo, message: mensaje,
