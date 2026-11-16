@@ -12,7 +12,8 @@
     "start:prod": "node scripts/migrate.js && node scripts/seed.js --solo-base && node --import ./src/instrument.js src/server.js",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "migrate:prod": "node scripts/migrate.js"
+    "migrate:prod": "node scripts/migrate.js",
+    "precios:evaluar": "node scripts/evaluate-prices.js"
   },
   "keywords": [],
   "author": "",

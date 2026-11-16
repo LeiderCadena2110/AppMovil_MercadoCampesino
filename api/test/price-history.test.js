@@ -37,3 +37,29 @@ test('un pedido guarda el precio y la cantidad que se compró', async () => {
   const ultimo = (await historial(producto.id)).at(-1);
   assert.deepEqual([ultimo.fuente, ultimo.precio, ultimo.cantidad], ['pedido', Number(producto.precio), 2]);
 });
+
+test('precio de referencia v2: usa el historial y explica la tendencia', async () => {
+  const palabra = `curuba${randomUUID().slice(0, 6).replace(/-/g, '')}`; // única: no se mezcla con corridas anteriores
+  const datos = { nombre: `${palabra} de referencia`, categoriaId, precio: 2000, unidad: 'unidad', stock: 50, activo: true };
+  const { body: p } = await api.post('/api/mis-productos').set('Authorization', `Bearer ${productor}`).send(datos);
+  // Dos precios viejos (hace 3 semanas) y dos recientes más altos
+  await pool.query(`update historial_precios set registrado_en = now() - interval '21 days' where producto_id = $1`, [p.id]);
+  await pool.query(`insert into historial_precios (producto_id, productor_id, categoria_id, nombre, unidad, precio, fuente, registrado_en)
+    select id, productor_id, categoria_id, nombre, unidad, v.precio, v.fuente::fuente_precio, now() - v.hace * interval '1 day'
+    from productos, (values (2000, 'pedido', 20), (2400, 'publicado', 5), (2500, 'pedido', 2)) as v(precio, fuente, hace) where id = $1`, [p.id]);
+  const r = await api.post('/api/ia/precio').set('Authorization', `Bearer ${productor}`).send({ nombre: palabra, categoriaId, unidad: 'unidad' });
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  assert.equal(r.body.fuente, 'historial');
+  assert.ok(r.body.sugerido >= 2000 && r.body.sugerido <= 2500, `sugerido ${r.body.sugerido}`);
+  assert.ok(r.body.tendencia > 0);
+  assert.match(r.body.explicacion, /subiendo/);
+});
+
+test('evaluación del error: solo administradores', async () => {
+  assert.equal((await api.get('/api/admin/precios/evaluacion').set('Authorization', `Bearer ${productor}`)).status, 403);
+  const admin = (await api.post('/api/auth/login').send({ email: 'admin@demo.co', password: 'Clave1234' })).body.token;
+  const r = await api.get('/api/admin/precios/evaluacion').set('Authorization', `Bearer ${admin}`);
+  assert.equal(r.status, 200);
+  assert.equal(r.body.semanasMinimas, 4);
+  assert.equal(typeof r.body.concluyente, 'boolean');
+});

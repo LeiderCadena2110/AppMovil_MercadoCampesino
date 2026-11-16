@@ -17,6 +17,7 @@ import { iaController } from '../controllers/aiController.js';
 import { notificaciones } from '../services/notificationService.js';
 import { pagoController } from '../controllers/paymentController.js';
 import { mapaService } from '../services/mapService.js';
+import { precioService } from '../services/priceService.js';
 
 const subida = multer({
   storage: multer.memoryStorage(),
@@ -94,6 +95,7 @@ r.post('/ia/precio', ...productor, validar(precioIaSchema), iaController.precio)
 
 // Administración
 r.get('/admin/productores', ...admin, adminController.productores);
+r.get('/admin/precios/evaluacion', ...admin, async (_req, res) => res.json(await precioService.evaluar()));
 r.patch('/admin/productores/:id/verificar', ...admin, adminController.verificar);
 r.patch('/admin/productos/:id/ocultar', ...admin, adminController.ocultar);
 
