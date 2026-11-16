@@ -14,6 +14,7 @@ import { AvisosService } from '../core/notifications.service';
 import { Categoria, Municipio, UNIDADES } from '../core/models';
 import { IaService, PrecioSugerido } from '../core/ai.service';
 import { AuthService } from '../core/auth.service';
+import { mensajeError } from '../core/auth.interceptor';
 import { CopPipe } from '../shared/format';
 
 /** Lo mismo que acepta la API al subir fotos */
@@ -327,7 +328,16 @@ export class ProductoFormPage implements OnInit {
     try {
       const datos = { ...this.form.getRawValue(), activo: publicar };
       const p = this.id() ? await this.srv.actualizar(+this.id()!, datos) : await this.srv.crear(datos);
-      if (this.fotoNueva) await this.srv.subirFoto(p.id, this.fotoNueva);
+      if (this.fotoNueva) {
+        try {
+          await this.srv.subirFoto(p.id, this.fotoNueva);
+        } catch (e) {
+          // El producto ya quedó guardado: no se vuelve a crear; se avisa y se abre para reintentar la foto
+          this.avisos.error(new Error(`El producto se guardó, pero la foto no: ${mensajeError(e)}`));
+          if (!this.id()) await this.nav.navigateRoot(['/productor/producto', p.id, 'editar']);
+          return;
+        }
+      }
       await this.avisos.exito(publicar ? 'Producto publicado' : 'Guardado como borrador: los compradores aún no lo ven');
       await this.nav.navigateBack('/productor/tabs/productos');
     } catch (e) {

@@ -6,7 +6,11 @@ function requerida(nombre) {
   return valor;
 }
 
+// Render define RENDER=true; en otros servidores usa NODE_ENV=production
+const produccion = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
+
 export const env = {
+  produccion,
   port: Number(process.env.PORT ?? 3000),
   databaseUrl: requerida('DATABASE_URL'),
   jwtSecret: requerida('JWT_SECRET'),
