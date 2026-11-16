@@ -5,6 +5,7 @@ import { productoRepository } from '../repositories/productRepository.js';
 import { almacenamiento } from '../storage/index.js';
 import { ErrorApp } from '../middlewares/errors.js';
 import { ubicacionPublica } from './mapService.js';
+import { registrarPrecio } from '../repositories/priceHistoryRepository.js';
 
 const conMiniatura = (p) => ({ ...p, miniaturaUrl: p.fotoUrl ? almacenamiento.miniatura(p.fotoUrl, 300) : null });
 
@@ -51,18 +52,28 @@ export const productoService = {
    */
   async crear(productorId, datos) {
     const fila = { ...datos, precio: String(datos.precio), productorId };
-    if (!datos.clienteId) return { producto: await productoRepository.crear(fila), repetido: false };
+    if (!datos.clienteId) {
+      const producto = await productoRepository.crear(fila);
+      await registrarPrecio(producto, 'publicado');
+      return { producto, repetido: false };
+    }
     const [nuevo] = await db.insert(productos).values(fila).onConflictDoNothing().returning();
-    if (nuevo) return { producto: nuevo, repetido: false };
+    if (nuevo) {
+      await registrarPrecio(nuevo, 'publicado');
+      return { producto: nuevo, repetido: false };
+    }
     const [previo] = await db.select().from(productos)
       .where(and(eq(productos.productorId, productorId), eq(productos.clienteId, datos.clienteId)));
     return { producto: previo, repetido: true };
   },
 
   async actualizar(productorId, id, datos) {
-    await propio(productorId, id);
+    const antes = await propio(productorId, id);
     const { clienteId: _ignorado, ...cambios } = datos; // el id del teléfono no se cambia
-    return productoRepository.actualizar(id, { ...cambios, precio: String(cambios.precio) });
+    const producto = await productoRepository.actualizar(id, { ...cambios, precio: String(cambios.precio) });
+    // Solo se guarda en el historial si el precio (o la unidad) cambió de verdad
+    if (Number(antes.precio) !== Number(producto.precio) || antes.unidad !== producto.unidad) await registrarPrecio(producto, 'publicado');
+    return producto;
   },
 
   async eliminar(productorId, id) {

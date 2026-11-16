@@ -7,6 +7,7 @@ import { productoRepository } from '../repositories/productRepository.js';
 import { ErrorApp } from '../middlewares/errors.js';
 import { notificaciones } from './notificationService.js';
 import { pagoService } from './paymentService.js';
+import { registrarPrecio } from '../repositories/priceHistoryRepository.js';
 
 // Qué estado puede seguir a cada uno
 const TRANSICIONES = {
@@ -55,6 +56,7 @@ export const pedidoService = {
         if (!p || !p.activo || p.oculto) throw new ErrorApp(400, `El producto ${productoId} no está disponible`);
         const ok = await productoRepository.descontarStock(productoId, cantidad, tx);
         if (ok.length === 0) throw new ErrorApp(409, `No hay suficiente "${p.nombre}" (quedan ${p.stock} ${p.unidad})`);
+        await registrarPrecio(p, 'pedido', { cantidad, tx });
         const grupo = porProductor.get(p.productorId) ?? [];
         grupo.push({ productoId, cantidad, precioUnitario: p.precio });
         porProductor.set(p.productorId, grupo);

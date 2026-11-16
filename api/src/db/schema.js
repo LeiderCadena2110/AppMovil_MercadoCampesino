@@ -145,6 +145,27 @@ export const dispositivos = pgTable('dispositivos', {
   actualizadoEn: timestamp('actualizado_en', { withTimezone: true }).defaultNow().notNull(),
 }, (t) => [index('dispositivos_usuario_idx').on(t.usuarioId)]);
 
+// Historial de precios: cada precio publicado (al crear o cambiar un producto) y cada precio
+// pedido (lo que de verdad se compró). Es la base para predecir precios y medir el error.
+// Guarda nombre, unidad, categoría y municipio del momento: si el producto cambia o se borra, el dato sigue.
+export const fuentePrecioEnum = pgEnum('fuente_precio', ['publicado', 'pedido']);
+export const historialPrecios = pgTable('historial_precios', {
+  id: serial('id').primaryKey(),
+  productoId: integer('producto_id').references(() => productos.id, { onDelete: 'set null' }),
+  productorId: integer('productor_id').notNull().references(() => productores.id, { onDelete: 'cascade' }),
+  categoriaId: integer('categoria_id').notNull().references(() => categorias.id),
+  municipioId: integer('municipio_id').references(() => municipios.id),
+  nombre: varchar('nombre', { length: 120 }).notNull(),
+  unidad: varchar('unidad', { length: 20 }).notNull(),
+  precio: numeric('precio', { precision: 12, scale: 2 }).notNull(),
+  fuente: fuentePrecioEnum('fuente').notNull(),
+  cantidad: integer('cantidad'), // solo en pedidos
+  registradoEn: timestamp('registrado_en', { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [
+  index('historial_precios_serie_idx').on(t.categoriaId, t.unidad, t.registradoEn),
+  index('historial_precios_producto_idx').on(t.productoId),
+]);
+
 // Relaciones para consultas con `with`
 export const usuariosRel = relations(usuarios, ({ one, many }) => ({
   productor: one(productores, { fields: [usuarios.id], references: [productores.usuarioId] }),
