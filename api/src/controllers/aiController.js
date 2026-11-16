@@ -2,7 +2,7 @@ import { iaService } from '../services/aiService.js';
 
 export const iaController = {
   estado: (_req, res) => res.json(iaService.estado()),
-  asistente: async (req, res) => res.json(await iaService.asistente(req.body)),
+  asistente: async (req, res) => res.json(await iaService.asistente(req.body, req.usuario)),
   descripcion: async (req, res) => res.json(await iaService.descripcion(req.body)),
   async foto(req, res) {
     if (!req.file) return res.status(400).json({ error: 'Envía una foto JPG, PNG o WebP de hasta 5 MB en el campo "foto"' });

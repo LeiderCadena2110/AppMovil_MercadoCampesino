@@ -61,3 +61,70 @@ export async function generarJson(opciones) {
   const texto = await generar(opciones);
   return JSON.parse(texto.replace(/^```(?:json)?\s*|\s*```$/g, ''));
 }
+
+/**
+ * Conversación con herramientas (function calling): Gemini decide qué herramienta usar, la API
+ * la ejecuta con datos reales y le devuelve el resultado, hasta que Gemini responde con texto.
+ * @param {object} opciones
+ * @param {{nombre: string, descripcion: string, parametros: object, ejecutar: (args: object) => Promise<unknown>}[]} opciones.herramientas
+ * @param {number} [opciones.maxPasos]  máximo de rondas de herramientas (evita bucles)
+ * @returns {Promise<{ texto: string, usadas: string[], resultados: {nombre: string, resultado: unknown}[] }>}
+ */
+export async function conversarConHerramientas({ sistema, mensajes, herramientas, temperatura = 0.5, maxPasos = 4 }) {
+  if (!iaDisponible()) throw new Error('IA no configurada');
+  const porNombre = new Map(herramientas.map((h) => [h.nombre, h]));
+  const contenidos = mensajes.map((m) => ({ role: m.rol === 'ia' ? 'model' : 'user', parts: [{ text: m.texto }] }));
+  const usadas = [];
+  const resultados = [];
+  for (let paso = 0; paso <= maxPasos; paso++) {
+    const contenido = await llamar({
+      systemInstruction: { parts: [{ text: sistema }] },
+      contents: contenidos,
+      tools: [{ functionDeclarations: herramientas.map((h) => ({ name: h.nombre, description: h.descripcion, parameters: h.parametros })) }],
+      generationConfig: { temperature: temperatura, maxOutputTokens: 1024 },
+    });
+    const llamadas = (contenido.parts ?? []).filter((p) => p.functionCall);
+    if (!llamadas.length) {
+      const texto = (contenido.parts ?? []).map((p) => p.text ?? '').join('').trim();
+      if (!texto) throw new Error('Gemini no devolvió texto');
+      return { texto, usadas, resultados };
+    }
+    if (paso === maxPasos) break;
+    contenidos.push({ role: 'model', parts: contenido.parts });
+    const respuestas = [];
+    for (const { functionCall: { name, args } } of llamadas) {
+      const h = porNombre.get(name);
+      let resultado;
+      try {
+        resultado = h ? await h.ejecutar(args ?? {}) : { error: `Herramienta desconocida: ${name}` };
+      } catch (e) {
+        resultado = { error: e.message };
+      }
+      usadas.push(name);
+      resultados.push({ nombre: name, resultado });
+      respuestas.push({ functionResponse: { name, response: { resultado } } });
+    }
+    contenidos.push({ role: 'user', parts: respuestas });
+  }
+  throw new Error('Demasiadas llamadas a herramientas');
+}
+
+async function llamar(cuerpo) {
+  const controlador = new AbortController();
+  const limite = setTimeout(() => controlador.abort(), 20_000);
+  try {
+    const r = await fetch(`${URL_BASE}/${env.geminiModelo}:generateContent`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': env.geminiApiKey },
+      body: JSON.stringify(cuerpo),
+      signal: controlador.signal,
+    });
+    if (!r.ok) throw new Error(`Gemini respondió ${r.status}: ${(await r.text().catch(() => '')).slice(0, 200)}`);
+    const datos = await r.json();
+    const contenido = datos?.candidates?.[0]?.content;
+    if (!contenido) throw new Error('Gemini no devolvió contenido');
+    return contenido;
+  } finally {
+    clearTimeout(limite);
+  }
+}
