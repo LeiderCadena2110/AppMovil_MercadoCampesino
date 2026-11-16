@@ -1,5 +1,6 @@
 import { Component, ElementRef, ViewChild, computed, inject, input, output, signal } from '@angular/core';
 import { TransicionesService } from '../core/transitions.service';
+import { vibrar } from '../core/haptics';
 import { IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { add, remove, leafOutline, locationOutline, checkmarkCircle, heart, heartOutline } from 'ionicons/icons';
@@ -118,7 +119,10 @@ export class ProductoCardComponent {
   }
 
   sumar(ev?: Event) {
+    const primera = this.enCarrito() === 0;
     this.carrito.agregar(this.producto(), 1);
+    vibrar.toque();
+    if (primera) this.transiciones.volarAlCarrito(this.fotoImg?.nativeElement ?? null);
     this.agregar.emit({ producto: this.producto(), origen: (ev?.target as HTMLElement | null) ?? null });
   }
 
@@ -129,6 +133,7 @@ export class ProductoCardComponent {
   }
 
   restar() {
+    vibrar.toque();
     this.carrito.cambiar(this.producto().id, this.enCarrito() - 1);
   }
 }

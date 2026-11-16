@@ -35,6 +35,38 @@ export class TransicionesService {
     });
     await transicion.finished.catch(() => undefined);
   }
+
+  /**
+   * Una copia pequeña de la foto "vuela" desde la tarjeta hasta el botón del carrito.
+   * Se omite si no hay foto, no se ve el carrito o se pidió reducir el movimiento.
+   */
+  volarAlCarrito(foto: HTMLElement | null) {
+    const destino = document.querySelector('ion-tab-button.mc-tab-central ion-icon');
+    if (!foto || !destino || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const a = foto.getBoundingClientRect();
+    const b = destino.getBoundingClientRect();
+    if (!a.width || !b.width) return;
+    const lado = Math.min(a.width, 96);
+    const copia = foto.cloneNode(true) as HTMLElement;
+    copia.removeAttribute('data-foto-compartida');
+    Object.assign(copia.style, {
+      position: 'fixed', zIndex: '9999', pointerEvents: 'none', margin: '0', objectFit: 'cover',
+      left: `${a.left + a.width / 2 - lado / 2}px`, top: `${a.top + a.height / 2 - lado / 2}px`,
+      width: `${lado}px`, height: `${lado}px`, borderRadius: '50%', boxShadow: 'var(--mc-e3)',
+    });
+    document.body.appendChild(copia);
+    const dx = b.left + b.width / 2 - (a.left + a.width / 2);
+    const dy = b.top + b.height / 2 - (a.top + a.height / 2);
+    const anim = copia.animate(
+      [
+        { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+        { transform: `translate(${dx * 0.45}px, ${dy * 0.2 - 60}px) scale(0.7)`, opacity: 1, offset: 0.45 },
+        { transform: `translate(${dx}px, ${dy}px) scale(0.18)`, opacity: 0.6 },
+      ],
+      { duration: 650, easing: 'cubic-bezier(0.3, 0, 0.4, 1)' },
+    );
+    anim.onfinish = anim.oncancel = () => copia.remove();
+  }
 }
 
 /** Espera (máx. ms) a que se cumpla la condición, revisando en cada cuadro */

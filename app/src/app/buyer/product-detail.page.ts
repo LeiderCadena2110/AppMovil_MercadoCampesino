@@ -11,7 +11,8 @@ import {
 } from 'ionicons/icons';
 import { CatalogoService, aLista } from '../core/catalog.service';
 import { FavoritosService } from '../core/favorites.service';
-import { FOTO_COMPARTIDA } from '../core/transitions.service';
+import { FOTO_COMPARTIDA, TransicionesService } from '../core/transitions.service';
+import { vibrar } from '../core/haptics';
 import { CatalogoListaComponent } from './catalog-list.component';
 import { EstadoVacioComponent } from '../shared/empty-state.component';
 import { CarritoService } from '../core/cart.service';
@@ -171,6 +172,7 @@ export class ProductoDetallePage implements OnInit {
   id = input.required<string>(); // viene de la ruta /comprador/producto/:id
   private catalogo = inject(CatalogoService);
   private carrito = inject(CarritoService);
+  private transiciones = inject(TransicionesService);
   private avisos = inject(AvisosService);
   favoritos = inject(FavoritosService);
   producto = signal<Producto | null>(null);
@@ -221,6 +223,8 @@ export class ProductoDetallePage implements OnInit {
 
   agregar(p: Producto) {
     this.carrito.agregar(aLista(p), this.cantidad());
+    vibrar.toque();
+    this.transiciones.volarAlCarrito(document.querySelector<HTMLElement>('ion-content img[data-foto-compartida]'));
     this.avisos.exito('Agregado al carrito');
   }
 }

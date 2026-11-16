@@ -4,6 +4,7 @@ import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonList, IonListHeader, IonItem, IonLabel,
   IonTextarea, IonRadioGroup, IonRadio, IonButton, IonFooter, IonNote, IonSpinner, NavController,
 } from '@ionic/angular';
+import { vibrar } from '../core/haptics';
 import { CarritoService } from '../core/cart.service';
 import { PedidosService, nuevaClave } from '../core/orders.service';
 import { AvisosService } from '../core/notifications.service';
@@ -84,6 +85,7 @@ export class CheckoutPage {
       this.clave = nuevaClave();
       this.ultimoIntento = '';
       this.carrito.vaciar();
+      vibrar.exito();
       await this.avisos.exito(creados.length > 1 ? `${creados.length} pedidos enviados` : 'Pedido enviado');
       // navigateRoot reinicia la pila: "atrás" no regresa al checkout
       await this.nav.navigateRoot('/comprador/tabs/pedidos');
