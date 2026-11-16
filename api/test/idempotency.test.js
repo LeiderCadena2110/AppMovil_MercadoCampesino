@@ -48,3 +48,15 @@ test('la misma clave con otra compra se rechaza y una clave inválida también',
 test('sin clave sigue funcionando (versiones viejas de la app)', async () => {
   assert.equal((await pedir(undefined)).status, 201);
 });
+
+test('GET /pedidos pagina de a 30 y filtra activos/cerrados', async () => {
+  const r = await api.get('/api/pedidos').set('Authorization', `Bearer ${token}`);
+  assert.equal(r.status, 200);
+  assert.ok(Array.isArray(r.body) && r.body.length <= 30);
+  assert.ok(['true', 'false'].includes(r.headers['x-hay-mas']));
+  const activos = await api.get('/api/pedidos?estado=activos').set('Authorization', `Bearer ${token}`);
+  assert.ok(activos.body.every((p) => !['ENTREGADO', 'RECHAZADO'].includes(p.estado)));
+  const fechas = r.body.map((p) => new Date(p.creadoEn).getTime());
+  assert.deepEqual(fechas, [...fechas].sort((a, b) => b - a));
+  assert.equal((await api.get('/api/pedidos?estado=otro').set('Authorization', `Bearer ${token}`)).status, 400);
+});

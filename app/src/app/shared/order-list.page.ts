@@ -2,7 +2,8 @@ import { Component, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import {
   IonContent, IonHeader, IonToolbar, IonList, IonItem, IonLabel, IonBadge, IonNote, IonRefresher,
-  IonRefresherContent, IonSegment, IonSegmentButton, NavController, RefresherCustomEvent, ViewWillEnter,
+  IonRefresherContent, IonSegment, IonSegmentButton, IonInfiniteScroll, IonInfiniteScrollContent, NavController,
+  RefresherCustomEvent, InfiniteScrollCustomEvent, ViewWillEnter,
 } from '@ionic/angular';
 import { AuthService } from '../core/auth.service';
 import { PedidosService } from '../core/orders.service';
@@ -18,7 +19,8 @@ import { receiptOutline } from 'ionicons/icons';
 @Component({
   selector: 'app-pedidos-lista',
   imports: [DatePipe, IonContent, IonHeader, IonToolbar, IonList, IonItem, IonLabel, IonBadge, IonNote, IonRefresher,
-    IonRefresherContent, IonSegment, IonSegmentButton, CopPipe, EstadoPipe, EstadoVacioComponent],
+    IonRefresherContent, IonSegment, IonSegmentButton, IonInfiniteScroll, IonInfiniteScrollContent, CopPipe, EstadoPipe,
+    EstadoVacioComponent],
   styles: `
     .titulo { margin: 10px 16px 0; font-size: 1.7rem; }
     .segmento { padding: 4px 12px 8px; }
@@ -27,7 +29,7 @@ import { receiptOutline } from 'ionicons/icons';
     <ion-header class="ion-no-border">
       <ion-toolbar><h1 class="titulo">{{ esProductor ? 'Pedidos recibidos' : 'Mis pedidos' }}</h1></ion-toolbar>
       <ion-toolbar class="segmento">
-        <ion-segment [value]="filtro()" (ionChange)="filtro.set($any($event.detail.value))">
+        <ion-segment [value]="filtro()" (ionChange)="cambiarFiltro($any($event.detail.value))">
           <ion-segment-button value="activos">En curso</ion-segment-button>
           <ion-segment-button value="cerrados">Cerrados</ion-segment-button>
         </ion-segment>
@@ -54,6 +56,9 @@ import { receiptOutline } from 'ionicons/icons';
           }
         }
       </ion-list>
+      <ion-infinite-scroll [disabled]="!hayMas()" (ionInfinite)="mas($event)">
+        <ion-infinite-scroll-content loadingText="Cargando pedidos anteriores..." />
+      </ion-infinite-scroll>
     </ion-content>
   `,
 })
@@ -69,8 +74,10 @@ export class PedidosListaPage implements ViewWillEnter {
     addIcons({ receiptOutline });
   }
 
-  visibles = () => this.lista().filter((p) =>
-    this.filtro() === 'activos' ? !['ENTREGADO', 'RECHAZADO'].includes(p.estado) : ['ENTREGADO', 'RECHAZADO'].includes(p.estado));
+  /** La API ya filtra por activos/cerrados y pagina de a 30 */
+  visibles = () => this.lista();
+  hayMas = signal(false);
+  private pagina = 1;
 
   // Se recarga cada vez que se entra a la pestaña
   private novedades = inject(NovedadesPedidosService);
@@ -81,7 +88,33 @@ export class PedidosListaPage implements ViewWillEnter {
   }
 
   async cargar() {
-    try { this.lista.set(await this.pedidos.listar()); } catch (e) { this.avisos.error(e); }
+    try {
+      const r = await this.pedidos.pagina(1, this.filtro());
+      this.pagina = 1;
+      this.lista.set(r.items);
+      this.hayMas.set(r.hayMas);
+    } catch (e) {
+      this.avisos.error(e);
+    }
+  }
+
+  cambiarFiltro(f: 'activos' | 'cerrados') {
+    this.filtro.set(f);
+    this.lista.set([]);
+    this.cargar();
+  }
+
+  async mas(ev: InfiniteScrollCustomEvent) {
+    try {
+      const r = await this.pedidos.pagina(this.pagina + 1, this.filtro());
+      this.pagina++;
+      this.lista.update((l) => [...l, ...r.items]);
+      this.hayMas.set(r.hayMas);
+    } catch (e) {
+      this.avisos.error(e);
+    } finally {
+      ev.target.complete();
+    }
   }
 
   async refrescar(ev: RefresherCustomEvent) {

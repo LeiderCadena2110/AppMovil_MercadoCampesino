@@ -64,6 +64,11 @@ export const pedidoSchema = z.object({
   })).min(1),
 });
 
+export const pedidosQuery = z.object({
+  pagina: z.coerce.number().int().min(1).max(1000).default(1),
+  estado: z.enum(['activos', 'cerrados']).optional(),
+});
+
 export const estadoSchema = z.object({
   estado: z.enum(['ACEPTADO', 'RECHAZADO', 'LISTO', 'ENTREGADO']),
 });

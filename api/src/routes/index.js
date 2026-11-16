@@ -3,7 +3,7 @@ import multer from 'multer';
 import { verificarToken, verificarRol } from '../middlewares/auth.js';
 import { validar } from '../middlewares/validate.js';
 import {
-  registroSchema, loginSchema, refreshSchema, productoSchema, catalogoQuery, pedidoSchema, estadoSchema, calificacionSchema,
+  registroSchema, loginSchema, refreshSchema, productoSchema, catalogoQuery, pedidoSchema, pedidosQuery, estadoSchema, calificacionSchema,
   asistenteSchema, descripcionIaSchema, precioIaSchema,
 } from '../schemas.js';
 import { limitePorUsuario } from '../middlewares/rateLimit.js';
@@ -51,7 +51,7 @@ r.post('/mis-productos/:id/foto', ...productor, subida.single('foto'), misProduc
 
 // Pedidos
 r.post('/pedidos', ...comprador, validar(pedidoSchema), pedidoController.crear);
-r.get('/pedidos', verificarToken, pedidoController.listar);
+r.get('/pedidos', verificarToken, validar(pedidosQuery, 'query'), pedidoController.listar);
 r.get('/pedidos/:id', verificarToken, pedidoController.detalle);
 r.patch('/pedidos/:id/estado', ...productor, validar(estadoSchema), pedidoController.estado);
 r.post('/pedidos/:id/calificacion', ...comprador, validar(calificacionSchema), pedidoController.calificar);

@@ -111,7 +111,9 @@ export class PanelPage implements ViewWillEnter {
 
   async ionViewWillEnter() {
     try {
-      const [pe, pr] = await Promise.all([this.pedidosSrv.listar(), this.productosSrv.listar()]);
+      // Pendientes: todos los activos; entregado hoy sale de los 30 más recientes
+      const [activos, recientes, pr] = await Promise.all([this.pedidosSrv.listar('activos'), this.pedidosSrv.listar(), this.productosSrv.listar()]);
+      const pe = [...activos, ...recientes.filter((r) => !activos.some((a) => a.id === r.id))];
       this.pedidos.set(pe);
       this.productos.set(pr);
     } catch (e) {

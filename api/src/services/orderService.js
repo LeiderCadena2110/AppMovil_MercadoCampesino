@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { and, eq, lt, sql } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { solicitudesIdempotentes } from '../db/schema.js';
-import { pedidoRepository } from '../repositories/orderRepository.js';
+import { pedidoRepository, PEDIDOS_POR_PAGINA } from '../repositories/orderRepository.js';
 import { productoRepository } from '../repositories/productRepository.js';
 import { ErrorApp } from '../middlewares/errors.js';
 
@@ -74,9 +74,13 @@ export const pedidoService = {
     });
   },
 
-  listar: (usuario) => (usuario.rol === 'PRODUCTOR'
-    ? pedidoRepository.delProductor(usuario.productorId)
-    : pedidoRepository.delComprador(usuario.id)),
+  /** Devuelve { items, hayMas }: hasta 30 pedidos por página (filtro opcional activos/cerrados) */
+  async listar(usuario, opciones) {
+    const filas = usuario.rol === 'PRODUCTOR'
+      ? await pedidoRepository.delProductor(usuario.productorId, opciones)
+      : await pedidoRepository.delComprador(usuario.id, opciones);
+    return { items: filas.slice(0, PEDIDOS_POR_PAGINA), hayMas: filas.length > PEDIDOS_POR_PAGINA };
+  },
 
   async detalle(usuario, id) {
     const pedido = await pedidoRepository.porId(id);

@@ -15,7 +15,11 @@ export const pedidoController = {
     if (r.repetida) res.set('Idempotent-Replayed', 'true');
     res.status(201).json(r.pedidos);
   },
-  listar: async (req, res) => res.json(await pedidoService.listar(req.usuario)),
+  async listar(req, res) {
+    const { items, hayMas } = await pedidoService.listar(req.usuario, req.datos);
+    // Se sigue respondiendo un arreglo (compatible con versiones viejas de la app)
+    res.set('X-Hay-Mas', String(hayMas)).json(items);
+  },
   detalle: async (req, res) => res.json(await pedidoService.detalle(req.usuario, id(req))),
   estado: async (req, res) => res.json(await pedidoService.cambiarEstado(req.usuario, id(req), req.body.estado)),
   calificar: async (req, res) => res.status(201).json(await pedidoService.calificar(req.usuario, id(req), req.body)),
