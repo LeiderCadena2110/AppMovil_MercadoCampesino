@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { almacen } from './storage';
-import { Categoria, Municipio, PaginaCatalogo, Producto, ProductoLista, Productor } from './models';
+import { FincaMapa, Categoria, Municipio, PaginaCatalogo, Producto, ProductoLista, Productor } from './models';
 
 /** Producto del detalle → fila del catálogo (para tarjetas) */
 export function aLista(p: Producto): ProductoLista {
@@ -55,6 +55,11 @@ export class CatalogoService {
   producto = (id: number) => firstValueFrom(this.http.get<Producto>(`${this.api}/productos/${id}`));
   productor = (id: number) => firstValueFrom(this.http.get<Productor>(`${this.api}/productores/${id}`));
 
+  /** Fincas con productos a la venta, para el mapa (se guarda para verlo sin señal) */
+  async fincasMapa() {
+    return this.listaConCache<FincaMapa>('mapa/fincas');
+  }
+
   async categorias() {
     return this.listaConCache<Categoria>('categorias');
   }
@@ -66,10 +71,10 @@ export class CatalogoService {
   private async listaConCache<T>(ruta: string): Promise<T[]> {
     try {
       const r = await firstValueFrom(this.http.get<T[]>(`${this.api}/${ruta}`));
-      await almacen.guardar(`cache_${ruta}`, r);
+      await almacen.guardar(`cache_${ruta.replace('/', '_')}`, r);
       return r;
     } catch (e) {
-      const cache = await almacen.leer<T[]>(`cache_${ruta}`);
+      const cache = await almacen.leer<T[]>(`cache_${ruta.replace('/', '_')}`);
       if (cache) return cache;
       throw e;
     }

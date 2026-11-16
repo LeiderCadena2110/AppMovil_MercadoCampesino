@@ -10,6 +10,15 @@ export interface Productor {
   descripcion: string | null; verificado: boolean;
   municipio?: Municipio; usuario?: { nombre: string; telefono: string | null; email?: string };
   productos?: Producto[];
+  /** Solo en el perfil público: punto aproximado (finca redondeada ~1 km o municipio) */
+  ubicacion?: UbicacionPublica | null;
+  /** Solo el propio productor recibe el punto exacto que marcó */
+  lat?: number | null; lng?: number | null;
+}
+
+export interface UbicacionPublica { lat: number; lng: number; precision: 'finca' | 'municipio'; }
+export interface FincaMapa extends UbicacionPublica {
+  id: number; nombreFinca: string; verificado: boolean; municipio: string; productos: number; categorias: string[];
 }
 
 export interface Usuario {

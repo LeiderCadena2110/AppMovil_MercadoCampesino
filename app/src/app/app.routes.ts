@@ -32,6 +32,7 @@ export const routes: Routes = [
       },
       { path: 'producto/:id', loadComponent: () => import('./buyer/product-detail.page').then((m) => m.ProductoDetallePage) },
       { path: 'productor/:id', loadComponent: () => import('./buyer/producer-profile.page').then((m) => m.ProductorPerfilPage) },
+      { path: 'mapa', loadComponent: () => import('./buyer/farm-map.page').then((m) => m.MapaFincasPage) },
       { path: 'asistente', loadComponent: () => import('./buyer/assistant.page').then((m) => m.AsistentePage) },
       { path: 'checkout', loadComponent: () => import('./buyer/checkout.page').then((m) => m.CheckoutPage) },
       { path: 'pedido/:id', loadComponent: pedidoDetalle },

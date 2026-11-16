@@ -40,6 +40,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Cámara y galería para las fotos de productos -->
     <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Marcar la ubicación de la finca con el GPS -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!-- Notificaciones push de pedidos (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- Dictar los datos del producto por voz -->

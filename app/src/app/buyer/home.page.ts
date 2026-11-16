@@ -4,7 +4,7 @@ import {
   IonRefresherContent, IonButton, NavController, InfiniteScrollCustomEvent, RefresherCustomEvent,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { cloudOfflineOutline, sparkles, searchOutline, arrowForward } from 'ionicons/icons';
+import { cloudOfflineOutline, sparkles, searchOutline, arrowForward, mapOutline } from 'ionicons/icons';
 import { CatalogoService, aLista } from '../core/catalog.service';
 import { FavoritosService } from '../core/favorites.service';
 import { AvisosService } from '../core/notifications.service';
@@ -45,6 +45,9 @@ import { ProductoCardComponent } from '../shared/product-card.component';
       <div class="buscador-fijo">
         <button type="button" class="buscador mc-tocable" (click)="irABuscar()">
           <ion-icon name="search-outline" aria-hidden="true" /> <span>Papa, queso, café…</span>
+        </button>
+        <button type="button" class="ir-mapa mc-tocable" (click)="irAlMapa()" aria-label="Ver las fincas en el mapa">
+          <ion-icon name="map-outline" aria-hidden="true" />
         </button>
       </div>
 
@@ -141,7 +144,9 @@ import { ProductoCardComponent } from '../shared/product-card.component';
     .saludo p { margin: 0; color: var(--mc-barro); font-size: 0.95rem; }
     .saludo h1 { margin: 2px 0 0; font-size: 1.75rem; }
 
-    .buscador-fijo { position: sticky; top: 0; z-index: 5; padding: 8px 16px 10px; background: var(--ion-background-color); }
+    .buscador-fijo { position: sticky; top: 0; z-index: 5; display: flex; gap: 10px; padding: 8px 16px 10px; background: var(--ion-background-color); }
+    .ir-mapa { flex-shrink: 0; width: 50px; height: 50px; border: 0; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
+      background: var(--mc-superficie); color: var(--mc-accion); box-shadow: var(--mc-e1); font-size: 22px; }
     .buscador { display: flex; align-items: center; gap: 10px; width: 100%; height: 50px; padding: 0 16px; border: 0; cursor: text;
       border-radius: 999px; background: var(--mc-superficie); box-shadow: var(--mc-e1); color: var(--mc-tinta-suave); font: inherit; font-size: 1rem; }
     .buscador ion-icon { font-size: 20px; color: var(--ion-text-color); }
@@ -215,7 +220,7 @@ export class InicioPage implements OnInit {
   ]);
 
   constructor() {
-    addIcons({ cloudOfflineOutline, sparkles, searchOutline, arrowForward });
+    addIcons({ mapOutline, cloudOfflineOutline, sparkles, searchOutline, arrowForward });
   }
 
   private cargarFavoritos = effect(() => {
@@ -235,6 +240,10 @@ export class InicioPage implements OnInit {
 
   abrir(id: number) {
     this.nav.navigateForward(['/comprador/producto', id]);
+  }
+
+  irAlMapa() {
+    this.nav.navigateForward('/comprador/mapa');
   }
 
   irABuscar() {

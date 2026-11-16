@@ -5,13 +5,14 @@ import {
 import { addIcons } from 'ionicons';
 import { personCircleOutline, logOutOutline } from 'ionicons/icons';
 import { SincronizacionService } from '../core/sync.service';
+import { UbicacionFincaComponent } from '../producer/farm-location.component';
 import { AuthService } from '../core/auth.service';
 import { AvisosService } from '../core/notifications.service';
 
 /** Perfil compartido por comprador y productor */
 @Component({
   selector: 'app-perfil',
-  imports: [IonContent, IonHeader, IonToolbar, IonTitle, IonList, IonItem, IonLabel, IonButton, IonIcon, IonBadge, IonNote],
+  imports: [IonContent, IonHeader, IonToolbar, IonTitle, IonList, IonItem, IonLabel, IonButton, IonIcon, IonBadge, IonNote, UbicacionFincaComponent],
   template: `
     <ion-header><ion-toolbar color="primary"><ion-title>Perfil</ion-title></ion-toolbar></ion-header>
     <ion-content class="ion-padding">
@@ -32,6 +33,7 @@ import { AvisosService } from '../core/notifications.service';
             </ion-item>
           }
         </ion-list>
+        @if (u.productor) { <app-ubicacion-finca /> }
       }
       <ion-button expand="block" color="danger" fill="outline" (click)="salir()">
         <ion-icon slot="start" name="log-out-outline" /> Cerrar sesión

@@ -1,3 +1,4 @@
+import { MapaComponent } from '../shared/map.component';
 import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import { IonContent, IonHeader, IonToolbar, IonButtons, IonBackButton, IonIcon, IonButton, IonSpinner } from '@ionic/angular';
 import { addIcons } from 'ionicons';
@@ -13,7 +14,7 @@ import { EstadoVacioComponent } from '../shared/empty-state.component';
  */
 @Component({
   selector: 'app-productor-perfil',
-  imports: [IonContent, IonHeader, IonToolbar, IonButtons, IonBackButton, IonIcon, IonButton, IonSpinner, CatalogoListaComponent,
+  imports: [MapaComponent, IonContent, IonHeader, IonToolbar, IonButtons, IonBackButton, IonIcon, IonButton, IonSpinner, CatalogoListaComponent,
     EstadoVacioComponent],
   template: `
     <ion-header class="ion-no-border"><ion-toolbar>
@@ -38,6 +39,15 @@ import { EstadoVacioComponent } from '../shared/empty-state.component';
             <h2>Sobre la finca</h2>
             <p class="descripcion">{{ p.descripcion }}</p>
           }
+          @if (p.ubicacion; as u) {
+            <h2>Dónde queda</h2>
+            <div class="mini-mapa">
+              <app-mapa [puntos]="[{ id: p.id, lat: u.lat, lng: u.lng, titulo: p.nombreFinca, destacado: p.verificado }]"
+                [centro]="[u.lat, u.lng]" [zoom]="u.precision === 'finca' ? 12 : 11" [fijo]="true"
+                [etiqueta]="'Mapa: ' + p.nombreFinca + ', ' + p.municipio?.nombre" />
+            </div>
+            <p class="nota-mapa">{{ u.precision === 'finca' ? 'Ubicación aproximada de la finca (a 1 km).' : 'Zona de ' + p.municipio?.nombre + '. La finca no marcó su punto exacto.' }}</p>
+          }
           <p class="nota"><ion-icon name="shield-checkmark-outline" /> Para coordinar la entrega, el contacto con el productor se habilita cuando haces un pedido.</p>
           <h2>A la venta ({{ productos().length }})</h2>
         </div>
@@ -58,6 +68,9 @@ import { EstadoVacioComponent } from '../shared/empty-state.component';
     </ion-content>
   `,
   styles: `
+    .mini-mapa { height: 170px; border-radius: var(--mc-radio); overflow: hidden; box-shadow: var(--mc-e1); }
+    .mini-mapa app-mapa { height: 100%; }
+    .nota-mapa { margin: 6px 0 14px; font-size: 0.82rem; color: var(--mc-tinta-suave); }
     .portada { display: flex; gap: 16px; align-items: center; margin: 0 16px; padding: 18px; border-radius: var(--mc-radio-grande);
       background: var(--mc-marca); color: var(--mc-marca-texto); }
     .avatar { width: 72px; height: 72px; flex-shrink: 0; border-radius: 50%; display: grid; place-items: center;
@@ -65,7 +78,7 @@ import { EstadoVacioComponent } from '../shared/empty-state.component';
     h1 { margin: 0; font-size: 1.5rem; line-height: 1.1; color: var(--mc-marca-texto); }
     .lugar, .quien { margin: 4px 0 0; font-size: 0.92rem; color: var(--mc-marca-suave); display: flex; gap: 4px; align-items: center; }
     .cuerpo { padding: 14px 16px 0; }
-    .verificada { margin: 0 0 6px; background: color-mix(in srgb, var(--ion-color-success) 15%, var(--mc-superficie)); color: var(--ion-color-success); }
+    .verificada { margin: 0 0 6px; background: color-mix(in srgb, var(--ion-color-success) 15%, var(--mc-superficie)); color: color-mix(in srgb, var(--ion-color-success) 55%, var(--mc-tinta)); }
     h2 { font-size: 1.1rem; margin: 18px 0 6px; }
     .descripcion { margin: 0; line-height: 1.55; max-width: 60ch; }
     .nota { display: flex; gap: 6px; align-items: flex-start; margin: 16px 0 0; padding: 10px 12px; border-radius: var(--mc-radio);
