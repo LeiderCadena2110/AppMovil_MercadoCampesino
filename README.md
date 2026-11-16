@@ -74,6 +74,8 @@ npm start                   # http://localhost:4200
 3. En Android Studio: elige el emulador o tu teléfono y pulsa **Run ▶**.
    El APK para instalar: **Build › Build App Bundle(s) / APK(s) › Build APK(s)**.
    Para un APK que use la API publicada: `npm run android:prod` y luego compila en Android Studio.
+   `npm run android` activa el modo desarrollo (`MINGA_DEV=1`): permite llamar a la API local por http.
+   Los builds de release (los del APK publicado) solo aceptan conexiones https.
 
 ## 6. Inteligencia artificial
 

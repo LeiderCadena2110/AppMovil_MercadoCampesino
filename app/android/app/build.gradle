@@ -37,7 +37,9 @@ android {
     }
     buildTypes {
         release {
-            if (rutaKeystore) signingConfig signingConfigs.release
+            // Sin keystore propio (secretos de GitHub) se firma con la clave de depuración:
+            // sigue siendo un build de release (sin la configuración http de depuración), instalable para pruebas.
+            signingConfig rutaKeystore ? signingConfigs.release : signingConfigs.debug
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

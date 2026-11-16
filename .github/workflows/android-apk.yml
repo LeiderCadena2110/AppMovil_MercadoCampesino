@@ -73,8 +73,9 @@ jobs:
           echo "VERSION_NAME=$VERSION" >> "$GITHUB_ENV"
           echo "VERSION_CODE=${{ github.run_number }}" >> "$GITHUB_ENV"
 
-      # Si existe el secreto KEYSTORE_BASE64 se genera un APK firmado de producción;
-      # si no, un APK de depuración (igual se instala en cualquier Android).
+      # Si existe el secreto KEYSTORE_BASE64 el APK se firma con tu clave (permite actualizar
+      # sin desinstalar); si no, con una clave de depuración (instalable, pero cada build
+      # tiene una firma distinta y hay que desinstalar la versión anterior).
       - name: Preparar firma
         id: firma
         env:
@@ -83,9 +84,9 @@ jobs:
           if [ -n "$KEYSTORE_BASE64" ]; then
             echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/minga.jks"
             echo "KEYSTORE_PATH=$RUNNER_TEMP/minga.jks" >> "$GITHUB_ENV"
-            echo "tipo=release" >> "$GITHUB_OUTPUT"
+            echo "tipo=firmado" >> "$GITHUB_OUTPUT"
           else
-            echo "tipo=debug" >> "$GITHUB_OUTPUT"
+            echo "tipo=firma de prueba" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Compilar APK
@@ -96,10 +97,9 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           chmod +x gradlew
-          TAREA=assembleDebug; CARPETA=debug; ARCHIVO=app-debug.apk
-          if [ "${{ steps.firma.outputs.tipo }}" = "release" ]; then
-            TAREA=assembleRelease; CARPETA=release; ARCHIVO=app-release.apk
-          fi
+          # Siempre release: el APK publicado nunca incluye la configuración de depuración (http).
+          # Con secretos KEYSTORE_* se firma con tu clave; sin ellos, con la clave de depuración.
+          TAREA=assembleRelease; CARPETA=release; ARCHIVO=app-release.apk
           set -o pipefail
           if ! ./gradlew "$TAREA" --no-daemon --stacktrace 2>&1 | tee "$RUNNER_TEMP/gradle.log"; then
             # Muestra el motivo del fallo como anotación (visible en el resumen de la ejecución)
