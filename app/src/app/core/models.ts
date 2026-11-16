@@ -17,7 +17,8 @@ export interface Usuario {
   productor?: Productor | null;
 }
 
-export interface Sesion { token: string; usuario: Usuario; }
+/** refreshToken falta en sesiones guardadas por versiones viejas de la app */
+export interface Sesion { token: string; refreshToken?: string; usuario: Usuario; }
 
 /** Fila del catálogo: solo lo que la lista necesita */
 export interface ProductoLista {
