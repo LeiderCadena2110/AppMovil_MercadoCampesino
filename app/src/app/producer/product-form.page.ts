@@ -10,12 +10,14 @@ import {
 import { Capacitor } from '@capacitor/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { addIcons } from 'ionicons';
-import { cameraOutline, sparkles, trashOutline, locationOutline, swapHorizontalOutline, informationCircleOutline } from 'ionicons/icons';
+import { mic, cameraOutline, sparkles, trashOutline, locationOutline, swapHorizontalOutline, informationCircleOutline } from 'ionicons/icons';
 import { MisProductosService } from '../core/my-products.service';
 import { CatalogoService } from '../core/catalog.service';
 import { AvisosService } from '../core/notifications.service';
 import { Categoria, Municipio, UNIDADES } from '../core/models';
 import { IaService, PrecioSugerido } from '../core/ai.service';
+import { VozService, VozError } from '../core/voice.service';
+import { vibrar } from '../core/haptics';
 import { AuthService } from '../core/auth.service';
 import { mensajeError } from '../core/auth.interceptor';
 import { CopPipe } from '../shared/format';
@@ -61,6 +63,25 @@ const MAX_FOTO_MB = 5;
         } @else if (fotosDisponibles() && !vistaPrevia()) {
           <p class="nota-foto">La foto es obligatoria para publicar. Sin foto puedes guardar como borrador.</p>
         }
+        @if (!id()) {
+          <p class="nota-foto">@if (iaActiva()) { Al tomar la foto, la IA reconoce el producto y llena el formulario. } @else { Toma la foto con buena luz. }</p>
+        }
+
+        <!-- Dictado: el productor dice el producto, el precio y cuánto tiene -->
+        @if (vozDisponible()) {
+          <button type="button" class="dictar mc-tocable" (click)="dictar()" [disabled]="estadoIa()?.tipo === 'trabajando'">
+            <ion-icon name="mic" />
+            <span><strong>Dictar los datos</strong><small>Ej.: “Papa pastusa a 45 mil la arroba, tengo 40”</small></span>
+          </button>
+        }
+        <div class="estado-ia" aria-live="polite">
+          @if (estadoIa(); as e) {
+            <p [class]="e.tipo">
+              @if (e.tipo === 'trabajando') { <ion-spinner name="dots" /> } @else { <ion-icon [name]="e.tipo === 'listo' ? 'sparkles' : 'information-circle-outline'" /> }
+              <span>{{ e.texto }}</span>
+            </p>
+          }
+        </div>
         <!-- En el navegador se usa un selector de archivos; en el teléfono, la cámara -->
         <input type="file" accept="image/jpeg,image/png,image/webp" hidden (change)="desdeArchivo($any($event.target).files?.[0])" />
       </section>
@@ -70,18 +91,18 @@ const MAX_FOTO_MB = 5;
         <section class="bloque">
           <h2>¿Qué vendes?</h2>
           <ion-list lines="full" class="caja">
-            <ion-item>
+            <ion-item [class.de-ia]="deIa().has('nombre')">
               <ion-input label="Nombre" labelPlacement="stacked" formControlName="nombre" placeholder="Papa pastusa" maxlength="120"
                 [class.ion-invalid]="invalido('nombre')" [class.ion-touched]="invalido('nombre')"
                 errorText="Escribe el nombre (mínimo 2 letras)" />
             </ion-item>
-            <ion-item>
+            <ion-item [class.de-ia]="deIa().has('categoriaId')">
               <ion-select label="Categoría" labelPlacement="stacked" formControlName="categoriaId" interface="action-sheet"
                 cancelText="Cancelar" placeholder="Elige una categoría">
                 @for (c of categorias(); track c.id) { <ion-select-option [value]="c.id">{{ c.nombre }}</ion-select-option> }
               </ion-select>
             </ion-item>
-            <ion-item>
+            <ion-item [class.de-ia]="deIa().has('descripcion')">
               <ion-textarea label="Descripción (opcional)" labelPlacement="stacked" formControlName="descripcion" [autoGrow]="true"
                 [counter]="true" maxlength="600" placeholder="Cómo se cultiva, cuándo se cosechó, para qué sirve..." />
             </ion-item>
@@ -100,17 +121,17 @@ const MAX_FOTO_MB = 5;
         <section class="bloque">
           <h2>Precio y cantidad</h2>
           <ion-list lines="full" class="caja">
-            <ion-item>
+            <ion-item [class.de-ia]="deIa().has('unidad')">
               <ion-select label="Unidad de venta" labelPlacement="stacked" formControlName="unidad" interface="action-sheet" cancelText="Cancelar">
                 @for (u of unidades; track u) { <ion-select-option [value]="u">{{ u }}</ion-select-option> }
               </ion-select>
             </ion-item>
-            <ion-item>
+            <ion-item [class.de-ia]="deIa().has('precio')">
               <ion-input [label]="'Precio por ' + form.controls.unidad.value + ' (COP)'" labelPlacement="stacked" type="number"
                 inputmode="numeric" min="1" formControlName="precio"
                 [class.ion-invalid]="invalido('precio')" [class.ion-touched]="invalido('precio')" errorText="El precio debe ser mayor que 0" />
             </ion-item>
-            <ion-item>
+            <ion-item [class.de-ia]="deIa().has('stock')">
               <ion-input [label]="'Cantidad disponible (' + form.controls.unidad.value + ')'" labelPlacement="stacked" type="number"
                 inputmode="numeric" min="0" step="1" formControlName="stock"
                 [class.ion-invalid]="invalido('stock')" [class.ion-touched]="invalido('stock')" errorText="Usa un número entero, 0 o más" />
@@ -164,6 +185,20 @@ const MAX_FOTO_MB = 5;
     .caja { border: 0; box-shadow: var(--mc-e1); border-radius: var(--mc-radio); padding: 0; }
     .foto { position: relative; display: block; width: 100%; aspect-ratio: 4 / 3; max-height: 260px; padding: 0; overflow: hidden; cursor: pointer;
       border-radius: var(--mc-radio); border: 2px dashed var(--mc-borde); background: var(--mc-suelo); }
+    .dictar { display: flex; align-items: center; gap: 12px; width: 100%; margin-top: 12px; padding: 12px 16px; border: 0; text-align: left;
+      border-radius: var(--mc-radio); background: var(--mc-superficie); box-shadow: var(--mc-e1); font: inherit; color: inherit; cursor: pointer; }
+    .dictar ion-icon { flex-shrink: 0; width: 26px; height: 26px; padding: 10px; border-radius: 50%; background: var(--mc-accion); color: var(--mc-accion-texto); }
+    .dictar span { display: grid; gap: 2px; }
+    .dictar small { color: var(--mc-tinta-suave); }
+    .dictar:disabled { opacity: 0.5; }
+    .estado-ia p { display: flex; align-items: center; gap: 8px; margin: 10px 0 0; padding: 10px 12px; border-radius: var(--mc-radio-chico); font-size: 0.9rem; }
+    .estado-ia ion-icon, .estado-ia ion-spinner { flex-shrink: 0; font-size: 20px; width: 20px; height: 20px; }
+    .estado-ia .trabajando { background: var(--mc-suelo); }
+    .estado-ia .listo { background: color-mix(in srgb, var(--mc-destaque) 22%, var(--mc-superficie)); }
+    .estado-ia .listo ion-icon { color: var(--mc-barro); }
+    .estado-ia .nada { background: var(--mc-suelo); color: var(--mc-tinta-suave); }
+    /* Campo llenado por la IA: borde de color para que el productor lo revise */
+    ion-item.de-ia { --border-color: var(--mc-destaque); --background: color-mix(in srgb, var(--mc-destaque) 9%, var(--mc-superficie)); }
     .nota-foto { margin: 6px 2px 0; font-size: 0.85rem; color: var(--mc-tinta-suave); }
     .foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .vacia { height: 100%; display: grid; place-content: center; justify-items: center; gap: 4px; color: var(--mc-arcilla); }
@@ -213,6 +248,15 @@ export class ProductoFormPage implements OnInit {
   sugerencia = signal<PrecioSugerido | null>(null);
   activoActual = signal(true);
   private fotoNueva: Blob | null = null;
+  private voz = inject(VozService);
+  iaActiva = signal(false);
+  vozDisponible = signal(false);
+  /** Mensaje de lo que hace la IA (mirando la foto, escuchando, qué llenó) */
+  estadoIa = signal<{ tipo: 'trabajando' | 'listo' | 'nada'; texto: string } | null>(null);
+  /** Campos que llenó la IA (se resaltan para revisarlos) */
+  deIa = signal(new Set<string>());
+  /** Para medir cuánto tarda publicar un producto nuevo (meta: menos de 60 s) */
+  private inicio = performance.now();
 
   form = inject(FormBuilder).nonNullable.group({
     nombre: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(120)]],
@@ -224,13 +268,15 @@ export class ProductoFormPage implements OnInit {
   });
 
   constructor() {
-    addIcons({ cameraOutline, sparkles, trashOutline, locationOutline, swapHorizontalOutline, informationCircleOutline });
+    addIcons({ mic, cameraOutline, sparkles, trashOutline, locationOutline, swapHorizontalOutline, informationCircleOutline });
   }
 
   async ngOnInit() {
     firstValueFrom(this.http.get<{ fotos?: string }>(`${environment.apiUrl}/salud`))
       .then((r) => this.fotosDisponibles.set(!!r.fotos && r.fotos !== 'sin configurar'))
       .catch(() => this.fotosDisponibles.set(null));
+    this.ia.estado().then((e) => this.iaActiva.set(e.activa)).catch(() => undefined);
+    this.voz.disponible().then((v) => this.vozDisponible.set(v));
     this.catalogo.municipios().then((m) => this.municipios.set(m)).catch(() => undefined);
     try {
       this.categorias.set(await this.catalogo.categorias());
@@ -330,6 +376,84 @@ export class ProductoFormPage implements OnInit {
     this.errorFoto.set('');
     this.fotoNueva = foto;
     this.vistaPrevia.set(vista);
+    if (!this.id() && this.iaActiva()) this.reconocer(foto);
+  }
+
+  /** La IA mira la foto y llena nombre, categoría, unidad y descripción (sin pisar lo que el productor escribió) */
+  private async reconocer(foto: Blob) {
+    this.estadoIa.set({ tipo: 'trabajando', texto: 'Mirando la foto…' });
+    try {
+      const r = await this.ia.reconocerFoto(foto);
+      if (!r.reconocido) {
+        this.estadoIa.set({ tipo: 'nada', texto: 'No reconocimos el producto en la foto. Escribe el nombre o dicta los datos.' });
+        return;
+      }
+      const c = this.form.controls;
+      const libre = (k: 'nombre' | 'categoriaId' | 'unidad' | 'descripcion') => this.deIa().has(k) || !c[k].dirty;
+      const llenos: Record<string, string | number> = {};
+      if (r.nombre && libre('nombre')) llenos['nombre'] = r.nombre;
+      if (r.categoriaId && libre('categoriaId')) llenos['categoriaId'] = r.categoriaId;
+      if (r.unidad && libre('unidad')) llenos['unidad'] = r.unidad;
+      if (r.descripcion && libre('descripcion') && !c.descripcion.value) llenos['descripcion'] = r.descripcion;
+      this.aplicar(llenos);
+      const dudosa = r.confianza === 'baja' ? ' No estamos seguros: revísalo.' : '';
+      this.estadoIa.set({ tipo: 'listo', texto: `Parece ${r.nombre}. Llenamos ${this.nombresCampos(llenos)}.${dudosa} Dicta o escribe el precio y la cantidad.` });
+      vibrar.toque();
+      this.sugerirSiFalta();
+    } catch {
+      this.estadoIa.set({ tipo: 'nada', texto: 'No pudimos revisar la foto ahora. Puedes llenar los datos tú mismo.' });
+    }
+  }
+
+  /** Escucha al productor y llena los campos que dijo */
+  async dictar() {
+    let texto: string;
+    try {
+      this.estadoIa.set({ tipo: 'trabajando', texto: 'Escuchando… di el producto, el precio y cuánto tienes.' });
+      texto = await this.voz.escuchar('Di el producto, el precio y cuánto tienes');
+    } catch (e) {
+      this.estadoIa.set({ tipo: 'nada', texto: e instanceof VozError ? e.message : 'No pudimos usar el micrófono.' });
+      return;
+    }
+    this.estadoIa.set({ tipo: 'trabajando', texto: `Entendiendo: “${texto}”` });
+    try {
+      const r = await this.ia.dictado(texto);
+      const llenos: Record<string, string | number> = {};
+      if (r.nombre) llenos['nombre'] = r.nombre;
+      if (r.categoriaId) llenos['categoriaId'] = r.categoriaId;
+      if (r.unidad) llenos['unidad'] = r.unidad;
+      if (r.precio) llenos['precio'] = r.precio;
+      if (r.stock !== null) llenos['stock'] = r.stock;
+      if (!Object.keys(llenos).length) {
+        this.estadoIa.set({ tipo: 'nada', texto: `Escuchamos “${texto}”, pero no encontramos datos del producto. Intenta: “Papa pastusa a 45 mil la arroba, tengo 40”.` });
+        return;
+      }
+      this.aplicar(llenos);
+      vibrar.toque();
+      const falta = (['precio', 'stock'] as const).filter((k) => !(k in llenos) && !this.form.controls[k].value)
+        .map((k) => (k === 'precio' ? 'el precio' : 'la cantidad'));
+      this.estadoIa.set({ tipo: 'listo', texto: `Escuchamos “${texto}”. Llenamos ${this.nombresCampos(llenos)}.${falta.length ? ` Falta ${falta.join(' y ')}.` : ' Revisa y publica.'}` });
+      this.sugerirSiFalta();
+    } catch (e) {
+      this.estadoIa.set({ tipo: 'nada', texto: `Escuchamos “${texto}”, pero no pudimos procesarlo: ${mensajeError(e)}` });
+    }
+  }
+
+  private aplicar(valores: Record<string, string | number>) {
+    this.form.patchValue(valores);
+    for (const k of Object.keys(valores)) this.form.get(k)?.markAsDirty();
+    this.deIa.update((s) => new Set([...s, ...Object.keys(valores)]));
+  }
+
+  private nombresCampos(valores: Record<string, unknown>) {
+    const n: Record<string, string> = { nombre: 'el nombre', categoriaId: 'la categoría', unidad: 'la unidad', descripcion: 'la descripción', precio: 'el precio', stock: 'la cantidad' };
+    const lista = Object.keys(valores).map((k) => n[k]);
+    return lista.length > 1 ? `${lista.slice(0, -1).join(', ')} y ${lista.at(-1)}` : lista[0] ?? 'nada';
+  }
+
+  /** Si no hay precio, muestra de una vez el precio de referencia para usarlo con un toque */
+  private sugerirSiFalta() {
+    if (!this.form.controls.precio.value && this.puedeSugerir() && !this.sugiriendo()) this.sugerirPrecio();
   }
 
   /** publicar = visible para compradores; si no, queda como borrador (no visible) */
@@ -359,7 +483,11 @@ export class ProductoFormPage implements OnInit {
           return;
         }
       }
-      await this.avisos.exito(publicar ? 'Producto publicado' : 'Guardado como borrador: los compradores aún no lo ven');
+      const segundos = Math.round((performance.now() - this.inicio) / 1000);
+      vibrar.exito();
+      await this.avisos.exito(publicar
+        ? (this.id() ? 'Producto publicado' : `Producto publicado en ${segundos < 120 ? segundos + ' s' : Math.round(segundos / 60) + ' min'}`)
+        : 'Guardado como borrador: los compradores aún no lo ven');
       await this.nav.navigateBack('/productor/tabs/productos');
     } catch (e) {
       this.avisos.error(e);
