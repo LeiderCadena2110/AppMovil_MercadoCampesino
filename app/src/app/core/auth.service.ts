@@ -3,6 +3,7 @@ import { HttpClient, HttpContext, HttpContextToken, HttpErrorResponse } from '@a
 import { NavController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
 import { PushService } from './push.service';
+import { baseLocal, COLA } from './local-db';
 import { environment } from '../../environments/environment';
 import { almacen } from './storage';
 import { almacenSeguro } from './secure-storage';
@@ -86,6 +87,9 @@ export class AuthService {
     await almacenSeguro.borrar(CLAVE);
     await almacen.borrar(CLAVE);
     await almacen.borrar('carrito');
+    // Datos del productor guardados para trabajar sin señal: son de esta cuenta
+    await almacen.borrar('cache_mis_productos');
+    await baseLocal.limpiar(COLA).catch(() => undefined);
     await this.nav.navigateRoot('/bienvenida');
   }
 
