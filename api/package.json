@@ -4,7 +4,7 @@
   "description": "API REST de Minga App",
   "main": "index.js",
   "scripts": {
-    "test": "node --test test/*.test.js",
+    "test": "node --test --test-concurrency=1 test/*.test.js",
     "dev": "node --watch src/server.js",
     "start": "node --import ./src/instrument.js src/server.js",
     "db:seed": "node scripts/seed.js",
