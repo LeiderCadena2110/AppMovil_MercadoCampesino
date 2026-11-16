@@ -27,7 +27,8 @@ export const precioService = {
     const pedidos = usadas.filter((f) => f.fuente === 'pedido').length;
     const base = mismoNombre.length >= 2 ? `"${palabra}"` : 'productos de la misma categoría';
     let explicacion = `Según ${usadas.length} precios de ${base} por ${unidad} en las últimas 4 semanas`
-      + `${pedidos ? ` (${pedidos} de pedidos reales)` : ''}, lo usual está entre ${pesos(r.minimo)} y ${pesos(r.maximo)}. Sugerido: ${pesos(r.predicho)}.`;
+      + `${pedidos ? ` (${pedidos} de pedidos reales)` : ''}, `
+      + (r.minimo === r.maximo ? `el precio ha estado estable en ${pesos(r.predicho)}.` : `lo usual está entre ${pesos(r.minimo)} y ${pesos(r.maximo)}. Sugerido: ${pesos(r.predicho)}.`);
     if (r.tendencia != null && Math.abs(r.tendencia) >= 3) {
       explicacion += ` Viene ${r.tendencia > 0 ? 'subiendo' : 'bajando'} ${Math.abs(r.tendencia).toLocaleString('es-CO')} % frente a las dos semanas anteriores.`;
     }
