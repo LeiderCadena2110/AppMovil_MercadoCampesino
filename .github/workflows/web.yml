@@ -31,6 +31,11 @@ jobs:
           cache: npm
           cache-dependency-path: app/package-lock.json
       - run: npm ci
+      - name: Activar el monitoreo de errores (Sentry) si está configurado
+        if: ${{ vars.SENTRY_DSN_APP != '' }}
+        run: |
+          sed -i "s|sentryDsn: ''|sentryDsn: '${{ vars.SENTRY_DSN_APP }}'|" src/environments/environment.prod.ts
+
       - name: Usar la URL de la API configurada en el repositorio
         if: ${{ vars.API_URL != '' }}
         run: |

@@ -3,4 +3,7 @@
 // (Settings > Secrets and variables > Actions > Variables).
 export const environment = {
   apiUrl: 'https://minga-app-api.onrender.com/api',
+  nombre: 'produccion',
+  // GitHub Actions lo reemplaza con la variable SENTRY_DSN_APP si existe
+  sentryDsn: '',
 };

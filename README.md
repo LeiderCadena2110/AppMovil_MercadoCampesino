@@ -116,6 +116,18 @@ Rutas: `POST /api/ia/asistente`, `POST /api/ia/descripcion`, `POST /api/ia/preci
   y en **Settings › Secrets › Actions** crea `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS` y `KEY_PASSWORD`.
   Sin esos secretos se publica un APK de depuración, que igual se instala en cualquier Android.
 
+### Seguridad y monitoreo
+- **Sesiones:** token de acceso de 15 min + refresh token rotativo de 30 días (`/auth/refresh`, `/auth/logout`).
+  En el teléfono la sesión se guarda cifrada (Android Keystore).
+- **Login:** máximo 8 intentos fallidos cada 15 min por IP + correo; registro: 10 cuentas por hora por IP.
+- **Pedidos:** la app envía `Idempotency-Key`; un reintento nunca duplica la compra.
+- **Fotos:** en producción sin `CLOUDINARY_URL` las subidas se rechazan (el disco de Render se borra).
+- **APK:** el de release solo acepta https; el http de la API local queda solo en builds de depuración.
+- **Salud:** `GET /api/salud` comprueba la base y muestra fotos e IA.
+- **Sentry (opcional):** crea dos proyectos gratis en https://sentry.io (Node.js y Angular).
+  Pon el DSN de Node en Render como `SENTRY_DSN` y el de Angular en GitHub
+  (**Settings › Secrets and variables › Actions › Variables**) como `SENTRY_DSN_APP`.
+
 ### Versión web (GitHub Pages)
 Una sola vez: **Settings › Pages › Source: GitHub Actions**. Después cada push a `main` la publica.
 

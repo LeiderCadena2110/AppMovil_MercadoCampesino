@@ -30,6 +30,8 @@ services:
         sync: false
       - key: GEMINI_MODELO
         value: gemini-3.6-flash
+      - key: SENTRY_DSN         # opcional: monitoreo de errores (sentry.io)
+        sync: false
       - key: URL_PUBLICA
         value: https://minga-app-api.onrender.com
       - key: CORS_ORIGEN

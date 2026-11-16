@@ -3,4 +3,7 @@
 // o la URL donde publiques la API (Render, Railway...).
 export const environment = {
   apiUrl: 'http://10.0.2.2:3000/api',
+  nombre: 'desarrollo',
+  /** DSN de Sentry para la app (vacío = sin monitoreo) */
+  sentryDsn: '',
 };
