@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   IonContent, IonHeader, IonToolbar, IonButton, IonIcon,
   IonBadge, NavController, ViewWillEnter,
@@ -12,19 +13,21 @@ import { AvisosService } from '../core/notifications.service';
 import { Pedido, Producto } from '../core/models';
 import { CopPipe, EstadoPipe, UnidadPipe } from '../shared/format';
 import { GraficoVentasComponent, VentaDia } from '../shared/sales-chart.component';
+import { EstadoSincronizacionComponent } from '../shared/sync-status.component';
 
 const UMBRAL_POCOS = 5;
 
 @Component({
   selector: 'app-panel',
   imports: [IonContent, IonHeader, IonToolbar, IonButton, IonIcon,
-    IonBadge, CopPipe, EstadoPipe, UnidadPipe, GraficoVentasComponent],
+    IonBadge, CopPipe, EstadoPipe, UnidadPipe, GraficoVentasComponent, EstadoSincronizacionComponent],
   template: `
     <ion-header class="ion-no-border"><ion-toolbar>
       <div class="saludo">
         <p>{{ finca }}</p>
         <h1>Hola, {{ nombre }}</h1>
       </div>
+      <app-estado-sincronizacion />
     </ion-toolbar></ion-header>
     <ion-content class="ion-padding">
       @if (!verificado) {
@@ -150,7 +153,9 @@ export class PanelPage implements ViewWillEnter {
       this.pedidos.set(pe);
       this.productos.set(pr);
     } catch (e) {
-      this.avisos.error(e);
+      // Sin señal: se muestran los productos guardados y la franja avisa; no hace falta otro error
+      if (!(e instanceof HttpErrorResponse && e.status === 0)) this.avisos.error(e);
+      this.productosSrv.listar().then((pr) => this.productos.set(pr)).catch(() => undefined);
     }
     // El gráfico es secundario: si falla, el panel sigue sirviendo
     this.pedidosSrv.resumen().then((r) => this.ventas.set(r.dias)).catch(() => undefined);

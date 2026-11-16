@@ -4,6 +4,7 @@ import {
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { personCircleOutline, logOutOutline } from 'ionicons/icons';
+import { SincronizacionService } from '../core/sync.service';
 import { AuthService } from '../core/auth.service';
 import { AvisosService } from '../core/notifications.service';
 
@@ -49,7 +50,13 @@ export class PerfilPage {
   constructor() {
     addIcons({ personCircleOutline, logOutOutline });
   }
+  private sync = inject(SincronizacionService);
+
   async salir() {
-    if (await this.avisos.confirmar('Cerrar sesión', '¿Quieres salir de tu cuenta?', 'Salir')) await this.auth.salir();
+    const n = this.sync.pendientes();
+    const aviso = n
+      ? `Tienes ${n} ${n === 1 ? 'cambio guardado' : 'cambios guardados'} en el teléfono que aún no se envían. Si sales, se perderán.`
+      : '¿Quieres salir de tu cuenta?';
+    if (await this.avisos.confirmar('Cerrar sesión', aviso, 'Salir')) await this.auth.salir();
   }
 }

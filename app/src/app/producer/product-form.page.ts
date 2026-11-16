@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
@@ -10,8 +10,8 @@ import {
 import { Capacitor } from '@capacitor/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { addIcons } from 'ionicons';
-import { mic, cameraOutline, sparkles, trashOutline, locationOutline, swapHorizontalOutline, informationCircleOutline } from 'ionicons/icons';
-import { MisProductosService } from '../core/my-products.service';
+import { cloudOfflineOutline, mic, cameraOutline, sparkles, trashOutline, locationOutline, swapHorizontalOutline, informationCircleOutline } from 'ionicons/icons';
+import { MisProductosService, ProductoForm } from '../core/my-products.service';
 import { CatalogoService } from '../core/catalog.service';
 import { AvisosService } from '../core/notifications.service';
 import { Categoria, Municipio, UNIDADES } from '../core/models';
@@ -20,6 +20,8 @@ import { VozService, VozError } from '../core/voice.service';
 import { vibrar } from '../core/haptics';
 import { AuthService } from '../core/auth.service';
 import { mensajeError } from '../core/auth.interceptor';
+import { SincronizacionService, Cambio } from '../core/sync.service';
+import { almacen } from '../core/storage';
 import { CopPipe } from '../shared/format';
 
 /** Lo mismo que acepta la API al subir fotos */
@@ -42,6 +44,9 @@ const MAX_FOTO_MB = 5;
     </ion-toolbar></ion-header>
 
     <ion-content class="ion-padding">
+      @if (!sync.enLinea()) {
+        <p class="aviso sin-senal" role="status"><ion-icon name="cloud-offline-outline" /> Sin señal. Puedes llenar y guardar: el producto se publica solo cuando vuelva la conexión.</p>
+      }
       @if (id() && !activoActual()) {
         <p class="aviso"><ion-icon name="information-circle-outline" /> Este producto está guardado como borrador o pausado: los compradores no lo ven.</p>
       }
@@ -226,6 +231,11 @@ const MAX_FOTO_MB = 5;
 })
 export class ProductoFormPage implements OnInit {
   id = input<string>(); // vacío = nuevo
+  /** Producto creado sin señal que aún no se envía (id del cambio en la cola) */
+  pendiente = input<string>();
+  sync = inject(SincronizacionService);
+  /** clienteId del producto nuevo: el mismo en línea o sin señal, así nunca se duplica */
+  private clienteId: string = crypto.randomUUID();
   private srv = inject(MisProductosService);
   private catalogo = inject(CatalogoService);
   private avisos = inject(AvisosService);
@@ -268,29 +278,51 @@ export class ProductoFormPage implements OnInit {
   });
 
   constructor() {
-    addIcons({ mic, cameraOutline, sparkles, trashOutline, locationOutline, swapHorizontalOutline, informationCircleOutline });
+    addIcons({ cloudOfflineOutline, mic, cameraOutline, sparkles, trashOutline, locationOutline, swapHorizontalOutline, informationCircleOutline });
   }
 
   async ngOnInit() {
+    // Sin señal se usa lo último que se supo del servidor
     firstValueFrom(this.http.get<{ fotos?: string }>(`${environment.apiUrl}/salud`))
-      .then((r) => this.fotosDisponibles.set(!!r.fotos && r.fotos !== 'sin configurar'))
-      .catch(() => this.fotosDisponibles.set(null));
+      .then((r) => {
+        const si = !!r.fotos && r.fotos !== 'sin configurar';
+        this.fotosDisponibles.set(si);
+        almacen.guardar('fotos_disponibles', si);
+      })
+      .catch(async () => this.fotosDisponibles.set((await almacen.leer<boolean>('fotos_disponibles')) ?? null));
     this.ia.estado().then((e) => this.iaActiva.set(e.activa)).catch(() => undefined);
     this.voz.disponible().then((v) => this.vozDisponible.set(v));
     this.catalogo.municipios().then((m) => this.municipios.set(m)).catch(() => undefined);
     try {
       this.categorias.set(await this.catalogo.categorias());
-      if (this.id()) {
+      const enCola = this.pendiente() ? this.sync.cambio(this.pendiente()!)
+        : this.sync.cambios().find((c) => c.tipo === 'actualizar' && c.productoId === +this.id()!);
+      if (this.pendiente() && enCola?.datos) {
+        // Producto nuevo guardado sin señal: se sigue editando el mismo (mismo clienteId)
+        this.clienteId = enCola.id;
+        this.cargarDeCola(enCola);
+      } else if (this.id()) {
         const p = (await this.srv.listar()).find((x) => x.id === +this.id()!);
         if (p) {
           this.form.patchValue({ ...p, precio: Number(p.precio), descripcion: p.descripcion ?? '' });
           this.vistaPrevia.set(p.fotoUrl);
           this.activoActual.set(p.activo);
         }
+        if (enCola?.datos) this.cargarDeCola(enCola); // la última edición hecha sin señal manda
       }
     } catch (e) {
       this.avisos.error(e);
     }
+  }
+
+  private cargarDeCola(c: Cambio) {
+    this.form.patchValue({ ...c.datos!, descripcion: c.datos!.descripcion ?? '' });
+    this.activoActual.set(!!c.datos!.activo);
+    if (c.foto) {
+      this.fotoNueva = c.foto;
+      this.vistaPrevia.set(URL.createObjectURL(c.foto));
+    }
+    if (c.error) this.estadoIa.set({ tipo: 'nada', texto: `El servidor no aceptó este cambio: ${c.error}. Corrígelo y guarda de nuevo.` });
   }
 
   /** Mostrar error solo después de que el campo se tocó (o al intentar guardar) */
@@ -376,7 +408,7 @@ export class ProductoFormPage implements OnInit {
     this.errorFoto.set('');
     this.fotoNueva = foto;
     this.vistaPrevia.set(vista);
-    if (!this.id() && this.iaActiva()) this.reconocer(foto);
+    if (!this.id() && !this.pendiente() && this.iaActiva() && this.sync.enLinea()) this.reconocer(foto);
   }
 
   /** La IA mira la foto y llena nombre, categoría, unidad y descripción (sin pisar lo que el productor escribió) */
@@ -407,6 +439,10 @@ export class ProductoFormPage implements OnInit {
 
   /** Escucha al productor y llena los campos que dijo */
   async dictar() {
+    if (!this.sync.enLinea()) {
+      this.estadoIa.set({ tipo: 'nada', texto: 'Sin señal no se puede dictar. Escribe los datos: se guardan en el teléfono.' });
+      return;
+    }
     let texto: string;
     try {
       this.estadoIa.set({ tipo: 'trabajando', texto: 'Escuchando… di el producto, el precio y cuánto tienes.' });
@@ -470,9 +506,14 @@ export class ProductoFormPage implements OnInit {
       return;
     }
     this.guardando.set(true);
+    const datos = { ...this.form.getRawValue(), activo: publicar };
+    // Sin señal (o si la red falla al guardar): queda en el teléfono y se envía después
+    if (!this.sync.enLinea() || this.pendiente()) {
+      await this.guardarEnTelefono(datos, publicar);
+      return;
+    }
     try {
-      const datos = { ...this.form.getRawValue(), activo: publicar };
-      const p = this.id() ? await this.srv.actualizar(+this.id()!, datos) : await this.srv.crear(datos);
+      const p = this.id() ? await this.srv.actualizar(+this.id()!, datos) : await this.srv.crear({ ...datos, clienteId: this.clienteId });
       if (this.fotoNueva) {
         try {
           await this.srv.subirFoto(p.id, this.fotoNueva);
@@ -490,7 +531,26 @@ export class ProductoFormPage implements OnInit {
         : 'Guardado como borrador: los compradores aún no lo ven');
       await this.nav.navigateBack('/productor/tabs/productos');
     } catch (e) {
-      this.avisos.error(e);
+      if (e instanceof HttpErrorResponse && (e.status === 0 || e.status >= 500)) await this.guardarEnTelefono(datos, publicar);
+      else this.avisos.error(e);
+    } finally {
+      this.guardando.set(false);
+    }
+  }
+
+  /** Guarda el cambio en la cola del teléfono; se publica solo cuando vuelva la señal */
+  private async guardarEnTelefono(datos: ProductoForm, publicar: boolean) {
+    try {
+      await this.sync.encolar(this.id()
+        ? { id: crypto.randomUUID(), tipo: 'actualizar', productoId: +this.id()!, nombre: datos.nombre, datos, foto: this.fotoNueva ?? undefined }
+        : { id: this.clienteId, tipo: 'crear', nombre: datos.nombre, datos, foto: this.fotoNueva ?? undefined });
+      vibrar.exito();
+      await this.avisos.exito(publicar
+        ? 'Sin señal: quedó guardado en el teléfono y se publicará solo cuando vuelva la conexión'
+        : 'Sin señal: el borrador quedó guardado en el teléfono');
+      await this.nav.navigateBack('/productor/tabs/productos');
+    } catch (e) {
+      this.avisos.error(new Error(`No se pudo guardar en el teléfono: ${mensajeError(e)}`));
     } finally {
       this.guardando.set(false);
     }
@@ -499,6 +559,12 @@ export class ProductoFormPage implements OnInit {
   async eliminar() {
     const nombre = this.form.controls.nombre.value || 'este producto';
     if (!(await this.avisos.confirmar('Eliminar producto', `¿Eliminar "${nombre}"? Esta acción no se puede deshacer.`, 'Eliminar'))) return;
+    if (!this.sync.enLinea()) {
+      await this.sync.encolar({ id: crypto.randomUUID(), tipo: 'eliminar', productoId: +this.id()!, nombre });
+      this.avisos.exito('Sin señal: se eliminará cuando vuelva la conexión');
+      await this.nav.navigateBack('/productor/tabs/productos');
+      return;
+    }
     try {
       const r = await this.srv.eliminar(+this.id()!);
       this.avisos.exito(r.desactivado ? 'Tenía pedidos: quedó pausado para conservar el historial' : 'Producto eliminado');

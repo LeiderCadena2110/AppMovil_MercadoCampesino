@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, IonBadge } from '@ionic/angular';
 import { NovedadesPedidosService } from '../core/order-updates.service';
 import { PushService } from '../core/push.service';
+import { SincronizacionService } from '../core/sync.service';
 import { addIcons } from 'ionicons';
 import { gridOutline, basketOutline, receiptOutline, personOutline } from 'ionicons/icons';
 
@@ -28,9 +29,11 @@ export class ProductorTabsPage implements OnInit, OnDestroy {
     addIcons({ gridOutline, basketOutline, receiptOutline, personOutline });
   }
   private push = inject(PushService);
+  private sync = inject(SincronizacionService);
   ngOnInit() {
     this.novedades.iniciar();
     this.push.iniciar();
+    this.sync.iniciar();
   }
   ngOnDestroy() {
     this.novedades.detener();
