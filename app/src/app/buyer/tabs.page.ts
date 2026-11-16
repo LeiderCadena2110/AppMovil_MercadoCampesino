@@ -13,9 +13,11 @@ import { NovedadesPedidosService } from '../core/order-updates.service';
       <ion-tab-bar slot="bottom">
         <ion-tab-button tab="inicio"><ion-icon name="home-outline" /><ion-label>Inicio</ion-label></ion-tab-button>
         <ion-tab-button tab="buscar"><ion-icon name="search-outline" /><ion-label>Buscar</ion-label></ion-tab-button>
-        <ion-tab-button tab="carrito">
+        <ion-tab-button tab="carrito" class="mc-tab-central" [attr.aria-label]="'Carrito, ' + carrito.cantidad() + ' productos'">
           <ion-icon name="cart-outline" /><ion-label>Carrito</ion-label>
-          @if (carrito.cantidad() > 0) { <ion-badge color="danger">{{ carrito.cantidad() }}</ion-badge> }
+          @if (carrito.cantidad() > 0) {
+            @for (n of [carrito.cantidad()]; track n) { <ion-badge color="danger" class="mc-rebote mc-num">{{ n }}</ion-badge> }
+          }
         </ion-tab-button>
         <ion-tab-button tab="pedidos">
           <ion-icon name="receipt-outline" /><ion-label>Pedidos</ion-label>
