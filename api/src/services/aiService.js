@@ -6,6 +6,7 @@
 // para que la app siga funcionando sin internet hacia Google ni costos.
 import { iaDisponible, generarJson, conversarConHerramientas } from '../ai/gemini.js';
 import { herramientasCampi, NOMBRE_CONSULTA } from '../ai/campiTools.js';
+import { respuestaLocal } from '../ai/campiLocal.js';
 import { productoRepository } from '../repositories/productRepository.js';
 import { almacenamiento } from '../storage/index.js';
 import { asc } from 'drizzle-orm';
@@ -215,6 +216,9 @@ export const iaService = {
         console.warn('[IA] asistente con respaldo local:', e.message);
       }
     }
+    // Respaldo: pedidos, precios y fincas con datos reales; si no, búsqueda en el catálogo
+    const directa = await respuestaLocal(mensaje, usuario).catch((e) => { console.warn('[IA] respaldo local:', e.message); return null; });
+    if (directa) return { ...directa, productos: [], fuente: 'local' };
     const catalogo = await productoRepository.paraIa();
     const local = asistenteLocal(mensaje, catalogo);
     return { ...local, productos: local.productos.map(conMiniatura), consultas: ['catálogo de hoy'], fuente: 'local' };
