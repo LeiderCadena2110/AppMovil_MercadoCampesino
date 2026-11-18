@@ -124,3 +124,24 @@ test('pide razonamiento corto y, si el modelo no lo acepta, reintenta sin él', 
   assert.deepEqual(cuerpos[0].generationConfig.thinkingConfig, { thinkingLevel: 'low' });
   assert.equal(cuerpos[1].generationConfig.thinkingConfig, undefined);
 });
+
+test('si Gemini está saturado (503) reintenta y luego usa el modelo de respaldo', async () => {
+  env.geminiApiKey = 'prueba';
+  env.geminiModeloRespaldo = 'modelo-respaldo';
+  const modelos = [];
+  globalThis.fetch = async (url, op) => {
+    if (!String(url).startsWith('https://generativelanguage.googleapis.com/')) return fetchReal(url, op);
+    const modelo = String(url).split('/models/')[1].split(':')[0];
+    modelos.push(modelo);
+    if (modelo !== 'modelo-respaldo') return new Response('{"error":{"code":503,"status":"UNAVAILABLE"}}', { status: 503 });
+    return Response.json({ candidates: [{ content: { role: 'model', parts: [{ text: 'Respondo desde el respaldo.' }] } }] });
+  };
+  try {
+    const r = await preguntar('Hola');
+    assert.equal(r.body.fuente, 'gemini');
+    assert.equal(r.body.respuesta, 'Respondo desde el respaldo.');
+    assert.equal(modelos.filter((m) => m !== 'modelo-respaldo').length, 3, '1 intento + 2 reintentos');
+  } finally {
+    env.geminiModeloRespaldo = '';
+  }
+});

@@ -114,17 +114,42 @@ async function llamar(cuerpo) {
   }
 }
 
+/**
+ * Gemini a veces responde 503 ("high demand") o 429 por picos de uso: son temporales.
+ * Se reintenta 2 veces con espera creciente; si sigue igual y hay un modelo de respaldo
+ * configurado (GEMINI_MODELO_RESPALDO), se intenta con ese antes de rendirse.
+ */
 async function peticion(cuerpo) {
+  const esperas = [1000, 2500];
+  for (let intento = 0; ; intento++) {
+    try {
+      return await peticionModelo(cuerpo, env.geminiModelo);
+    } catch (e) {
+      const temporal = /respondió (503|429|500)/.test(e.message);
+      if (temporal && intento < esperas.length) {
+        await new Promise((r) => setTimeout(r, esperas[intento]));
+        continue;
+      }
+      if (temporal && env.geminiModeloRespaldo && env.geminiModeloRespaldo !== env.geminiModelo) {
+        console.warn(`[IA] ${env.geminiModelo} saturado; se usa ${env.geminiModeloRespaldo}`);
+        return peticionModelo(cuerpo, env.geminiModeloRespaldo);
+      }
+      throw e;
+    }
+  }
+}
+
+async function peticionModelo(cuerpo, modelo) {
   const controlador = new AbortController();
   const limite = setTimeout(() => controlador.abort(), LIMITE_MS);
   try {
-    const r = await fetch(`${URL_BASE}/${env.geminiModelo}:generateContent`, {
+    const r = await fetch(`${URL_BASE}/${modelo}:generateContent`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': env.geminiApiKey },
       body: JSON.stringify(cuerpo),
       signal: controlador.signal,
     });
-    if (!r.ok) throw new Error(`Gemini respondió ${r.status}: ${(await r.text().catch(() => '')).slice(0, 200)}`);
+    if (!r.ok) throw new Error(`Gemini respondió ${r.status}: ${(await r.text().catch(() => '')).replace(/\s+/g, ' ').slice(0, 200)}`);
     const datos = await r.json();
     const contenido = datos?.candidates?.[0]?.content;
     if (!contenido) throw new Error('Gemini no devolvió contenido');

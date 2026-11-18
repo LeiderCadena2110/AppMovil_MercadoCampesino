@@ -30,6 +30,8 @@ services:
         sync: false
       - key: GEMINI_MODELO
         value: gemini-3.6-flash
+      - key: GEMINI_MODELO_RESPALDO   # opcional: modelo para cuando el principal está saturado (503)
+        sync: false
       - key: SENTRY_DSN         # opcional: monitoreo de errores (sentry.io)
         sync: false
       - key: FIREBASE_SERVICE_ACCOUNT   # opcional: notificaciones push (JSON de la cuenta de servicio)

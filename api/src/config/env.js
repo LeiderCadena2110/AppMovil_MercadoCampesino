@@ -24,6 +24,8 @@ export const env = {
   // IA (opcional). Sin clave, la app usa respuestas locales básicas.
   geminiApiKey: process.env.GEMINI_API_KEY ?? '',
   geminiModelo: process.env.GEMINI_MODELO || 'gemini-3.6-flash',
+  // Opcional: otro modelo para cuando el principal está saturado (503)
+  geminiModeloRespaldo: process.env.GEMINI_MODELO_RESPALDO ?? '',
   // Notificaciones push (opcional): JSON de la cuenta de servicio de Firebase
   firebaseCuentaServicio: process.env.FIREBASE_SERVICE_ACCOUNT ?? '',
   // Pagos en línea (opcional). Mercado Pago: credenciales de prueba TEST-... y clave del webhook.
