@@ -105,3 +105,22 @@ test('si Gemini insiste en llamar herramientas sin fin, Campi responde con el re
   assert.equal(r.body.fuente, 'local');
   assert.ok(r.body.respuesta.length > 0);
 });
+
+test('pide razonamiento corto y, si el modelo no lo acepta, reintenta sin él', async () => {
+  env.geminiApiKey = 'prueba';
+  const cuerpos = [];
+  globalThis.fetch = async (url, op) => {
+    if (!String(url).startsWith('https://generativelanguage.googleapis.com/')) return fetchReal(url, op);
+    const cuerpo = JSON.parse(op.body);
+    cuerpos.push(cuerpo);
+    if (cuerpo.generationConfig.thinkingConfig) {
+      return new Response('{"error":{"message":"Thinking level is not supported for this model."}}', { status: 400 });
+    }
+    return Response.json({ candidates: [{ content: { role: 'model', parts: [{ text: 'Hola, soy Campi.' }] } }] });
+  };
+  const r = await preguntar('Hola');
+  assert.equal(r.body.fuente, 'gemini');
+  assert.equal(r.body.respuesta, 'Hola, soy Campi.');
+  assert.deepEqual(cuerpos[0].generationConfig.thinkingConfig, { thinkingLevel: 'low' });
+  assert.equal(cuerpos[1].generationConfig.thinkingConfig, undefined);
+});
